@@ -5,8 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.motifissa.ui.login.LoginScreen;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,7 +15,7 @@ public class StartupScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup_screen);
 
-        int timeout = 3000; // make the activity visible for 4 seconds
+        int timeout = 2000; // make the activity visible for 4 seconds 4000
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
