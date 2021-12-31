@@ -7,7 +7,7 @@
     tools:context=".DashboardScreen">
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/Username_Hello"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/Username_welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -26,7 +26,7 @@
         android:text="Sterre Kuijper"
         android:textSize="36sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toBottomOf="@+id/Username_Hello" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/scoreboard_container"
@@ -37,8 +37,62 @@
         android:layout_marginEnd="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        app:cardCornerRadius="15px"
+        app:layout_constraintTop_toBottomOf="@+id/Username_welcome"
+        app:cardCornerRadius="16dp"
         />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/dashboard_tile1"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="6dp"
+        android:backgroundTint="?colorPrimaryVariant"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintEnd_toStartOf="@id/dashboard_tile2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scoreboard_container" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/dashboard_tile2"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:backgroundTint="?colorPrimaryVariant"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/dashboard_tile1"
+        app:layout_constraintTop_toBottomOf="@+id/scoreboard_container" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/dashboard_tile3"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="6dp"
+        android:backgroundTint="?colorPrimaryVariant"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintEnd_toStartOf="@id/dashboard_tile4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dashboard_tile1" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/dashboard_tile4"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="24dp"
+        android:backgroundTint="?colorPrimaryVariant"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/dashboard_tile3"
+        app:layout_constraintTop_toBottomOf="@+id/dashboard_tile2" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

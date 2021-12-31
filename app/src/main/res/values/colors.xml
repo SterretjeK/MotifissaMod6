@@ -10,4 +10,10 @@
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="lighter_grey">#DFDFDF</color>
+    <color name="light_grey">#C0C0C0</color>
+    <color name="grey">#808080</color>
+    <color name="dark_grey">#404040</color>
+    <color name="darker_grey">#202020</color>
+    <color name="error">#FF0000</color>
 </resources>

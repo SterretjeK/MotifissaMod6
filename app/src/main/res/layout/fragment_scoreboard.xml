@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".ScoreboardFragment"
-    android:background="@color/color_primary">
+    android:background="?colorPrimaryVariant">
 
 
     <TextView
@@ -15,6 +15,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Scoreboard"
+        android:textColor="?colorOnPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +38,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Floor Lieverse"
+        android:textColor="?colorOnPrimary"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/imageView3"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
@@ -57,6 +59,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Sil Dijkman"
+        android:textColor="?colorOnPrimary"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/imageView4"
         app:layout_constraintTop_toBottomOf="@+id/person1" />
@@ -77,6 +80,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Jelle Gerritsen"
+        android:textColor="?colorOnPrimary"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/imageView5"
         app:layout_constraintTop_toBottomOf="@+id/person2" />
@@ -97,6 +101,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Frank Bosman"
+        android:textColor="?colorOnPrimary"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/imageView6"
         app:layout_constraintTop_toBottomOf="@+id/person3" />
@@ -118,6 +123,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Sterre Kuijper"
+        android:textColor="?colorOnPrimary"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toBottomOf="@+id/person4" />

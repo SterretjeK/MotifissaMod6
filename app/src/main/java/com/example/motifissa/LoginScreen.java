@@ -6,10 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
-
 public class LoginScreen extends AppCompatActivity {
+    public static final String LOGIN_NAME = "com.example.myfirstapp.LOGIN_NAME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,9 +22,28 @@ public class LoginScreen extends AppCompatActivity {
 
         loginButton.setOnClickListener(view -> {
             // click handling code
-            Intent dashboard = new Intent(LoginScreen.this, DashboardScreen.class);
-            startActivity(dashboard);
-
+            // get text from username
+            EditText usernameText = findViewById(R.id.username);
+            String usernameMessage = usernameText.getText().toString();
+            
+            //get text from password
+            EditText passwordText = findViewById(R.id.password);
+            String passwordMessage = passwordText.getText().toString();
+            
+            
+            if(!usernameMessage.matches("") && !passwordMessage.matches("")) { //checks if the username edit text is not empty
+                Intent dashboardIntent = new Intent(LoginScreen.this, DashboardScreen.class);
+                dashboardIntent.putExtra(LOGIN_NAME, usernameMessage);
+                startActivity(dashboardIntent);
+            }
+            if(passwordMessage.matches("")) {
+                Toast.makeText(this, "Password is missing", Toast.LENGTH_LONG).show();
+            }  
+                
+            if(usernameMessage.matches("")) {
+                Toast.makeText(this, "Username is missing", Toast.LENGTH_LONG).show();
+            }
+            
         });
     }
 }
