@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DashboardScreen">
+    tools:context=".DashboardScreen"
+    android:background="?backgroundColor">
 
     <TextView
         android:id="@+id/Username_Hello"
@@ -41,54 +42,50 @@
         app:cardCornerRadius="16dp"
         />
 
-    <androidx.cardview.widget.CardView
+    <Button
         android:id="@+id/dashboard_tile1"
         android:layout_width="0dp"
         android:layout_height="150dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="6dp"
-        android:backgroundTint="?colorPrimaryVariant"
-        app:cardCornerRadius="16dp"
+        android:background="@drawable/custom_tile"
         app:layout_constraintEnd_toStartOf="@id/dashboard_tile2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scoreboard_container" />
 
-    <androidx.cardview.widget.CardView
+    <Button
         android:id="@+id/dashboard_tile2"
         android:layout_width="0dp"
         android:layout_height="150dp"
         android:layout_marginStart="6dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="24dp"
-        android:backgroundTint="?colorPrimaryVariant"
-        app:cardCornerRadius="16dp"
+        android:background="@drawable/custom_tile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/dashboard_tile1"
         app:layout_constraintTop_toBottomOf="@+id/scoreboard_container" />
 
-    <androidx.cardview.widget.CardView
+    <Button
         android:id="@+id/dashboard_tile3"
         android:layout_width="0dp"
         android:layout_height="150dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="6dp"
-        android:backgroundTint="?colorPrimaryVariant"
-        app:cardCornerRadius="16dp"
+        android:background="@drawable/custom_tile"
         app:layout_constraintEnd_toStartOf="@id/dashboard_tile4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dashboard_tile1" />
 
-    <androidx.cardview.widget.CardView
+    <Button
         android:id="@+id/dashboard_tile4"
         android:layout_width="0dp"
         android:layout_height="150dp"
         android:layout_marginStart="6dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="24dp"
-        android:backgroundTint="?colorPrimaryVariant"
-        app:cardCornerRadius="16dp"
+        android:background="@drawable/custom_tile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/dashboard_tile3"
         app:layout_constraintTop_toBottomOf="@+id/dashboard_tile2" />
