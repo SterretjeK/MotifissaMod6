@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,9 +31,9 @@ public class LoginScreen extends AppCompatActivity {
             
             
             if(!usernameMessage.matches("") && !passwordMessage.matches("")) { //checks if the username edit text is not empty
-                Intent dashboardIntent = new Intent(LoginScreen.this, DashboardScreen.class);
-                dashboardIntent.putExtra(LOGIN_NAME, usernameMessage);
-                startActivity(dashboardIntent);
+                Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
+                mainScreenIntent.putExtra(LOGIN_NAME, usernameMessage);
+                startActivity(mainScreenIntent);
             }
             if(passwordMessage.matches("")) {
                 Toast.makeText(this, "Password is missing", Toast.LENGTH_LONG).show();
