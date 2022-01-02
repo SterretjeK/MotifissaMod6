@@ -8,7 +8,7 @@
     android:background="?backgroundColor">
 
     <FrameLayout
-        android:id="@+id/dashboard_container"
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="@id/bottom_navigation"
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:layout_constraintBottom_toBottomOf="@id/dashboard_container"
+        app:layout_constraintBottom_toBottomOf="@id/fragmentContainer"
         app:menu="@menu/bottom_navigation" />
 
 

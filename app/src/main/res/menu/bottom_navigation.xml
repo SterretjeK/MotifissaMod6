@@ -2,13 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/home"
-        android:title="Home"
+        android:id="@+id/dashboard"
+        android:title="@string/dashboard"
+        android:icon="@drawable/ic_baseline_dashboard_24"
         />
 
     <item
         android:id="@+id/friends"
-        android:title="Friends"
+        android:title="@string/friends"
+        android:icon="@drawable/ic_baseline_people_24"
         />
 
 </menu>
