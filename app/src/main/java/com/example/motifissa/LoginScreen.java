@@ -32,6 +32,7 @@ public class LoginScreen extends AppCompatActivity {
             
             if(!usernameMessage.matches("") && !passwordMessage.matches("")) { //checks if the username edit text is not empty
                 Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
+                finish();
                 mainScreenIntent.putExtra(LOGIN_NAME, usernameMessage);
                 startActivity(mainScreenIntent);
             }
