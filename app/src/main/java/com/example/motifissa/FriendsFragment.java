@@ -1,7 +1,9 @@
 package com.example.motifissa;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
@@ -22,6 +24,7 @@ public class FriendsFragment extends Fragment {
     ArrayAdapter<String> listUsers_Adapter;
     View view;
     String[] users;
+    MainScreen mainscreen;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -37,13 +40,23 @@ public class FriendsFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MainScreen) {
+            mainscreen = (MainScreen) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must be MainScreen");
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_friends, container, false);
 
         // setup the list view for the users
-        users = new String[]{"Henkie", "Sterre", "Frank", "Jelle", "Floor", "Sil", "Henkie 2", "Sallie","Carmine","Norbert","Pam","Deon","Modesto","Isaac","Robert","Bernie","Rodrigo","Yesenia","Rosalinda","Mohammed","Britt","Candace","Ginger","Zelma","Patricia","Aurelio","Carlos","Emmitt","Garfield","Charley","Blanche","Efren","Frank","Kay","Pam","Robert","Pearlie","Imelda","Daryl","Latonya","Jami","Jere","Dwain","Randolph","Ina","Karla","Ellen","Aimee","Malcolm","Antione","Lana","Sherrie","Carlo","Anastasia","Tonya","Harris","Roslyn"};
 
+        users = mainscreen.mDatabaseService.getUsersString();
         usersList = view.findViewById(R.id.users_list);
         listUsers_Adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, users);// sets the bluetooth devices in an adaptor
         usersList.setAdapter(listUsers_Adapter); //add the bluetooth devices to the list view
@@ -63,6 +76,7 @@ public class FriendsFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mainscreen.mDatabaseService.addFriend(users[position]);
             Toast.makeText(getContext(), users[position], Toast.LENGTH_SHORT).show();
         }
     };

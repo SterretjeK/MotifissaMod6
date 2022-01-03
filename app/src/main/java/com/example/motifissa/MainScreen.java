@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.content.Intent;
@@ -18,8 +21,12 @@ public class MainScreen extends AppCompatActivity {
     DashboardFragment dashboardFragment;
     FriendsFragment friendsFragment;
 
-    //elements
+    // elements
     BottomNavigationView bottomNav;
+
+    // service
+    boolean mBounded;
+    DatabaseService mDatabaseService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +52,42 @@ public class MainScreen extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListener);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // setup the service that connects to the database (just mock data for now)
+        Intent serviceIntent = new Intent(this, DatabaseService.class);
+        bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
+    }
+
+    ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Toast.makeText(MainScreen.this, "Service is disconnected", Toast.LENGTH_SHORT).show();
+            mBounded = false;
+            mDatabaseService = null;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Toast.makeText(MainScreen.this, "Service is connected", Toast.LENGTH_SHORT).show();
+            mBounded = true;
+            DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
+            mDatabaseService = mLocalBinder.getServerInstance();
+        }
+    };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        //when the activity is stopped, release the server
+        if(mBounded) {
+            unbindService(mConnection);
+            mBounded = false;
+        }
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -58,12 +101,12 @@ public class MainScreen extends AppCompatActivity {
                 case R.id.friends:
                     selectedFragment = friendsFragment;
                     break;
-//                case R.id.nav_dashboard:
-//                    selectedFragment = dashboardFragment;
+//                case R.id.profile:
+//                    selectedFragment = ;
 //                    break;
             }
             if (selectedFragment == null){
-                Toast.makeText(MainScreen.this, "SelectedFragment in navListener was null", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainScreen.this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
                 return false;
             }
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selectedFragment).commit();
