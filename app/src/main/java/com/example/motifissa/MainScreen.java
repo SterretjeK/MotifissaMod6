@@ -75,6 +75,8 @@ public class MainScreen extends AppCompatActivity {
             mBounded = true;
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
+
+            mDatabaseService.makeUsers();
         }
     };
 

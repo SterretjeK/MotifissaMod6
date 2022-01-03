@@ -1,47 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent">-->
+
+<!--    <TextView-->
+<!--        android:visibility="invisible"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text=""-->
+<!--        android:layout_columnWeight="1"-->
+<!--        android:id="@+id/icon_view"-->
+<!--        android:layout_row="0"-->
+<!--        android:layout_column="1"-->
+<!--        app:drawableStartCompat="@drawable/ic_friends"-->
+<!--        />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textViewName"-->
+<!--        android:layout_width="382dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_row="0"-->
+<!--        android:layout_column="1"-->
+<!--        android:layout_columnWeight="1"-->
+<!--        android:text="New Text"-->
+<!--        android:layout_marginTop="2dp"-->
+<!--        android:layout_marginBottom="0dp"-->
+<!--        android:textColor="?itemTextColor"-->
+<!--        android:layout_marginStart="25dp"-->
+<!--        />-->
+
+
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textSize="12sp"-->
+<!--        android:text="New Text"-->
+<!--        android:layout_columnWeight="1"-->
+<!--        android:id="@+id/textViewDesc"-->
+<!--        android:layout_row="1"-->
+<!--        android:layout_column="1"-->
+<!--        android:layout_marginTop="0dp"-->
+<!--        android:textColor="?itemTextColor"-->
+<!--        android:layout_marginStart="25dp"-->
+<!--        />-->
+<!--</GridLayout>-->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:visibility="invisible"
+        android:id="@+id/icon_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
         android:layout_columnWeight="1"
-        android:id="@+id/icon_view"
-        android:layout_row="0"
-        android:layout_column="1"
+        android:text=""
+        android:visibility="invisible"
         app:drawableStartCompat="@drawable/ic_friends"
-        />
+        app:layout_constraintBottom_toBottomOf="@+id/textViewDesc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textViewName" />
+
 
     <TextView
         android:id="@+id/textViewName"
-        android:layout_width="382dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_row="0"
         android:layout_column="1"
         android:layout_columnWeight="1"
         android:text="New Text"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="0dp"
         android:textColor="?itemTextColor"
-        android:layout_marginStart="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/icon_view"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="6dp"
         />
-
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:text="New Text"
-        android:layout_columnWeight="1"
         android:id="@+id/textViewDesc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_row="1"
         android:layout_column="1"
-        android:layout_marginTop="0dp"
+        android:layout_columnWeight="1"
+        android:text="New Text"
         android:textColor="?itemTextColor"
-        android:layout_marginStart="25dp"
-        />
-</GridLayout>
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textViewName"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+</androidx.constraintlayout.widget.ConstraintLayout>
