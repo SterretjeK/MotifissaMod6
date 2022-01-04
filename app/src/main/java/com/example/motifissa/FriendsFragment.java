@@ -2,6 +2,7 @@ package com.example.motifissa;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,15 +23,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class FriendsFragment extends Fragment {
 
     EditText searchField;
     ListView usersList;
-    ArrayAdapter<String> listUsers_Adapter;
     FriendsListAdaptor friendsListAdaptor;
     View view;
     JSONObject[] users;
-    String[] usersIDs;
     MainScreen mainscreen;
 
     public FriendsFragment() {
@@ -62,26 +64,27 @@ public class FriendsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_friends, container, false);
 
         // setup the list view for the users
-        users = mainscreen.mDatabaseService.getUsers();
+        if (mainscreen.mBounded) // TODO change this to make it retry when it isn't connected, maybe https://stackoverflow.com/questions/14457711/android-listening-for-variable-changes
+            this.populateList();
+
+        return view;
+    }
+
+    public void populateList(){
+        // setup the list view for the users
+        users = mainscreen.getUsers();
+        String[] friends = mainscreen.getFriends();
+
         usersList = view.findViewById(R.id.users_list);
 
-        usersIDs = mainscreen.mDatabaseService.getUsersIDString();
-        String[] friends = mainscreen.mDatabaseService.getFriendsString();
         friendsListAdaptor = new FriendsListAdaptor(getActivity(), users, friends);
         usersList.setAdapter(friendsListAdaptor);
-
-//        listUsers_Adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, users);// sets the users list in an adaptor
-//        usersList.setAdapter(listUsers_Adapter); //add the adaptor to the list view
-
-        // more complex adaptor for the list view (future improvement): https://www.tutlane.com/tutorial/android/android-listview-with-examples
 
         usersList.setOnItemClickListener(usersListListener);
 
         // setup the search field:
         searchField = view.findViewById(R.id.search_friends);
         searchField.addTextChangedListener(searchTextWatcher);
-
-        return view;
     }
 
     private AdapterView.OnItemClickListener usersListListener = new AdapterView.OnItemClickListener(){
