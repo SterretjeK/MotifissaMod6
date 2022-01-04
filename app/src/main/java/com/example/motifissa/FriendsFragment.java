@@ -102,9 +102,7 @@ public class FriendsFragment extends Fragment {
                 e.printStackTrace();
             }
             String[] friends = mainscreen.mDatabaseService.getFriendsString();
-            friendsListAdaptor = new FriendsListAdaptor(getActivity(), users, friends);
-            usersList.setAdapter(friendsListAdaptor);
-//            friendsListAdaptor.changeFriends(friends);
+            friendsListAdaptor.changeFriends(friends);
         }
     };
 
