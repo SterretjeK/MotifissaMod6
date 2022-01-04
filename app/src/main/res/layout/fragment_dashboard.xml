@@ -63,7 +63,7 @@
         app:layout_constraintStart_toStartOf="@+id/dashboard_tile_challenge"
         app:layout_constraintTop_toTopOf="@+id/dashboard_tile_challenge"
         app:srcCompat="@drawable/ic_launcher_foreground"
-        android:translationZ="3dp"
+        android:elevation="3dp"
         android:layout_margin="0dp"
         android:contentDescription="" />
 
