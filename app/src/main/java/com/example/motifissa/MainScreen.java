@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +30,7 @@ public class MainScreen extends AppCompatActivity {
     BottomNavigationView bottomNav;
 
     // service
-    boolean mBounded;
+    ListenerVariable<Boolean> mBounded = new ListenerVariable<>(false); // a custom type, that allows us to add listeners to variables
     boolean mIsConnecting;
     DatabaseService mDatabaseService;
 
@@ -66,7 +67,7 @@ public class MainScreen extends AppCompatActivity {
     }
 
 
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+    private final BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
@@ -92,7 +93,8 @@ public class MainScreen extends AppCompatActivity {
     };
 
     private void connectToService(){
-        mIsConnecting = true;
+        mIsConnecting  = true;
+        mBounded = new ListenerVariable<>(false);
         Intent serviceIntent = new Intent(this, DatabaseService.class);
         bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
     }
@@ -101,7 +103,7 @@ public class MainScreen extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Toast.makeText(MainScreen.this, "Service is disconnected", Toast.LENGTH_SHORT).show();
-            mBounded = false;
+            mBounded.set(false);
             mIsConnecting = false;
             mDatabaseService = null;
         }
@@ -109,15 +111,12 @@ public class MainScreen extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Toast.makeText(MainScreen.this, "Service is connected", Toast.LENGTH_SHORT).show();
-            mBounded = true;
+            mBounded.set(true);
             mIsConnecting = false;
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
 
             mDatabaseService.makeUsers();
-
-            if(friendsFragment.mainscreen != null)
-                friendsFragment.populateList();
         }
     };
 
@@ -126,34 +125,43 @@ public class MainScreen extends AppCompatActivity {
         super.onStop();
 
         //when the activity is stopped, release the server
-        if(mBounded) {
+        if(mBounded.get()) {
             unbindService(mConnection);
-            mBounded = false;
+            mBounded.set(false);
         }
         mIsConnecting = false;
     }
 
     public JSONObject[] getUsers(){
-        if (mBounded){
-            return mDatabaseService.getUsers();
-        } else{
-            if (!mIsConnecting) {
-                Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
-                this.connectToService();
+        if (mBounded.get() && mDatabaseService != null) {
+            try {
+                return mDatabaseService.getUsers();
+            } catch (Exception e) {
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
             }
-            return null;
         }
+
+        if (!mIsConnecting) {
+            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
+            this.connectToService();
+        }
+        return null;
     }
 
     public String[] getFriends(){
-        if (mBounded){
-            return mDatabaseService.getFriendsString();
-        } else{
-            if (!mIsConnecting) {
-                Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
-                this.connectToService();
+        if (mBounded.get()) {
+            try {
+                return mDatabaseService.getFriendsString();
+            } catch (Exception e){
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
             }
-            return null;
         }
+
+        if (!mIsConnecting) {
+            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
+            this.connectToService();
+        }
+        return null;
+
     }
 }
