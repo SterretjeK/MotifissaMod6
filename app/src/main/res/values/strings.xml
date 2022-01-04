@@ -104,4 +104,7 @@
     <string name="friends">Friends</string>
     <string name="prompt_search_friend">Enter name or ID</string>
     <string name="Friends_Title">Add Friends</string>
+    <string name="username">Username</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
 </resources>
