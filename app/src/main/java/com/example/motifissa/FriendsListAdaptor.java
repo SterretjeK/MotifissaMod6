@@ -89,6 +89,7 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
 
     public void changeFriends(String[] friends) {
         this.friends = friends;
+        notifyDataSetChanged();
     }
 
     Filter myFilter = new Filter() {
