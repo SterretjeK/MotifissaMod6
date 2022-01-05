@@ -23,7 +23,7 @@ public class StartupScreen extends AppCompatActivity {
             @Override
             public void run() {
                 finish();
-                Intent homepage = new Intent(StartupScreen.this, LoginScreen.class);
+                Intent homepage = new Intent(StartupScreen.this, MainScreen.class);
                 startActivity(homepage);
             }
         }, timeout);

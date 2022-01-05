@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/search_friends"
+        android:id="@+id/C_search_friends"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <ListView
-        android:id="@+id/users_list"
+        android:id="@+id/C_friends_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
 
@@ -47,6 +47,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_friends" />
+        app:layout_constraintTop_toBottomOf="@+id/C_search_friends" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

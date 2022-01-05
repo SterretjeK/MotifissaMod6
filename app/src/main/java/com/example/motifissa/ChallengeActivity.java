@@ -32,6 +32,7 @@ public class ChallengeActivity extends AppCompatActivity {
     int currentFragment = 1;
     ChooseFriendFragment chooseFriendFragment;
     OverviewChallengeFragment overviewChallengeFragment;
+    private String selectedFriend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,8 @@ public class ChallengeActivity extends AppCompatActivity {
         assert actionBar != null; // to make sure that this activity has an action bar, idk wou die graag
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("Challenge");
+
+        changeFragment(1);
     }
 
     @Override
@@ -109,7 +112,7 @@ public class ChallengeActivity extends AppCompatActivity {
 
     private void connectToService(){
         mIsConnecting  = true;
-        mBounded = new ListenerVariable<>(false);
+        mBounded.set(false);
         Intent serviceIntent = new Intent(this, DatabaseService.class);
         bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
     }
@@ -124,12 +127,12 @@ public class ChallengeActivity extends AppCompatActivity {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mBounded.set(true);
-            mIsConnecting = false;
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
+            mBounded.set(true);
+            mIsConnecting = false;
 
-            mDatabaseService.makeUsers();
+//            Toast.makeText(ChallengeActivity.this, "Service is connected Challenge screen", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -148,9 +151,24 @@ public class ChallengeActivity extends AppCompatActivity {
     public JSONObject[] getUsers(){
         if (mBounded.get() && mDatabaseService != null) {
             try {
-                return mDatabaseService.getUsers();
+                return mDatabaseService.getUsersArray();
             } catch (Exception e) {
                 Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
+            }
+        }
+
+        if (!mIsConnecting) {
+            this.connectToService();
+        }
+        return null;
+    }
+
+    public JSONObject getUser(String ID){
+        if (mBounded.get()) {
+            try {
+                return mDatabaseService.getUser(ID);
+            } catch (Exception e){
+                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getUser");
             }
         }
 
@@ -163,7 +181,7 @@ public class ChallengeActivity extends AppCompatActivity {
     public String[] getFriends(){
         if (mBounded.get()) {
             try {
-                return mDatabaseService.getFriendsString();
+                return mDatabaseService.getFriendsNameArray();
             } catch (Exception e){
                 Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
             }
@@ -173,6 +191,46 @@ public class ChallengeActivity extends AppCompatActivity {
             this.connectToService();
         }
         return null;
+    }
 
+    public String[] getFriendsID(){
+        if (mBounded.get()) {
+            try {
+                return mDatabaseService.getFriendsIDArray();
+            } catch (Exception e){
+                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
+            }
+        }
+
+        if (!mIsConnecting) {
+            this.connectToService();
+        }
+        return null;
+    }
+
+    public void moveUpFragment(){
+        changeFragment(currentFragment+1);
+        // This callback will change what happens when the user clicks back
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if (currentFragment > 1)
+                    changeFragment(currentFragment-1);
+                else
+                    finish();
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    public void changeFragment(int from, int to){
+        // TODO make this if necessary
+    }
+
+    public String getSelectedFriend() {
+        return selectedFriend;
+    }
+    public void setSelectedFriend(String newID){
+        selectedFriend = newID;
     }
 }

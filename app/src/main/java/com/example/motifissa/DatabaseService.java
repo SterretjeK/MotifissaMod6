@@ -6,21 +6,29 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class DatabaseService extends Service {
 
     IBinder mBinder = new LocalBinder();
 
     // data
-    JSONObject[] users;
-    ArrayList<String> friends = new ArrayList<>(Arrays.asList("Sterre", "Jelle", "Floor", "Sil", "Frank"));
+    JSONObject[] usersArray;
+    JSONObject users;
+    ArrayList<String> friendsNameArray;
+    ArrayList<String> friendsIDArray;
+//    ArrayList<String> friends = new ArrayList<>(Arrays.asList("Sterre", "Jelle", "Floor", "Sil", "Frank"));
+    JSONObject friends;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,43 +42,102 @@ public class DatabaseService extends Service {
     }
 
 
-    public JSONObject[] getUsers(){
+    public JSONObject getUsers(){
         return users;
     }
 
-    public String[] getFriendsString() {
-        String[] _friends = new String[friends.size()];
-        friends.toArray(_friends);
-        return _friends;
+    public JSONObject getUser(String ID){
+        try{
+            return users.getJSONObject(ID);
+        } catch (JSONException e) {
+            Log.e("Database", String.format("Can't find a use by the ID: %s, in getUser()", ID));
+            return null;
+        }
     }
 
-    public void addFriend(String newFriend) {
-        if (!friends.contains(newFriend)) friends.add(newFriend);
+    public JSONObject[] getUsersArray(){
+        return usersArray;
     }
 
-    public void toggleFriend(String friend){
-        if (friends.contains(friend)) friends.remove(friend);
-        else friends.add(friend);
+    public String[] getFriendsNameArray() {
+       return toArray(friendsNameArray);
+    }
+    public String[] getFriendsIDArray(){
+        return toArray(friendsIDArray);
+    }
+
+    // TODO rework adding and deleting users
+    public void toggleFriend(String friendsID){
+        if (friends.has(friendsID)) friends.remove(friendsID); // remove friend
+        else { // add friend
+            try {
+                friends.put(friendsID, users.get(friendsID));
+            } catch (JSONException e){
+                Log.e("DatabaseService", "couldn't find the user by the ID " + friendsID);
+            }
+        }
+
+        splitFriendsToArray();
     }
 
     public void makeUsers() {
         try {
             String[] names = new String[]{"Henkie", "Sterre", "Jelle", "Floor", "Sil", "Frank", "Henkie 2", "Sallie", "Carmine", "Norbert", "Pam", "Deon", "Modesto", "Isaac", "Robert", "Bernie", "Rodrigo", "Yesenia", "Rosalinda", "Mohammed", "Britt", "Candace", "Ginger", "Zelma", "Patricia", "Aurelio", "Carlos", "Emmitt", "Garfield", "Charley", "Blanche", "Efren", "Kay", "Pam", "Robert", "Pearlie", "Imelda", "Daryl", "Latonya", "Jami", "Jere", "Dwain", "Randolph", "Ina", "Karla", "Ellen", "Aimee", "Malcolm", "Antione", "Lana", "Sherrie", "Carlo", "Anastasia", "Tonya", "Harris", "Roslyn"};
 
-            users = new JSONObject[names.length];
+            usersArray = new JSONObject[names.length];
+            users = new JSONObject();
+            friends = new JSONObject();
+
             Random random = new Random();
 
-            for (int i = 0; i < users.length; i++) {
+            for (int i = 0; i < usersArray.length; i++) {
                 JSONObject userData = new JSONObject();
                 userData.put("Name", names[i]);
+                userData.put("Online",  random.nextInt(3)==0);
+
+                String id = "";
                 if (names[i].equals("Frank"))
-                    userData.put("ID", "#666");
+                    id = "666";
                 else
-                    userData.put("ID", "#" + random.nextInt(1000));
-                users[i] = userData;
+                    while(users.has(id) || id.equals("666"))
+                        id = "" + random.nextInt(1000);
+
+
+                userData.put("ID", id);
+                usersArray[i] = userData;
+                users.put(id, userData);
+
+                if (i > 0 && i < 6)
+                    friends.put(id, userData);
             }
+
+            splitFriendsToArray();
+//            Log.e("Test", users.toString());
+//            Log.e("test", friends.toString());
         } catch (JSONException e){
-            Log.e("DATABASE", "faild to make users\n" + e);
+            Log.e("DATABASE", "failed to make users\n" + e);
         }
+    }
+
+    private void splitFriendsToArray(){
+        friendsNameArray = new ArrayList<>();
+        friendsIDArray = new ArrayList<>();
+        Iterator<String> keys = friends.keys();
+        while (keys.hasNext()){
+            String key = (String) keys.next();
+            friendsIDArray.add(key);
+            try{
+                friendsNameArray.add(users.getJSONObject(key).getString("Name"));
+            }catch (JSONException e){
+                Log.e("DatabaseService/MakeUsers", "whiles making user, users doesn't got an name " + key);
+            }
+        }
+//        Log.e("test", friends.toString());
+    }
+
+    private String[] toArray(ArrayList<String> arrayListIn){
+        String[] _array = new String[arrayListIn.size()];
+        arrayListIn.toArray(_array);
+        return _array;
     }
 }
