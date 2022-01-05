@@ -15,8 +15,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class ChallengeActivity extends AppCompatActivity {
 
@@ -25,28 +28,38 @@ public class ChallengeActivity extends AppCompatActivity {
     boolean mIsConnecting;
     DatabaseService mDatabaseService;
 
+    // fragments
+    int currentFragment = 1;
+    ChooseFriendFragment chooseFriendFragment;
+    OverviewChallengeFragment overviewChallengeFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_challenge);
 
-        // This callback will only be called when MyFragment is at least Started.
+        chooseFriendFragment = new ChooseFriendFragment();
+        overviewChallengeFragment = new OverviewChallengeFragment();
+
+        // This callback will change what happens when the user clicks back
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
-                finish();
+                if (currentFragment > 1)
+                    changeFragment(currentFragment-1);
+                else
+                    finish();
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
 
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         // calling the action bar
         ActionBar actionBar = getSupportActionBar();
         // showing the back button in action bar
+        assert actionBar != null; // to make sure that this activity has an action bar, idk wou die graag
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("Challenge");
     }
@@ -59,13 +72,35 @@ public class ChallengeActivity extends AppCompatActivity {
         this.connectToService();
     }
 
+    private void changeFragment(int changeToFragment){
+        Fragment selectedFragment = null;
+
+        switch (changeToFragment){
+            case 1:
+                selectedFragment = chooseFriendFragment;
+                break;
+            case 2:
+                selectedFragment = overviewChallengeFragment;
+                break;
+
+            default:
+                Toast.makeText(this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
+                return;
+        }
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerChallenge, selectedFragment).commit();
+        this.currentFragment = changeToFragment;
+    }
+
     // this event will enable the back
     // function to the button on press
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.finish();
+                if (currentFragment > 1)
+                    changeFragment(currentFragment-1);
+                else
+                    finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
