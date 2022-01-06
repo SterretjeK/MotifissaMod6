@@ -91,10 +91,13 @@ public class DatabaseService extends Service {
             Random random = new Random();
 
             for (int i = 0; i < usersArray.length; i++) {
+                // data of the user
                 JSONObject userData = new JSONObject();
                 userData.put("Name", names[i]);
                 userData.put("Online",  random.nextInt(3)==0);
+                userData.put("Score", random.nextInt(25));
 
+                // ID of the user
                 String id = "";
                 if (names[i].equals("Frank"))
                     id = "666";
@@ -102,11 +105,12 @@ public class DatabaseService extends Service {
                     while(users.has(id) || id.equals("666"))
                         id = "" + random.nextInt(1000);
 
-
+                // put it al together in an array and JSONObject (the JSONObject is how we will get it from the database)
                 userData.put("ID", id);
                 usersArray[i] = userData;
                 users.put(id, userData);
 
+                // if they are the current users friend
                 if (i > 0 && i < 6)
                     friends.put(id, userData);
             }

@@ -109,4 +109,9 @@
     <string name="login">Login</string>
     <string name="password">Password</string>
     <string name="Welcome_message">Hello,</string>
+    <string name="Choose_friend_title">Challenge a friend</string>
+    <string name="motifissa_logo_Description">Motifissa logo</string>
+    <string name="challenge_button">Challenge</string>
+    <string name="Challenge_IntroTxt">Are you sure, you want to challenge username?</string>
+    <string name="challenge_subText">username is scoreDiff ahead/below of you</string>
 </resources>

@@ -7,26 +7,63 @@
     tools:context=".OverviewChallengeFragment">
 
 <!--    TODO Sterre HELP! dit moet nog mooi gemaakt worden, maar heb voor nu zo. ik heb in dit fragment alle data van de selected user-->
-<!--    TODO Button om de persoon te challenge-->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Overview_fragment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:textSize="36sp"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- TODO font looks strange-->
 
     <TextView
-        android:id="@+id/Username_field"
-        android:textSize="24sp"
+        android:id="@+id/Challenge_IntroTxtField"
+        android:textSize="34sp"
+        android:padding="5dp"
+        android:textColor="?itemTextColor"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="TextView"
+        android:text="@string/Challenge_IntroTxt"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/Challenge_userImg"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+
+        android:layout_margin="50dp"
+        android:src="@tools:sample/avatars"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Challenge_IntroTxtField" />
+
+    <TextView
+        android:id="@+id/challenge_subText"
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/challenge_subText"
+        android:textColor="?itemTextColor"
+
+        android:textSize="@dimen/sub_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Challenge_userImg" />
+
+    <Button
+        android:id="@+id/ChallengeFriendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/custom_button"
+        android:text="@string/challenge_button"
+        android:textColor="?itemTextColor"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/challenge_subText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

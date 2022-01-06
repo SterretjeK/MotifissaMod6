@@ -57,9 +57,19 @@ public class OverviewChallengeFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_overview_challenge, container, false);
 
         if(selectedUser != null){
-            TextView username = v.findViewById(R.id.Username_field);
+            TextView introTxtField = v.findViewById(R.id.Challenge_IntroTxtField);
+            TextView subTxtField = v.findViewById(R.id.challenge_subText);
             try {
-                username.setText(selectedUser.getString("Name"));
+                String introTxt = getResources().getString(R.string.Challenge_IntroTxt);
+                String username =  selectedUser.getString("Name");
+                introTxt = introTxt.replaceAll("username", username);
+                introTxtField.setText(introTxt);
+
+                // TODO get the actual current user
+                // TODO change scoreDiff and ahead/below of the string.
+                String subTxt = getResources().getString(R.string.challenge_subText);
+                subTxt = subTxt.replaceAll("username", username);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

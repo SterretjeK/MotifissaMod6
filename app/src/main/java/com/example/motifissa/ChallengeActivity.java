@@ -61,8 +61,9 @@ public class ChallengeActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         // showing the back button in action bar
         assert actionBar != null; // to make sure that this activity has an action bar, idk wou die graag
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.action_bar);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Challenge");
 
         changeFragment(1);
     }
