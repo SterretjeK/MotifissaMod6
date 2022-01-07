@@ -115,4 +115,9 @@
     <string name="Challenge_IntroTxt">Are you sure, you want to challenge username?</string>
     <string name="challenge_subText">username is scoreDiff points aheadOf/behind you</string>
     <string name="profile_picture_description">profile picture</string>
+    <string name="Challenge_sent_IntroTxt">Challenge has been sent to username</string>
+    <string name="Challenge_sent_waiting_txt">Waiting for their response…</string>
+    <string name="buttonBackTxt">Back</string>
+    <string name="buttonHomeTxt">Home</string>
+    <string name="challege_sent_note">you can safely navigate away from this screen. as long as you keep this app active in the background you will get a notification if your challenge was accepted</string>
 </resources>

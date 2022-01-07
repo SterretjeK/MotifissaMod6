@@ -34,6 +34,8 @@ public class ChallengeActivity extends AppCompatActivity {
     int currentFragment = 1;
     ChooseFriendFragment chooseFriendFragment;
     OverviewChallengeFragment overviewChallengeFragment;
+    ChallengeSentFragment challengeSentFragment;
+
     private String selectedFriend;
 
     @Override
@@ -43,6 +45,7 @@ public class ChallengeActivity extends AppCompatActivity {
 
         chooseFriendFragment = new ChooseFriendFragment();
         overviewChallengeFragment = new OverviewChallengeFragment();
+        challengeSentFragment = new ChallengeSentFragment();
 
         // This callback will change what happens when the user clicks back
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -88,6 +91,9 @@ public class ChallengeActivity extends AppCompatActivity {
             case 2:
                 selectedFragment = overviewChallengeFragment;
                 break;
+            case 3:
+                selectedFragment = challengeSentFragment;
+                break;
 
             default:
 //                Toast.makeText(this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
@@ -126,6 +132,19 @@ public class ChallengeActivity extends AppCompatActivity {
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    public void moveBackFragment(){
+        if (currentFragment > 1)
+            changeFragment(currentFragment-1);
+        else
+            finish();
+    }
+    public void moveBackFragment(int amount){
+        if (currentFragment - amount > 0)
+            changeFragment(currentFragment - amount);
+        else
+            finish();
     }
 
 //    public void changeFragment(int from, int to){

@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.motifissa.R;
@@ -82,6 +83,9 @@ public class OverviewChallengeFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
+        Button challengeFriend_button = v.findViewById(R.id.ChallengeFriendButton);
+        challengeFriend_button.setOnClickListener(view -> challengeActivity.moveUpFragment());
 
         return v;
     }
