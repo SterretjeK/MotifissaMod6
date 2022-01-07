@@ -113,5 +113,6 @@
     <string name="motifissa_logo_Description">Motifissa logo</string>
     <string name="challenge_button">Challenge</string>
     <string name="Challenge_IntroTxt">Are you sure, you want to challenge username?</string>
-    <string name="challenge_subText">username is scoreDiff ahead/below of you</string>
+    <string name="challenge_subText">username is scoreDiff points aheadOf/behind you</string>
+    <string name="profile_picture_description">profile picture</string>
 </resources>

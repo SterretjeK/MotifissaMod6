@@ -1,4 +1,4 @@
-package com.example.motifissa;
+package com.example.motifissa.challenge_screens;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.motifissa.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +25,7 @@ public class OverviewChallengeFragment extends Fragment {
 
     private ChallengeActivity challengeActivity;
     private JSONObject selectedUser;
+    private JSONObject currentUser;
 
     public OverviewChallengeFragment() {
         // Required empty public constructor
@@ -44,10 +47,11 @@ public class OverviewChallengeFragment extends Fragment {
         if (context instanceof ChallengeActivity) {
             challengeActivity = (ChallengeActivity) context;
         } else {
-            throw new RuntimeException(context.toString() + " must be MainScreen");
+            throw new RuntimeException(context.toString() + " must be challengeActivity");
         }
 
         selectedUser = challengeActivity.getUser(challengeActivity.getSelectedFriend());
+        currentUser = challengeActivity.getCurrentUser();
     }
 
     @Override
@@ -56,7 +60,7 @@ public class OverviewChallengeFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_overview_challenge, container, false);
 
-        if(selectedUser != null){
+        if(selectedUser != null){ // if the user is selected replace the texts so it's about the current user and his opponent
             TextView introTxtField = v.findViewById(R.id.Challenge_IntroTxtField);
             TextView subTxtField = v.findViewById(R.id.challenge_subText);
             try {
@@ -65,10 +69,14 @@ public class OverviewChallengeFragment extends Fragment {
                 introTxt = introTxt.replaceAll("username", username);
                 introTxtField.setText(introTxt);
 
-                // TODO get the actual current user
-                // TODO change scoreDiff and ahead/below of the string.
                 String subTxt = getResources().getString(R.string.challenge_subText);
                 subTxt = subTxt.replaceAll("username", username);
+
+                int scoreDiff = selectedUser.getInt("Score") - currentUser.getInt("Score"); // the amount the opponent (selected user is ahead of you)
+                subTxt = subTxt.replaceAll("scoreDiff", (scoreDiff > 0 ? "+" : "") + scoreDiff);
+                subTxt = subTxt.replaceAll("aheadOf/behind", (scoreDiff >= 0 ? "ahead of" : "behind") );
+
+                subTxtField.setText(subTxt);
 
             } catch (JSONException e) {
                 e.printStackTrace();

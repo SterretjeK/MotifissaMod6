@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.motifissa.challenge_screens.ChallengeActivity;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link DashboardFragment#newInstance} factory method to

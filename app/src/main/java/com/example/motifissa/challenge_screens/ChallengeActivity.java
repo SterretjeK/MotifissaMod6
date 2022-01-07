@@ -1,4 +1,4 @@
-package com.example.motifissa;
+package com.example.motifissa.challenge_screens;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -17,9 +17,11 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-import org.json.JSONObject;
+import com.example.motifissa.DatabaseService;
+import com.example.motifissa.ListenerVariable;
+import com.example.motifissa.R;
 
-import java.util.HashMap;
+import org.json.JSONObject;
 
 public class ChallengeActivity extends AppCompatActivity {
 
@@ -76,8 +78,8 @@ public class ChallengeActivity extends AppCompatActivity {
         this.connectToService();
     }
 
-    private void changeFragment(int changeToFragment){
-        Fragment selectedFragment = null;
+    public void changeFragment(int changeToFragment){
+        Fragment selectedFragment;
 
         switch (changeToFragment){
             case 1:
@@ -88,7 +90,7 @@ public class ChallengeActivity extends AppCompatActivity {
                 break;
 
             default:
-                Toast.makeText(this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
                 return;
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerChallenge, selectedFragment).commit();
@@ -110,6 +112,25 @@ public class ChallengeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    public void moveUpFragment(){
+        changeFragment(currentFragment+1);
+        // This callback will change what happens when the user clicks back
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if (currentFragment > 1)
+                    changeFragment(currentFragment-1);
+                else
+                    finish();
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+//    public void changeFragment(int from, int to){
+//        // TODO make this if necessary
+//    }
 
     private void connectToService(){
         mIsConnecting  = true;
@@ -209,23 +230,19 @@ public class ChallengeActivity extends AppCompatActivity {
         return null;
     }
 
-    public void moveUpFragment(){
-        changeFragment(currentFragment+1);
-        // This callback will change what happens when the user clicks back
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-            @Override
-            public void handleOnBackPressed() {
-                if (currentFragment > 1)
-                    changeFragment(currentFragment-1);
-                else
-                    finish();
+    public JSONObject getCurrentUser() {
+        if (mBounded.get()) {
+            try {
+                return mDatabaseService.getCurrentUser();
+            } catch (Exception e){
+                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
             }
-        };
-        this.getOnBackPressedDispatcher().addCallback(this, callback);
-    }
+        }
 
-    public void changeFragment(int from, int to){
-        // TODO make this if necessary
+        if (!mIsConnecting) {
+            this.connectToService();
+        }
+        return null;
     }
 
     public String getSelectedFriend() {

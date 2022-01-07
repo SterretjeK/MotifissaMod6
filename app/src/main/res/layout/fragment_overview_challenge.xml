@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OverviewChallengeFragment">
+    tools:context=".challenge_screens.OverviewChallengeFragment">
 
 <!--    TODO Sterre HELP! dit moet nog mooi gemaakt worden, maar heb voor nu zo. ik heb in dit fragment alle data van de selected user-->
     <!-- TODO font looks strange-->
@@ -28,14 +28,18 @@
         android:id="@+id/Challenge_userImg"
         android:layout_width="150dp"
         android:layout_height="150dp"
-
         android:layout_margin="50dp"
-        android:src="@tools:sample/avatars"
+
+        android:src="@drawable/ic_baseline_person_24"
+        app:tint="?itemTextColor"
+        android:background="@drawable/custom_input"
+
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Challenge_IntroTxtField" />
+        app:layout_constraintTop_toBottomOf="@id/Challenge_IntroTxtField"
 
+        android:contentDescription="@string/profile_picture_description" />
+<!--    tools:src="@tools:sample/avatars"-->
     <TextView
         android:id="@+id/challenge_subText"
         android:layout_width="wrap_content"

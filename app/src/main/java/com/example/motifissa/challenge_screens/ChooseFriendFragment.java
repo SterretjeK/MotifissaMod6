@@ -1,4 +1,4 @@
-package com.example.motifissa;
+package com.example.motifissa.challenge_screens;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,9 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.json.JSONObject;
-
-import java.util.Objects;
+import com.example.motifissa.ListenerVariable;
+import com.example.motifissa.R;
 
 public class ChooseFriendFragment extends Fragment {
 
@@ -77,7 +76,7 @@ public class ChooseFriendFragment extends Fragment {
 
         ListView friendslist = view.findViewById(R.id.C_friends_list);
 
-        arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,friends);
+        arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1,friends);
 //        friendsListAdaptor = new FriendsListAdaptor(getActivity(), users, friends);
         friendslist.setAdapter(arrayAdapter);
 

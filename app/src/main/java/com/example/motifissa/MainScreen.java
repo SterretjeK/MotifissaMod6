@@ -34,6 +34,8 @@ public class MainScreen extends AppCompatActivity {
     boolean mIsConnecting;
     DatabaseService mDatabaseService;
 
+    String loginName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +43,7 @@ public class MainScreen extends AppCompatActivity {
 
         // get the login name from the intent
         Intent intent = getIntent();
-        String loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
+        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
 
         // setup the dashboard fragment
         dashboardFragment = new DashboardFragment();
@@ -114,6 +116,8 @@ public class MainScreen extends AppCompatActivity {
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
             mDatabaseService.makeUsers();
+
+            mDatabaseService.setCurrentUser(loginName);
 
             mIsConnecting = false;
             mBounded.set(true);

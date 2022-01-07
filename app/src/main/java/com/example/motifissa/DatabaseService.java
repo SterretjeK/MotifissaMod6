@@ -25,6 +25,7 @@ public class DatabaseService extends Service {
     // data
     JSONObject[] usersArray;
     JSONObject users;
+    JSONObject currentUser;
     ArrayList<String> friendsNameArray;
     ArrayList<String> friendsIDArray;
 //    ArrayList<String> friends = new ArrayList<>(Arrays.asList("Sterre", "Jelle", "Floor", "Sil", "Frank"));
@@ -50,7 +51,7 @@ public class DatabaseService extends Service {
         try{
             return users.getJSONObject(ID);
         } catch (JSONException e) {
-            Log.e("Database", String.format("Can't find a use by the ID: %s, in getUser()", ID));
+            Log.e("Database/getUsers", String.format("Can't find a user by the ID: %s, in getUser()", ID));
             return null;
         }
     }
@@ -80,21 +81,46 @@ public class DatabaseService extends Service {
         splitFriendsToArray();
     }
 
-    public void makeUsers() {
+    public JSONObject getCurrentUser(){
+        return currentUser;
+    }
+
+    // temp, for mock data:
+    public void setCurrentUser(String name){
+        currentUser = new JSONObject();
         try {
-            String[] names = new String[]{"Henkie", "Sterre", "Jelle", "Floor", "Sil", "Frank", "Henkie 2", "Sallie", "Carmine", "Norbert", "Pam", "Deon", "Modesto", "Isaac", "Robert", "Bernie", "Rodrigo", "Yesenia", "Rosalinda", "Mohammed", "Britt", "Candace", "Ginger", "Zelma", "Patricia", "Aurelio", "Carlos", "Emmitt", "Garfield", "Charley", "Blanche", "Efren", "Kay", "Pam", "Robert", "Pearlie", "Imelda", "Daryl", "Latonya", "Jami", "Jere", "Dwain", "Randolph", "Ina", "Karla", "Ellen", "Aimee", "Malcolm", "Antione", "Lana", "Sherrie", "Carlo", "Anastasia", "Tonya", "Harris", "Roslyn"};
-
-            usersArray = new JSONObject[names.length];
-            users = new JSONObject();
-            friends = new JSONObject();
-
             Random random = new Random();
+            currentUser.put("Name", name);
+            currentUser.put("Online", true);
+            currentUser.put("Score", random.nextInt(25));
 
-            for (int i = 0; i < usersArray.length; i++) {
+            String id = "";
+            while (users.has(id))
+                id = "" + random.nextInt(1000);
+
+            currentUser.put("ID", id);
+
+        } catch (JSONException e){
+            Log.e("DatabaseService/setUser", "Failed to set user: \n" + e);
+        }
+    }
+
+    // mock data:
+    public void makeUsers() {
+        String[] names = new String[]{"Henkie", "Sterre", "Jelle", "Floor", "Sil", "Frank", "Henkie 2", "Sallie", "Carmine", "Norbert", "Pam", "Deon", "Modesto", "Isaac", "Robert", "Bernie", "Rodrigo", "Yesenia", "Rosalinda", "Mohammed", "Britt", "Candace", "Ginger", "Zelma", "Patricia", "Aurelio", "Carlos", "Emmitt", "Garfield", "Charley", "Blanche", "Efren", "Kay", "Pam", "Robert", "Pearlie", "Imelda", "Daryl", "Latonya", "Jami", "Jere", "Dwain", "Randolph", "Ina", "Karla", "Ellen", "Aimee", "Malcolm", "Antione", "Lana", "Sherrie", "Carlo", "Anastasia", "Tonya", "Harris", "Roslyn"};
+
+        usersArray = new JSONObject[names.length];
+        users = new JSONObject();
+        friends = new JSONObject();
+
+        Random random = new Random();
+
+        for (int i = 0; i < usersArray.length; i++) {
+            try {
                 // data of the user
                 JSONObject userData = new JSONObject();
                 userData.put("Name", names[i]);
-                userData.put("Online",  random.nextInt(3)==0);
+                userData.put("Online", random.nextInt(3) == 0);
                 userData.put("Score", random.nextInt(25));
 
                 // ID of the user
@@ -102,7 +128,7 @@ public class DatabaseService extends Service {
                 if (names[i].equals("Frank"))
                     id = "666";
                 else
-                    while(users.has(id) || id.equals("666"))
+                    while (users.has(id) || id.equals("666"))
                         id = "" + random.nextInt(1000);
 
                 // put it al together in an array and JSONObject (the JSONObject is how we will get it from the database)
@@ -113,14 +139,14 @@ public class DatabaseService extends Service {
                 // if they are the current users friend
                 if (i > 0 && i < 6)
                     friends.put(id, userData);
+            } catch (Exception e){
+                Log.e("DatabaseServie/makeUser", "failed to create user " + names[i] + "\n" + e);
             }
+        }
 
-            splitFriendsToArray();
+        splitFriendsToArray();
 //            Log.e("Test", users.toString());
 //            Log.e("test", friends.toString());
-        } catch (JSONException e){
-            Log.e("DATABASE", "failed to make users\n" + e);
-        }
     }
 
     private void splitFriendsToArray(){
