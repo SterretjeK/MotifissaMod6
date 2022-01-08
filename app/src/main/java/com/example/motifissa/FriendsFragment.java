@@ -67,7 +67,7 @@ public class FriendsFragment extends Fragment {
         if (mainscreen.mBounded.get()) // TODO change this to make it retry when it isn't connected, maybe https://stackoverflow.com/questions/14457711/android-listening-for-variable-changes
             this.populateList();
         else{
-            mainscreen.mBounded.setListener((ListenerVariable.ChangeListener<Boolean>) value -> {
+            mainscreen.mBounded.setListener(value -> {
              if(value) populateList();
             });
         }
@@ -97,7 +97,7 @@ public class FriendsFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             try {
-                mainscreen.mDatabaseService.toggleFriend(users[position].getString("ID"));
+                mainscreen.mDatabaseService.toggleFriend(friendsListAdaptor.getItem(position).getString("ID"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
