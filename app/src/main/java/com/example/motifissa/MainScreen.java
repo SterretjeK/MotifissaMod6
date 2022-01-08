@@ -97,7 +97,7 @@ public class MainScreen extends AppCompatActivity {
     private void connectToService(){
         if (!mBounded.get()) {
             mIsConnecting = true;
-            mBounded.set(false);
+            mBounded = new ListenerVariable<>(false);
             Intent serviceIntent = new Intent(this, DatabaseService.class);
             bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
         }
@@ -133,8 +133,8 @@ public class MainScreen extends AppCompatActivity {
         //when the activity is stopped, release the server
         if(mBounded.get()) {
             unbindService(mConnection);
-            mBounded.set(false);
         }
+        mBounded = new ListenerVariable<>(false);
         mIsConnecting = false;
     }
 
