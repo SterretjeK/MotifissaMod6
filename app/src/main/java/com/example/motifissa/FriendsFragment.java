@@ -97,11 +97,11 @@ public class FriendsFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             try {
-                mainscreen.mDatabaseService.toggleFriend(users[position].getString("Name"));
+                mainscreen.mDatabaseService.toggleFriend(users[position].getString("ID"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            String[] friends = mainscreen.mDatabaseService.getFriendsString();
+            String[] friends = mainscreen.mDatabaseService.getFriendsNameArray();
             friendsListAdaptor.changeFriends(friends);
         }
     };

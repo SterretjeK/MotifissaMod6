@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="64dp"
-        android:text="Hello,"
+        android:text="@string/Welcome_message"
         android:textSize="36sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +42,7 @@
         />
 
     <Button
-        android:id="@+id/dashboard_tile1"
+        android:id="@+id/dashboard_tile_challenge"
         android:layout_width="0dp"
         android:layout_height="150dp"
         android:layout_marginStart="24dp"
@@ -51,7 +51,21 @@
         android:background="@drawable/custom_tile"
         app:layout_constraintEnd_toStartOf="@id/dashboard_tile2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scoreboard_container" />
+        app:layout_constraintTop_toBottomOf="@+id/scoreboard_container"
+        />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/dashboard_tile_challenge"
+        app:layout_constraintEnd_toEndOf="@+id/dashboard_tile_challenge"
+        app:layout_constraintStart_toStartOf="@+id/dashboard_tile_challenge"
+        app:layout_constraintTop_toTopOf="@+id/dashboard_tile_challenge"
+        app:srcCompat="@drawable/ic_launcher_foreground"
+        android:elevation="3dp"
+        android:layout_margin="0dp"
+        android:contentDescription="" />
 
     <Button
         android:id="@+id/dashboard_tile2"
@@ -62,7 +76,7 @@
         android:layout_marginEnd="24dp"
         android:background="@drawable/custom_tile"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/dashboard_tile1"
+        app:layout_constraintStart_toEndOf="@id/dashboard_tile_challenge"
         app:layout_constraintTop_toBottomOf="@+id/scoreboard_container" />
 
     <Button
@@ -75,7 +89,7 @@
         android:background="@drawable/custom_tile"
         app:layout_constraintEnd_toStartOf="@id/dashboard_tile4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dashboard_tile1" />
+        app:layout_constraintTop_toBottomOf="@+id/dashboard_tile_challenge" />
 
     <Button
         android:id="@+id/dashboard_tile4"

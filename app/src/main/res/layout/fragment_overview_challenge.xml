@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".challenge_screens.OverviewChallengeFragment">
+
+<!--    TODO Sterre HELP! dit moet nog mooi gemaakt worden, maar heb voor nu zo. ik heb in dit fragment alle data van de selected user-->
+    <!-- TODO font looks strange-->
+
+    <TextView
+        android:id="@+id/Challenge_IntroTxtField"
+        android:textSize="34sp"
+        android:padding="5dp"
+        android:textColor="?itemTextColor"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/Challenge_IntroTxt"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/Challenge_userImg"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="50dp"
+
+        android:src="@drawable/ic_baseline_person_24"
+        app:tint="?itemTextColor"
+        android:background="@drawable/custom_input"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Challenge_IntroTxtField"
+
+        android:contentDescription="@string/profile_picture_description" />
+<!--    tools:src="@tools:sample/avatars"-->
+    <TextView
+        android:id="@+id/challenge_subText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:padding="20dp"
+        android:gravity="center"
+        
+        android:text="@string/challenge_subText"
+        android:textColor="?itemTextColor"
+        android:textSize="@dimen/sub_text_size"
+        android:textStyle="bold"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Challenge_userImg" />
+
+    <Button
+        android:id="@+id/ChallengeFriendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/custom_button"
+        android:text="@string/challenge_button"
+        android:textColor="?itemTextColor"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/challenge_subText" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

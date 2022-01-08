@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -61,7 +62,7 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
         //change the contents of the view element
         try { //try catch because working with JSON
             viewHolder.textViewName.setText(this.users[position].getString("Name"));
-            viewHolder.textViewDesc.setText(this.users[position].getString("ID"));
+            viewHolder.textViewDesc.setText(MessageFormat.format("#{0}", this.users[position].getString("ID")));
 
             if (Arrays.asList(friends).contains(this.users[position].getString("Name"))) { // needs updating so it also contains the id
                 viewHolder.icon.setVisibility(View.VISIBLE);
@@ -103,7 +104,7 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
 
             //constraint is the result from text you want to filter against.
             //objects is your data set you will filter from
-            if(input != null && originalUsers!=null) {
+            if(originalUsers != null) {
                 for (JSONObject user : originalUsers) {
                     String userName = "";
                     String userID = "";

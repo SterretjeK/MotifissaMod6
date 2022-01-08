@@ -4,28 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FriendsFragment">
+    tools:context=".challenge_screens.ChooseFriendFragment">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/Choose_friend_title"
+        android:textColor="?itemTextColor"
+        android:textSize="36sp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
-        android:text="@string/Friends_Title"
-        android:textColor="?itemTextColor"
-        android:textSize="48sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/search_friends"
+        android:id="@+id/C_search_friends"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:autofillHints="@string/prompt_search_user"
+        android:autofillHints="@string/prompt_search_friend"
         android:background="@drawable/custom_input"
         android:drawablePadding="12dp"
         android:hint="@string/prompt_search_friend"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <ListView
-        android:id="@+id/users_list"
+        android:id="@+id/C_friends_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
 
@@ -47,21 +47,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_friends" />
+        app:layout_constraintTop_toBottomOf="@+id/C_search_friends" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"-->
-<!--    android:paddingRight="@dimen/activity_horizontal_margin"-->
-<!--    android:orientation="vertical"-->
-<!--    android:paddingTop="@dimen/activity_vertical_margin"-->
-<!--    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainScreen">-->
-
-<!--    <ListView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:id="@+id/listView" />-->
-
-<!--</LinearLayout>-->

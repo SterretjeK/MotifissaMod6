@@ -1,5 +1,6 @@
 package com.example.motifissa;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,7 +8,10 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.motifissa.challenge_screens.ChallengeActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,11 +23,8 @@ public class DashboardFragment extends Fragment {
 
     ScoreboardFragment scoreboardFragment;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String LOGIN_NAME = "LOGIN_NAME";
 
-    // TODO: Rename and change types of parameters
     private String Login_name;
 
     public DashboardFragment() {
@@ -37,7 +38,6 @@ public class DashboardFragment extends Fragment {
      * @param Login_name Parameter 1.
      * @return A new instance of fragment DashboardFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static DashboardFragment newInstance(String Login_name) {
         DashboardFragment fragment = new DashboardFragment();
         Bundle args = new Bundle();
@@ -68,6 +68,16 @@ public class DashboardFragment extends Fragment {
         scoreboardFragment = new ScoreboardFragment();
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.scoreboard_container, scoreboardFragment).commit();
 
+        Button challengeButton = view.findViewById(R.id.dashboard_tile_challenge);
+        challengeButton.setOnClickListener(challengeOnClickListener);
+
         return view;
     }
+
+
+    private View.OnClickListener challengeOnClickListener = v -> {
+        Intent mainScreenIntent = new Intent(getContext(), ChallengeActivity.class);
+        startActivity(mainScreenIntent);
+    };
+
 }

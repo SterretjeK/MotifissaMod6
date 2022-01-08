@@ -34,6 +34,8 @@ public class MainScreen extends AppCompatActivity {
     boolean mIsConnecting;
     DatabaseService mDatabaseService;
 
+    String loginName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +43,7 @@ public class MainScreen extends AppCompatActivity {
 
         // get the login name from the intent
         Intent intent = getIntent();
-        String loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
+        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
 
         // setup the dashboard fragment
         dashboardFragment = new DashboardFragment();
@@ -111,12 +113,14 @@ public class MainScreen extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Toast.makeText(MainScreen.this, "Service is connected", Toast.LENGTH_SHORT).show();
-            mBounded.set(true);
-            mIsConnecting = false;
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
-
             mDatabaseService.makeUsers();
+
+            mDatabaseService.setCurrentUser(loginName);
+
+            mIsConnecting = false;
+            mBounded.set(true);
         }
     };
 
@@ -135,7 +139,7 @@ public class MainScreen extends AppCompatActivity {
     public JSONObject[] getUsers(){
         if (mBounded.get() && mDatabaseService != null) {
             try {
-                return mDatabaseService.getUsers();
+                return mDatabaseService.getUsersArray();
             } catch (Exception e) {
                 Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
             }
@@ -151,7 +155,7 @@ public class MainScreen extends AppCompatActivity {
     public String[] getFriends(){
         if (mBounded.get()) {
             try {
-                return mDatabaseService.getFriendsString();
+                return mDatabaseService.getFriendsNameArray();
             } catch (Exception e){
                 Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
             }

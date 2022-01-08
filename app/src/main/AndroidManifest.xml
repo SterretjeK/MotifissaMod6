@@ -9,15 +9,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Motifissa">
-        <activity android:name=".MainScreen" android:parentActivityName=".LoginScreen" />
-        <activity android:name=".LoginScreen" android:parentActivityName=".StartupScreen" />
+        <activity android:name=".challenge_screens.ChallengeActivity"/>
+        <activity
+            android:name=".MainScreen"
+            android:parentActivityName=".LoginScreen" />
+        <activity
+            android:name=".LoginScreen"
+            android:parentActivityName=".StartupScreen" />
         <activity android:name=".StartupScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".DatabaseService"/>
+
+        <service android:name=".DatabaseService" />
     </application>
 
 </manifest>
