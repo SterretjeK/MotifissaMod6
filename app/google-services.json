@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "290694106022",
+    "project_id": "motifissa-21c73",
+    "storage_bucket": "motifissa-21c73.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290694106022:android:853b207fe0286befcddd67",
+        "android_client_info": {
+          "package_name": "com.example.motifissa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "290694106022-pbfm5875reogbj7s0mu2fsdhbvnse2pt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC37FQI9i3ECjYVf_H3ac7XNYFkfmxp5To"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "290694106022-pbfm5875reogbj7s0mu2fsdhbvnse2pt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

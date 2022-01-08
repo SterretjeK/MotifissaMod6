@@ -1,6 +1,8 @@
-plugins {
-    id 'com.android.application'
-}
+//plugins {
+//    id 'com.android.application'
+//}
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 30
@@ -40,4 +42,9 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    // firebase
+    implementation platform('com.google.firebase:firebase-bom:29.0.3')
+    implementation 'com.google.firebase:firebase-analytics' // the dependency for the Firebase SDK for Google Analytics
+    implementation 'com.google.firebase:firebase-database'  // the dependency for the realtime database
 }
