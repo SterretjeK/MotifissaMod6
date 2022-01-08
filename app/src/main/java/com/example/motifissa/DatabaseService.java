@@ -5,6 +5,11 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -30,8 +35,16 @@ public class DatabaseService extends Service {
     ArrayList<String> friendsIDArray;
     JSONObject friends;
 
+    // firebase
+    private DatabaseReference databaseReference;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // firebase setup
+        FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
+        databaseReference = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
+
+
         makeUsers();
         String username = intent.getExtras().getString("LOGIN_NAME");
         setCurrentUser(username);
@@ -54,7 +67,20 @@ public class DatabaseService extends Service {
         }
     }
 
+    // Firebase get data functions
+    public Task<Void> addUser(User user){
+        // TODO validate data
+//        if (user == null) throw ....;
 
+        return databaseReference.push().setValue(user);
+    }
+
+
+
+
+
+
+    // mock Data TODO remove this:
     public JSONObject getUsers(){
         return users;
     }

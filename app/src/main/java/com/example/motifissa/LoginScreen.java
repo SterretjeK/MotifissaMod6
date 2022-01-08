@@ -43,10 +43,15 @@ public class LoginScreen extends AppCompatActivity {
             startService(startServiceIntent);
 
             // starts the main screen activity
-            Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
+//            Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
+//            finish();
+//            mainScreenIntent.putExtra(LOGIN_NAME, usernameMessage);
+//            startActivity(mainScreenIntent);
+
+            // testing
+            Intent testIntent = new Intent(LoginScreen.this, TestActivity.class);
             finish();
-            mainScreenIntent.putExtra(LOGIN_NAME, usernameMessage);
-            startActivity(mainScreenIntent);
+            startActivity(testIntent);
         }
         if(passwordMessage.matches("")) {
             Toast.makeText(this, "Password is missing", Toast.LENGTH_LONG).show();
