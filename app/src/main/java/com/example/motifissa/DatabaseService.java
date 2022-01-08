@@ -28,8 +28,20 @@ public class DatabaseService extends Service {
     JSONObject currentUser;
     ArrayList<String> friendsNameArray;
     ArrayList<String> friendsIDArray;
-//    ArrayList<String> friends = new ArrayList<>(Arrays.asList("Sterre", "Jelle", "Floor", "Sil", "Frank"));
     JSONObject friends;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        makeUsers();
+        String username = intent.getExtras().getString("LOGIN_NAME");
+        setCurrentUser(username);
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -154,7 +166,7 @@ public class DatabaseService extends Service {
         friendsIDArray = new ArrayList<>();
         Iterator<String> keys = friends.keys();
         while (keys.hasNext()){
-            String key = (String) keys.next();
+            String key = keys.next();
             friendsIDArray.add(key);
             try{
                 friendsNameArray.add(users.getJSONObject(key).getString("Name"));

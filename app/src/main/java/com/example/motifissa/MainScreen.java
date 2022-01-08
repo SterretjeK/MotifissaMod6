@@ -95,10 +95,12 @@ public class MainScreen extends AppCompatActivity {
     };
 
     private void connectToService(){
-        mIsConnecting  = true;
-        mBounded = new ListenerVariable<>(false);
-        Intent serviceIntent = new Intent(this, DatabaseService.class);
-        bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
+        if (!mBounded.get()) {
+            mIsConnecting = true;
+            mBounded.set(false);
+            Intent serviceIntent = new Intent(this, DatabaseService.class);
+            bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
+        }
     }
 
     ServiceConnection mConnection = new ServiceConnection() {
@@ -115,9 +117,9 @@ public class MainScreen extends AppCompatActivity {
             Toast.makeText(MainScreen.this, "Service is connected", Toast.LENGTH_SHORT).show();
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
-            mDatabaseService.makeUsers();
+//            mDatabaseService.makeUsers();
 
-            mDatabaseService.setCurrentUser(loginName);
+//            mDatabaseService.setCurrentUser(loginName);
 
             mIsConnecting = false;
             mBounded.set(true);

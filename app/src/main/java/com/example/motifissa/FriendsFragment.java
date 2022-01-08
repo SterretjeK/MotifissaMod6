@@ -64,7 +64,7 @@ public class FriendsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_friends, container, false);
 
         // setup the list view for the users
-        if (mainscreen.mBounded.get()) // TODO change this to make it retry when it isn't connected, maybe https://stackoverflow.com/questions/14457711/android-listening-for-variable-changes
+        if (mainscreen.mBounded.get())
             this.populateList();
         else{
             mainscreen.mBounded.setListener(value -> {

@@ -36,6 +36,13 @@ public class LoginScreen extends AppCompatActivity {
 
 
         if(!usernameMessage.matches("") && !passwordMessage.matches("")) { //checks if the username edit text is not empty
+
+            //starts the service
+            Intent startServiceIntent = new Intent(this, DatabaseService.class);
+            startServiceIntent.putExtra(LOGIN_NAME, usernameMessage);
+            startService(startServiceIntent);
+
+            // starts the main screen activity
             Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
             finish();
             mainScreenIntent.putExtra(LOGIN_NAME, usernameMessage);
