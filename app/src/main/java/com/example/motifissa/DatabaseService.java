@@ -5,23 +5,17 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 public class DatabaseService extends Service {
 
@@ -36,13 +30,13 @@ public class DatabaseService extends Service {
     JSONObject friends;
 
     // firebase
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReferenceUsers;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // firebase setup
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
-        databaseReference = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
+        databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
 
 
         makeUsers();
@@ -70,11 +64,23 @@ public class DatabaseService extends Service {
     // Firebase get data functions
     public Task<Void> addUser(User user){
         // TODO validate data
-//        if (user == null) throw ....;
+        //  if (user == null) throw ....;
 
-        return databaseReference.push().setValue(user);
+        return databaseReferenceUsers.push().setValue(user);
     }
 
+    // Not being used !!!!!!!!!!!!
+//    public Task<Void> createUser(String username, String UID){
+//        Random random = new Random();
+//
+//        // TODO implement id, even tho it wont' actually be used anymore
+//        String id = "";
+////        while (users.has(id))
+//            id = "" + random.nextInt(1000);
+//
+//        User user = new User(username, UID, id);
+//        return databaseReferenceUsers.child(UID).setValue(user);
+//    }
 
 
 
