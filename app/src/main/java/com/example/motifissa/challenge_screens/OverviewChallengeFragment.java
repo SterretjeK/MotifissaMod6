@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.motifissa.R;
 import com.example.motifissa.User;
@@ -82,7 +83,10 @@ public class OverviewChallengeFragment extends Fragment {
         }
 
         Button challengeFriend_button = v.findViewById(R.id.ChallengeFriendButton);
-        challengeFriend_button.setOnClickListener(view -> challengeActivity.moveUpFragment());
+        challengeFriend_button.setOnClickListener(view -> {
+            challengeActivity.challengeFriend().addOnSuccessListener(success -> challengeActivity.moveUpFragment())
+                    .addOnFailureListener(error -> Toast.makeText(getContext(), "Couldn't sent notification", Toast.LENGTH_SHORT).show());
+        });
 
         return v;
     }

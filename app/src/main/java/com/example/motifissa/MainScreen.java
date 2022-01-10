@@ -64,10 +64,6 @@ public class MainScreen extends AppCompatActivity {
         }
         loginName = currentUser.getDisplayName();
 
-//        // get the login name from the intent
-//        Intent intent = getIntent();
-//        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
-
         // setup the dashboard fragment
         dashboardFragment = new DashboardFragment();
         Bundle bundle = new Bundle();

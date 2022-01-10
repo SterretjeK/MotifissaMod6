@@ -21,6 +21,7 @@ import com.example.motifissa.DatabaseService;
 import com.example.motifissa.ListenerVariable;
 import com.example.motifissa.R;
 import com.example.motifissa.User;
+import com.google.android.gms.tasks.Task;
 
 import org.json.JSONObject;
 
@@ -256,6 +257,21 @@ public class ChallengeActivity extends AppCompatActivity {
         if (mBounded.get()) {
             try {
                 return mDatabaseService.getCurrentUserData();
+            } catch (Exception e){
+                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
+            }
+        }
+
+        if (!mIsConnecting) {
+            this.connectToService();
+        }
+        return null;
+    }
+
+    public Task<Void> challengeFriend(){
+        if (mBounded.get()) {
+            try {
+                return mDatabaseService.sendNotification("Challenge", selectedFriend);
             } catch (Exception e){
                 Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
             }

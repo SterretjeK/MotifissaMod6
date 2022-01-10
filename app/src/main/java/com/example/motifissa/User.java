@@ -11,6 +11,7 @@ public class User {
     private int Score;
     private boolean isOnline;
     private List<String> Friends;
+    private List<String> Notifications;
 
     public User(){}
     public User(String name, String UID, String ID){
@@ -21,6 +22,7 @@ public class User {
         this.isOnline = true;
         this.Friends = new ArrayList<>();
         this.Friends.add("rKjspnNlU7OWs4BOGeQR59g5VQ23"); // add the TestAccount to their friends
+        this.Notifications = new ArrayList<>();
     }
 
     public String getName() {
@@ -67,6 +69,10 @@ public class User {
         return Friends;
     }
 
+    public void setFriends(List<String> friends) {
+        Friends = friends;
+    }
+
     public void toggleFriend(String UID){
         if (Friends == null) Friends = new ArrayList<>();
         if (Friends.contains(UID))
@@ -75,8 +81,25 @@ public class User {
             Friends.add(UID);
     }
 
-    public void setFriends(List<String> friends) {
-        Friends = friends;
+    public List<String> getNotifications() {
+        return Notifications;
     }
+
+    public void setNotifications(List<String> notifications) {
+        Notifications = notifications;
+    }
+
+    public void addNotification(String notification){
+        if (Notifications == null)
+            Notifications = new ArrayList<>();
+        Notifications.add(notification);
+    }
+
+    public void removeNotification(String notification){
+        if(Notifications != null){
+            Notifications.remove(notification);
+        }
+    }
+
 }
 
