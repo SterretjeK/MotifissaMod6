@@ -74,6 +74,9 @@ public class MainScreen extends AppCompatActivity {
         // setup the bottom navigation
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
+
+        View notificationsFragment = findViewById(R.id.notificationsFragment);
+        notificationsFragment.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -213,6 +216,7 @@ public class MainScreen extends AppCompatActivity {
     }
 
     public void showNotifications() {
-
+        View notificationsFragment = findViewById(R.id.notificationsFragment);
+        notificationsFragment.setVisibility(View.VISIBLE);
     }
 }
