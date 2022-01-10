@@ -90,7 +90,7 @@
         android:gravity="center"
         android:padding="20dp"
 
-        android:text="NOTE: NO MESSAGE WAS ACTUALLY SENT"
+        android:text="NOTE: THEY CAN'T ACCEPT YET"
         android:textColor="@color/error"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

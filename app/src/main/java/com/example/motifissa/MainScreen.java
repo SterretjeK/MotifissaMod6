@@ -57,10 +57,7 @@ public class MainScreen extends AppCompatActivity {
         // get the current user
         currentUser = mAuth.getCurrentUser();
         if (currentUser == null){ //log out if the login isn't valid
-            mAuth.signOut();
-            finish();
-            Intent loginPageIntent = new Intent(this, LoginScreen.class);
-            startActivity(loginPageIntent);
+            logout();
         }
         loginName = currentUser.getDisplayName();
 
@@ -77,15 +74,6 @@ public class MainScreen extends AppCompatActivity {
         // setup the bottom navigation
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
-
-        // setup logout button
-        FloatingActionButton logoutButton = findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(view -> {
-            mAuth.signOut();
-            finish();
-            Intent loginPageIntent = new Intent(this, LoginScreen.class);
-            startActivity(loginPageIntent);
-        });
     }
 
     @Override
@@ -96,6 +84,12 @@ public class MainScreen extends AppCompatActivity {
         this.connectToService();
     }
 
+    public void logout(){
+        mAuth.signOut();
+        finish();
+        Intent loginPageIntent = new Intent(this, LoginScreen.class);
+        startActivity(loginPageIntent);
+    }
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -216,5 +210,9 @@ public class MainScreen extends AppCompatActivity {
 
     public FirebaseUser getCurrentUser(){
         return currentUser;
+    }
+
+    public void showNotifications() {
+
     }
 }

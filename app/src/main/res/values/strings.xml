@@ -125,4 +125,6 @@
     <string name="signup_action">Sign up!</string>
     <string name="signup_txt">Don\'t have an account yet?</string>
     <string name="logout">Logout</string>
+    <string name="more_menu">More menu</string>
+    <string name="Notifications">Notifications</string>
 </resources>

@@ -17,26 +17,6 @@
         app:layout_constraintTop_toTopOf="parent" >
     </FrameLayout>
 
-    <!--    TODO make the logout button better-->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        app:shapeAppearance="?backgroundColor"
-        android:focusedByDefault="false"
-        android:focusable="false"
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:backgroundTint="@color/color_primary_dark"
-        app:borderWidth="0dp"
-        android:scaleY="0.75"
-        android:scaleX="0.75"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_action_logout"
-        android:layout_margin="10dp"
-        android:elevation="3dp"
-        android:contentDescription="@string/logout" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"

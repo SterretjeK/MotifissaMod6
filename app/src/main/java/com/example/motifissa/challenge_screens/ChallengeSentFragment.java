@@ -19,11 +19,6 @@ import com.example.motifissa.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChallengeSentFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ChallengeSentFragment extends Fragment {
 
     private ChallengeActivity challengeActivity;
