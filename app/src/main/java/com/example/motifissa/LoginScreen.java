@@ -183,13 +183,15 @@ public class LoginScreen extends AppCompatActivity {
     private void loginSuccess(FirebaseUser user){
         //starts the service
         Intent startServiceIntent = new Intent(this, DatabaseService.class);
-        startServiceIntent.putExtra(LOGIN_NAME, "Henk");
+//        startServiceIntent.putExtra(LOGIN_NAME, "Henk");
+        startServiceIntent.putExtra("CurrentUser", mAuth.getCurrentUser());
         startService(startServiceIntent);
 
+
         // starts the main screen activity
-            Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
-            finish();
-            startActivity(mainScreenIntent);
+        Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
+        finish();
+        startActivity(mainScreenIntent);
 
         // testing
 //        Intent testIntent = new Intent(LoginScreen.this, TestActivity.class);

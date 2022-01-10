@@ -196,6 +196,9 @@ public class MainScreen extends AppCompatActivity {
             this.connectToService();
         }
         return null;
+    }
 
+    public FirebaseUser getCurrentUser(){
+        return currentUser;
     }
 }

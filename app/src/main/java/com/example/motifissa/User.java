@@ -71,3 +71,4 @@ public class User {
         Friends = friends;
     }
 }
+
