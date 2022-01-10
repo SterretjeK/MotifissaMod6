@@ -113,12 +113,6 @@ public class FriendsListAdaptor extends ArrayAdapter<User> implements Filterable
 
                 }
 
-
-                //TODO CHANGE THIS:
-                // Change the ArrayList<JSONObject> to a JSONObject[]
-//                User[] tempList = new User[filteredList.size()];
-//                filteredList.toArray(tempList);
-
                 // Store the JSONObject[] in a filterResult
                 filterResults.values = filteredList;
                 filterResults.count = filteredList.size();

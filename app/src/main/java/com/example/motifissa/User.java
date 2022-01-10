@@ -67,6 +67,14 @@ public class User {
         return Friends;
     }
 
+    public void toggleFriend(String UID){
+        if (Friends == null) Friends = new ArrayList<>();
+        if (Friends.contains(UID))
+            Friends.remove(UID);
+        else
+            Friends.add(UID);
+    }
+
     public void setFriends(List<String> friends) {
         Friends = friends;
     }

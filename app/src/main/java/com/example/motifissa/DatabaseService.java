@@ -74,7 +74,6 @@ public class DatabaseService extends Service {
                 usersArray = new ArrayList<>();
                 users = new HashMap<>();
 
-                Log.e("DatabaseService", snapshot.toString());
                 for (DataSnapshot data : snapshot.getChildren()){
                     User user = data.getValue(User.class);
                     usersArray.add(user);
@@ -89,11 +88,15 @@ public class DatabaseService extends Service {
                 friendsNameArray = new ArrayList<>();
                 friendsData = new ArrayList<>();
 
-                for (String friendUID : currentUserData.getFriends()){
-                    friendsUIDArray.add(friendUID);
-                    User friend = users.get(friendUID);
-                    friendsData.add(friend);
-                    friendsNameArray.add(friend.getName());
+                try {
+                    for (String friendUID : currentUserData.getFriends()) {
+                        friendsUIDArray.add(friendUID);
+                        User friend = users.get(friendUID);
+                        friendsData.add(friend);
+                        friendsNameArray.add(friend.getName());
+                    }
+                } catch(NullPointerException ignored){
+
                 }
             }
 
@@ -168,6 +171,12 @@ public class DatabaseService extends Service {
 
     public User getUser(String UID){
         return users.get(UID);
+    }
+
+    public Task<Void> toggleFriend(String UID){
+        currentUserData.toggleFriend(UID);
+
+        return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
     }
 
     // ------------ Mock data ------------

@@ -42,6 +42,8 @@ public class FriendsFragment extends Fragment {
     MainScreen mainscreen;
     Query userQuery;
 
+    ArrayList<String> friends;
+
     public FriendsFragment() {
         // Required empty public constructor
     }
@@ -102,9 +104,6 @@ public class FriendsFragment extends Fragment {
 
     public void populateList(ArrayList<User> users, ArrayList<String> friends){
         // setup the list view for the users
-//        JSONObject[] users = mainscreen.getUsers();
-//        String[] friends = mainscreen.getFriends();
-
         usersList = view.findViewById(R.id.users_list);
 
         friendsListAdaptor = new FriendsListAdaptor(getActivity(), users, friends);
@@ -128,7 +127,7 @@ public class FriendsFragment extends Fragment {
             }
 
 
-            ArrayList<String> friends = mainscreen.getFriendsName();
+            friends = mainscreen.getFriendsUID();
             populateList(users, friends);
         }
 
@@ -140,16 +139,20 @@ public class FriendsFragment extends Fragment {
 
 
     private AdapterView.OnItemClickListener usersListListener = (parent, view, position, id) -> {
-//            try {
-//                mainscreen.mDatabaseService.toggleFriend(friendsListAdaptor.getItem(position).getString("ID"));
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            String[] friends = mainscreen.mDatabaseService.getFriendsNameArray();
-//            friendsListAdaptor.changeFriends(friends);
+        String UID = friendsListAdaptor.getItem(position).getUID();
+        mainscreen.toggleFriend(UID).addOnSuccessListener(success ->{
+                if(friends.contains(UID))
+                    friends.remove(UID);
+                else friends.add(UID);
+
+                friendsListAdaptor.changeFriends(friends);
+            }).addOnFailureListener(error -> {
+                Toast.makeText(getContext(), "Couldn't add friend", Toast.LENGTH_SHORT).show();
+                Log.e("FriendsFragment", "Couldn't toggle friend: " + error);
+            });
     };
 
-    private TextWatcher searchTextWatcher = new TextWatcher(){
+    private final TextWatcher searchTextWatcher = new TextWatcher(){
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {

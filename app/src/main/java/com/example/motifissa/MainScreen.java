@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -185,12 +186,28 @@ public class MainScreen extends AppCompatActivity {
         return null;
     }
 
-    public ArrayList<String> getFriendsName(){
+    public ArrayList<String> getFriendsUID(){
         if (mBounded.get() && mDatabaseService != null) {
             try {
-                return mDatabaseService.getFriendsNameArray();
+                return mDatabaseService.getFriendsUIDArray();
             } catch (Exception e) {
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsNameArray");
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsUID");
+            }
+        }
+
+        if (!mIsConnecting) {
+            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
+            this.connectToService();
+        }
+        return null;
+    }
+
+    public Task<Void> toggleFriend(String UID){
+        if (mBounded.get() && mDatabaseService != null) {
+            try {
+                return mDatabaseService.toggleFriend(UID);
+            } catch (Exception e) {
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsUID");
             }
         }
 
