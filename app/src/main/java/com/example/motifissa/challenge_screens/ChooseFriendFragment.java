@@ -19,12 +19,14 @@ import android.widget.ListView;
 import com.example.motifissa.ListenerVariable;
 import com.example.motifissa.R;
 
+import java.util.ArrayList;
+
 public class ChooseFriendFragment extends Fragment {
 
     ChallengeActivity challengeActivity;
     ArrayAdapter<String> arrayAdapter;
-    private String[] friends;
-    private String[] friendsID;
+    private ArrayList<String> friends;
+    private ArrayList<String> friendsID;
 
     public ChooseFriendFragment() {
         // Required empty public constructor
@@ -92,7 +94,7 @@ public class ChooseFriendFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // TODO make a new intent to go to the next fragment and send with the username of the friend
-            challengeActivity.setSelectedFriend(friendsID[position]);
+            challengeActivity.setSelectedFriend(friendsID.get(position));
             challengeActivity.moveUpFragment();
 
         }

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,8 +39,10 @@ public class FriendsFragment extends Fragment {
     ListView usersList;
     FriendsListAdaptor friendsListAdaptor;
     View view;
-    JSONObject[] users;
     MainScreen mainscreen;
+    Query userQuery;
+
+    ArrayList<String> friends;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -56,6 +65,18 @@ public class FriendsFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString() + " must be MainScreen");
         }
+        if (mainscreen.mBounded.get()){
+            userQuery = mainscreen.mDatabaseService.getUsersQuery();
+            userQuery.addValueEventListener(usersChangeListener);
+        }
+        else{
+            mainscreen.mBounded.setListener(value -> {
+                if(value) {
+                    userQuery = mainscreen.mDatabaseService.getUsersQuery();
+                    userQuery.addValueEventListener(usersChangeListener);
+                }
+            });
+        }
     }
 
     @Override
@@ -64,22 +85,25 @@ public class FriendsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_friends, container, false);
 
         // setup the list view for the users
-        if (mainscreen.mBounded.get())
-            this.populateList();
-        else{
-            mainscreen.mBounded.setListener(value -> {
-             if(value) populateList();
-            });
-        }
+//        if (mainscreen.mBounded.get())
+//            this.populateList();
+//        else{
+//            mainscreen.mBounded.setListener(value -> {
+//             if(value) populateList();
+//            });
+//        }
 
         return view;
     }
 
-    public void populateList(){
-        // setup the list view for the users
-        users = mainscreen.getUsers();
-        String[] friends = mainscreen.getFriends();
+    @Override
+    public void onDetach() { // called when the fragment is detached, so when it isn't visible anymore to the user
+        super.onDetach();
+        userQuery.removeEventListener(usersChangeListener);
+    }
 
+    public void populateList(ArrayList<User> users, ArrayList<String> friends){
+        // setup the list view for the users
         usersList = view.findViewById(R.id.users_list);
 
         friendsListAdaptor = new FriendsListAdaptor(getActivity(), users, friends);
@@ -92,21 +116,43 @@ public class FriendsFragment extends Fragment {
         searchField.addTextChangedListener(searchTextWatcher);
     }
 
-    private AdapterView.OnItemClickListener usersListListener = new AdapterView.OnItemClickListener(){
+    private final ValueEventListener usersChangeListener =  new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            ArrayList<User> users = new ArrayList<>();
+
+            for (DataSnapshot data : snapshot.getChildren()){
+                User user = data.getValue(User.class);
+                users.add(user);
+            }
+
+
+            friends = mainscreen.getFriendsUID();
+            populateList(users, friends);
+        }
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            try {
-                mainscreen.mDatabaseService.toggleFriend(friendsListAdaptor.getItem(position).getString("ID"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            String[] friends = mainscreen.mDatabaseService.getFriendsNameArray();
-            friendsListAdaptor.changeFriends(friends);
+        public void onCancelled(@NonNull DatabaseError error) {
+
         }
     };
 
-    private TextWatcher searchTextWatcher = new TextWatcher(){
+
+    private AdapterView.OnItemClickListener usersListListener = (parent, view, position, id) -> {
+        String UID = friendsListAdaptor.getItem(position).getUID();
+        mainscreen.toggleFriend(UID).addOnSuccessListener(success ->{
+                if(friends.contains(UID))
+                    friends.remove(UID);
+                else friends.add(UID);
+
+                friendsListAdaptor.changeFriends(friends);
+            }).addOnFailureListener(error -> {
+                Toast.makeText(getContext(), "Couldn't add friend", Toast.LENGTH_SHORT).show();
+                Log.e("FriendsFragment", "Couldn't toggle friend: " + error);
+            });
+    };
+
+    private final TextWatcher searchTextWatcher = new TextWatcher(){
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {

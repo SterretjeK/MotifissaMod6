@@ -16,9 +16,16 @@ import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.Query;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MainScreen extends AppCompatActivity {
 
@@ -34,6 +41,10 @@ public class MainScreen extends AppCompatActivity {
     boolean mIsConnecting;
     DatabaseService mDatabaseService;
 
+    // firebase
+    private FirebaseAuth mAuth;
+    FirebaseUser currentUser;
+
     String loginName;
 
     @Override
@@ -41,9 +52,21 @@ public class MainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        // get the login name from the intent
-        Intent intent = getIntent();
-        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        // get the current user
+        currentUser = mAuth.getCurrentUser();
+        if (currentUser == null){ //log out if the login isn't valid
+            mAuth.signOut();
+            finish();
+            Intent loginPageIntent = new Intent(this, LoginScreen.class);
+            startActivity(loginPageIntent);
+        }
+        loginName = currentUser.getDisplayName();
+
+//        // get the login name from the intent
+//        Intent intent = getIntent();
+//        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
 
         // setup the dashboard fragment
         dashboardFragment = new DashboardFragment();
@@ -58,6 +81,15 @@ public class MainScreen extends AppCompatActivity {
         // setup the bottom navigation
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
+
+        // setup logout button
+        FloatingActionButton logoutButton = findViewById(R.id.logoutButton);
+        logoutButton.setOnClickListener(view -> {
+            mAuth.signOut();
+            finish();
+            Intent loginPageIntent = new Intent(this, LoginScreen.class);
+            startActivity(loginPageIntent);
+        });
     }
 
     @Override
@@ -117,8 +149,8 @@ public class MainScreen extends AppCompatActivity {
             Toast.makeText(MainScreen.this, "Service is connected", Toast.LENGTH_SHORT).show();
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
-//            mDatabaseService.makeUsers();
 
+//            mDatabaseService.makeUsers();
 //            mDatabaseService.setCurrentUser(loginName);
 
             mIsConnecting = false;
@@ -138,12 +170,12 @@ public class MainScreen extends AppCompatActivity {
         mIsConnecting = false;
     }
 
-    public JSONObject[] getUsers(){
+    public Query getUsersQuery(){
         if (mBounded.get() && mDatabaseService != null) {
             try {
-                return mDatabaseService.getUsersArray();
+                return mDatabaseService.getUsersQuery();
             } catch (Exception e) {
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getUsersQuery");
             }
         }
 
@@ -154,12 +186,12 @@ public class MainScreen extends AppCompatActivity {
         return null;
     }
 
-    public String[] getFriends(){
-        if (mBounded.get()) {
+    public ArrayList<String> getFriendsUID(){
+        if (mBounded.get() && mDatabaseService != null) {
             try {
-                return mDatabaseService.getFriendsNameArray();
-            } catch (Exception e){
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
+                return mDatabaseService.getFriendsUIDArray();
+            } catch (Exception e) {
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsUID");
             }
         }
 
@@ -168,6 +200,25 @@ public class MainScreen extends AppCompatActivity {
             this.connectToService();
         }
         return null;
+    }
 
+    public Task<Void> toggleFriend(String UID){
+        if (mBounded.get() && mDatabaseService != null) {
+            try {
+                return mDatabaseService.toggleFriend(UID);
+            } catch (Exception e) {
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsUID");
+            }
+        }
+
+        if (!mIsConnecting) {
+            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
+            this.connectToService();
+        }
+        return null;
+    }
+
+    public FirebaseUser getCurrentUser(){
+        return currentUser;
     }
 }

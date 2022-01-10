@@ -120,4 +120,9 @@
     <string name="buttonBackTxt">Back</string>
     <string name="buttonHomeTxt">Home</string>
     <string name="challenge_sent_note">you can safely navigate away from this screen. as long as you keep this app active in the background you will get a notification if your challenge was accepted</string>
+    <string name="DatabaseUsersRoot">Users</string>
+    <string name="databaseURL">https://motifissa-21c73-default-rtdb.europe-west1.firebasedatabase.app/</string>
+    <string name="signup_action">Sign up!</string>
+    <string name="signup_txt">Don\'t have an account yet?</string>
+    <string name="logout">Logout</string>
 </resources>
