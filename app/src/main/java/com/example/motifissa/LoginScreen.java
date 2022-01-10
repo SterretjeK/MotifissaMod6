@@ -40,7 +40,7 @@ public class LoginScreen extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){ // user is still signed in
-            loginSuccess(currentUser); // TODO replace HENK
+            loginSuccess(currentUser);
         }
     }
 
@@ -187,15 +187,14 @@ public class LoginScreen extends AppCompatActivity {
         startService(startServiceIntent);
 
         // starts the main screen activity
-//            Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
-//            finish();
-//            mainScreenIntent.putExtra(LOGIN_NAME, usernameMessage);
-//            startActivity(mainScreenIntent);
+            Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
+            finish();
+            startActivity(mainScreenIntent);
 
         // testing
-        Intent testIntent = new Intent(LoginScreen.this, TestActivity.class);
-        finish();
-        startActivity(testIntent);
+//        Intent testIntent = new Intent(LoginScreen.this, TestActivity.class);
+//        finish();
+//        startActivity(testIntent);
     }
 
 

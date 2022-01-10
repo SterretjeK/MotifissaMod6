@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class TestActivity extends AppCompatActivity {
+    // TODO remove this activity or archive as it only service as an example anymore, it isn't used
 
     // service
     ListenerVariable<Boolean> mBounded = new ListenerVariable<>(false); // a custom type, that allows us to add listeners to variables

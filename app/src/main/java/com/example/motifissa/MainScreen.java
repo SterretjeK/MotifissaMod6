@@ -17,6 +17,9 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONObject;
 
@@ -34,6 +37,10 @@ public class MainScreen extends AppCompatActivity {
     boolean mIsConnecting;
     DatabaseService mDatabaseService;
 
+    // firebase
+    private FirebaseAuth mAuth;
+    FirebaseUser currentUser;
+
     String loginName;
 
     @Override
@@ -41,9 +48,21 @@ public class MainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        // get the login name from the intent
-        Intent intent = getIntent();
-        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        // get the current user
+        currentUser = mAuth.getCurrentUser();
+        if (currentUser == null){ //log out if the login isn't valid
+            mAuth.signOut();
+            finish();
+            Intent loginPageIntent = new Intent(this, LoginScreen.class);
+            startActivity(loginPageIntent);
+        }
+        loginName = currentUser.getDisplayName();
+
+//        // get the login name from the intent
+//        Intent intent = getIntent();
+//        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
 
         // setup the dashboard fragment
         dashboardFragment = new DashboardFragment();
@@ -58,6 +77,15 @@ public class MainScreen extends AppCompatActivity {
         // setup the bottom navigation
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
+
+        // setup logout button
+        FloatingActionButton logoutButton = findViewById(R.id.logoutButton);
+        logoutButton.setOnClickListener(view -> {
+            mAuth.signOut();
+            finish();
+            Intent loginPageIntent = new Intent(this, LoginScreen.class);
+            startActivity(loginPageIntent);
+        });
     }
 
     @Override
@@ -117,8 +145,8 @@ public class MainScreen extends AppCompatActivity {
             Toast.makeText(MainScreen.this, "Service is connected", Toast.LENGTH_SHORT).show();
             DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
             mDatabaseService = mLocalBinder.getServerInstance();
-//            mDatabaseService.makeUsers();
 
+//            mDatabaseService.makeUsers();
 //            mDatabaseService.setCurrentUser(loginName);
 
             mIsConnecting = false;
