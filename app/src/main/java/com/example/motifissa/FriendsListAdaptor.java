@@ -22,14 +22,14 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filterable {
+public class FriendsListAdaptor extends ArrayAdapter<User> implements Filterable {
 
-    private JSONObject[] users;
-    private final JSONObject[] originalUsers;
-    private String[] friends;
+    private ArrayList<User> users;
+    private final ArrayList<User> originalUsers;
+    private ArrayList<String> friends;
     private final Activity context;
 
-    public FriendsListAdaptor(Activity context, JSONObject[] users, String[] friends) {
+    public FriendsListAdaptor(Activity context, ArrayList<User> users, ArrayList<String> friends) {
         super(context, R.layout.list_friends, users);
         this.context = context;
         this.users = users;
@@ -60,17 +60,14 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
         }
 
         //change the contents of the view element
-        try { //try catch because working with JSON
-            viewHolder.textViewName.setText(this.users[position].getString("Name"));
-            viewHolder.textViewDesc.setText(MessageFormat.format("#{0}", this.users[position].getString("ID")));
+        //try catch because working with JSON
+        viewHolder.textViewName.setText(this.users.get(position).getName());
+        viewHolder.textViewDesc.setText(MessageFormat.format("#{0}", this.users.get(position).getID()));
 
-            if (Arrays.asList(friends).contains(this.users[position].getString("Name"))) { // needs updating so it also contains the id
-                viewHolder.icon.setVisibility(View.VISIBLE);
-            } else {
-                viewHolder.icon.setVisibility(View.INVISIBLE);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (friends.contains(this.users.get(position).getUID())) { // needs updating so it also contains the id
+            viewHolder.icon.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.icon.setVisibility(View.INVISIBLE);
         }
 
         return convertView;
@@ -88,7 +85,7 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
         return myFilter;
     }
 
-    public void changeFriends(String[] friends) {
+    public void changeFriends(ArrayList<String> friends) {
         this.friends = friends;
         notifyDataSetChanged();
     }
@@ -97,7 +94,7 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
-            ArrayList<JSONObject> filteredList = new ArrayList<>();
+            ArrayList<User> filteredList = new ArrayList<>();
 
             // make what the user entered lowercase so cases are ignored:
             String input = constraint.toString().toLowerCase();
@@ -105,39 +102,33 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
             //constraint is the result from text you want to filter against.
             //objects is your data set you will filter from
             if(originalUsers != null) {
-                for (JSONObject user : originalUsers) {
-                    String userName = "";
-                    String userID = "";
+                for (User user : originalUsers) {
+                    String userName = user.getName();
+                    String userID = user.getID();
 
-                    try {
-                        userName = user.getString("Name");
-                        userID = user.getString("ID");
-                    } catch (JSONException e) {
-                        Log.e("Friends List adaptor", "name and/or ID of user wasn't found: " + user);
-                        e.printStackTrace();
-                    }
                     String searchable = userName + userID;
 
                     if (searchable.toLowerCase().contains(input))
                         filteredList.add(user);
 
-
                 }
 
+
+                //TODO CHANGE THIS:
                 // Change the ArrayList<JSONObject> to a JSONObject[]
-                JSONObject[] tempList = new JSONObject[filteredList.size()];
-                filteredList.toArray(tempList);
+//                User[] tempList = new User[filteredList.size()];
+//                filteredList.toArray(tempList);
 
                 // Store the JSONObject[] in a filterResult
-                filterResults.values = tempList;
-                filterResults.count = tempList.length;
+                filterResults.values = filteredList;
+                filterResults.count = filteredList.size();
             }
             return filterResults;
         }
 
         @Override
         protected void publishResults(CharSequence contraint, FilterResults results) {
-            users = (JSONObject[]) results.values;
+            users = (ArrayList<User>) results.values;
             if (results.count > 0) {
                 notifyDataSetChanged();
             } else {
@@ -147,12 +138,12 @@ public class FriendsListAdaptor extends ArrayAdapter<JSONObject> implements Filt
     };
 
     public int getCount () {
-        return users.length;
+        return users.size();
     }
 
     @Nullable
     @Override
-    public JSONObject getItem(int position) {
-        return this.users[position];
+    public User getItem(int position) {
+        return this.users.get(position);
     }
 }

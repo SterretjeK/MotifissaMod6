@@ -128,7 +128,7 @@ public class FriendsFragment extends Fragment {
             }
 
 
-
+            ArrayList<String> friends = mainscreen.getFriendsName();
             populateList(users, friends);
         }
 
@@ -139,18 +139,14 @@ public class FriendsFragment extends Fragment {
     };
 
 
-    private AdapterView.OnItemClickListener usersListListener = new AdapterView.OnItemClickListener(){
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            try {
-                mainscreen.mDatabaseService.toggleFriend(friendsListAdaptor.getItem(position).getString("ID"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            String[] friends = mainscreen.mDatabaseService.getFriendsNameArray();
-            friendsListAdaptor.changeFriends(friends);
-        }
+    private AdapterView.OnItemClickListener usersListListener = (parent, view, position, id) -> {
+//            try {
+//                mainscreen.mDatabaseService.toggleFriend(friendsListAdaptor.getItem(position).getString("ID"));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            String[] friends = mainscreen.mDatabaseService.getFriendsNameArray();
+//            friendsListAdaptor.changeFriends(friends);
     };
 
     private TextWatcher searchTextWatcher = new TextWatcher(){

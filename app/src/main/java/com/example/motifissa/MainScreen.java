@@ -20,8 +20,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.Query;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MainScreen extends AppCompatActivity {
 
@@ -166,12 +169,12 @@ public class MainScreen extends AppCompatActivity {
         mIsConnecting = false;
     }
 
-    public JSONObject[] getUsers(){
+    public Query getUsersQuery(){
         if (mBounded.get() && mDatabaseService != null) {
             try {
-                return mDatabaseService.getUsersArray();
+                return mDatabaseService.getUsersQuery();
             } catch (Exception e) {
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getUsersQuery");
             }
         }
 
@@ -182,12 +185,12 @@ public class MainScreen extends AppCompatActivity {
         return null;
     }
 
-    public String[] getFriends(){
-        if (mBounded.get()) {
+    public ArrayList<String> getFriendsName(){
+        if (mBounded.get() && mDatabaseService != null) {
             try {
                 return mDatabaseService.getFriendsNameArray();
-            } catch (Exception e){
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriends");
+            } catch (Exception e) {
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsNameArray");
             }
         }
 

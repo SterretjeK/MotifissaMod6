@@ -67,13 +67,14 @@ public class DatabaseService extends Service {
     }
 
     public void setup(){
-        databaseReferenceUsers.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+        databaseReferenceUsers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // get/update users
                 usersArray = new ArrayList<>();
                 users = new HashMap<>();
 
+                Log.e("DatabaseService", snapshot.toString());
                 for (DataSnapshot data : snapshot.getChildren()){
                     User user = data.getValue(User.class);
                     usersArray.add(user);
@@ -141,10 +142,33 @@ public class DatabaseService extends Service {
         return currentUser;
     }
 
+    public User getCurrentUserData() {
+        return currentUserData;
+    }
 
+    public ArrayList<User> getUsersArray() {
+        return usersArray;
+    }
 
+    public HashMap<String, User> getUsers() {
+        return users;
+    }
 
+    public ArrayList<String> getFriendsUIDArray() {
+        return friendsUIDArray;
+    }
 
+    public ArrayList<String> getFriendsNameArray() {
+        return friendsNameArray;
+    }
+
+    public ArrayList<User> getFriendsData() {
+        return friendsData;
+    }
+
+    public User getUser(String UID){
+        return users.get(UID);
+    }
 
     // ------------ Mock data ------------
     // mock Data TODO remove this:
