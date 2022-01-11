@@ -1,8 +1,10 @@
 package com.example.motifissa;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -13,18 +15,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseUser;
+
+import org.w3c.dom.Text;
+
 
 public class LoginTabFragment extends Fragment {
     public static final String LOGIN_NAME = "com.example.myfirstapp.LOGIN_NAME";
 
-    ViewGroup root;
+    private LoginScreen loginScreen;
 
-    TextView usernameText;
-    EditText username;
-    TextView passwordText;
-    EditText password;
-    Button loginButton;
-    float v = 0;
+    private ViewGroup root;
 
     public LoginTabFragment() {
         // Required empty public constructor
@@ -36,67 +37,75 @@ public class LoginTabFragment extends Fragment {
         // Inflate the layout for this fragment
         root = (ViewGroup) inflater.inflate(R.layout.fragment_login_tab, container, false);
 
+        // animation
+        TextView emailText = root.findViewById(R.id.email_text);
+        EditText email = root.findViewById(R.id.email);
+        TextView passwordText = root.findViewById(R.id.password_text);
+        EditText password = root.findViewById(R.id.password);
+        TextView forgot_password = root.findViewById(R.id.forgot_password);
+        Button loginButton = root.findViewById(R.id.login_button);
 
-        usernameText = root.findViewById(R.id.username_text);
-        username = root.findViewById(R.id.username);
-        passwordText = root.findViewById(R.id.password_text);
-        password = root.findViewById(R.id.password);
-        loginButton = root.findViewById(R.id.login_button);
-
-        usernameText.setTranslationX(800);
-        username.setTranslationX(800);
+        emailText.setTranslationX(800);
+        email.setTranslationX(800);
         passwordText.setTranslationX(800);
         password.setTranslationX(800);
+        forgot_password.setTranslationX(800);
         loginButton.setTranslationY(300);
 
-        usernameText.setAlpha(v);
-        username.setAlpha(v);
-        passwordText.setAlpha(v);
-        password.setAlpha(v);
-        loginButton.setAlpha(v);
+        emailText.setAlpha(0f);
+        email.setAlpha(0f);
+        passwordText.setAlpha(0f);
+        password.setAlpha(0f);
+        forgot_password.setAlpha(0f);
+        loginButton.setAlpha(0f);
 
-        usernameText.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(300).start();
-        username.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(350).start();
-        passwordText.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(500).start();
-        password.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(550).start();
-        loginButton.animate().translationY(0).alpha(1).setDuration(800).setStartDelay(700).start();
+        emailText.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(3000).start();
+        email.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(3050).start();
+        passwordText.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(3200).start();
+        password.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(3250).start();
+        forgot_password.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(3300).start();
+        loginButton.animate().translationY(0).alpha(1).setDuration(800).setStartDelay(3450).start();
 
+        // add onclick listener on login button
         passwordText.setOnFocusChangeListener(passwordOnFocusChangeListener);
         loginButton.setOnClickListener(view -> login()); // click handling code
+
+        forgot_password.setOnClickListener(view -> {
+            if (!email.getText().toString().matches(""))
+                loginScreen.forgotPassword(email.getText().toString());
+            else
+                Toast.makeText(getActivity(), "Enter email", Toast.LENGTH_LONG).show();
+        });
 
         return root;
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof LoginScreen) {
+            loginScreen = (LoginScreen) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must be LoginScreen");
+        }
+    }
+
     private void login(){
+        // get input from email
+        EditText emailInput = root.findViewById(R.id.email);
+        String username = emailInput.getText().toString();
 
-        // get text from username
-        EditText usernameText = root.findViewById(R.id.username);
-        String usernameMessage = usernameText.getText().toString();
+        //get input from password
+        EditText passwordInput = root.findViewById(R.id.password);
+        String password = passwordInput.getText().toString();
 
-        //get text from password
-        EditText passwordText = root.findViewById(R.id.password);
-        String passwordMessage = passwordText.getText().toString();
-
-
-        if(!usernameMessage.matches("") && !passwordMessage.matches("")) { //checks if the username edit text is not empty
-
-            //starts the service
-            Intent startServiceIntent = new Intent(getActivity(), DatabaseService.class);
-            startServiceIntent.putExtra(LOGIN_NAME, usernameMessage);
-            getActivity().startService(startServiceIntent);
-
-            // starts the main screen activity
-            Intent mainScreenIntent = new Intent(getActivity(), MainScreen.class);
-            getActivity().finish();
-            mainScreenIntent.putExtra(LOGIN_NAME, usernameMessage);
-            startActivity(mainScreenIntent);
-        }
-        if(passwordMessage.matches("")) {
+        if(password.matches("")) {
             Toast.makeText(getActivity(), "Password is missing", Toast.LENGTH_LONG).show();
-        }
-
-        if(usernameMessage.matches("")) {
+        } else if(username.matches("")) {
             Toast.makeText(getActivity(), "Username is missing", Toast.LENGTH_LONG).show();
+        } else {
+            loginScreen.login(username, password);
         }
     }
 

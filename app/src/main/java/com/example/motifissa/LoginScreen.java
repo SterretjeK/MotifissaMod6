@@ -2,6 +2,7 @@ package com.example.motifissa;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +28,8 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.w3c.dom.Text;
+
 import java.util.Random;
 
 public class LoginScreen extends AppCompatActivity {
@@ -36,28 +40,15 @@ public class LoginScreen extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReferenceUsers;
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){ // user is still signed in
-            loginSuccess(currentUser);
-        }
-    }
-
+    // layout
     TabLayout tabLayout;
     ViewPager viewPager;
-    float v = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
 
-        tabLayout = findViewById(R.id.tab_layout);
-        viewPager = findViewById(R.id.view_pager);
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
@@ -65,8 +56,9 @@ public class LoginScreen extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
         databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
 
-        Button loginButton = findViewById(R.id.login_button);
-        loginButton.setOnClickListener(view -> login()); // click handling code
+        // tab layout
+        tabLayout = findViewById(R.id.tab_layout);
+        viewPager = findViewById(R.id.view_pager);
 
         tabLayout.addTab(tabLayout.newTab().setText("Login"));
         tabLayout.addTab(tabLayout.newTab().setText("Signup"));
@@ -76,7 +68,6 @@ public class LoginScreen extends AppCompatActivity {
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
         // from the internet lol
@@ -98,29 +89,40 @@ public class LoginScreen extends AppCompatActivity {
             }
         });
 
+        ImageView app_logo = findViewById(R.id.app_logo);
+        TextView app_title = findViewById(R.id.app_title);
+        ConstraintLayout constraintLayout = findViewById(R.id.constraintLayout);
+
+        app_logo.setTranslationY(800);
+        app_title.setTranslationY(900);
+        constraintLayout.setTranslationY(1500);
+
+        constraintLayout.setAlpha(0f);
+
+        app_logo.setScaleX(2);
+        app_logo.setScaleY(2);
+        app_title.setScaleX(2);
+        app_title.setScaleY(2);
+
+        app_logo.animate().scaleX(1).scaleY(1).translationY(0).setDuration(800).setStartDelay(2500).start();
+        app_title.animate().scaleX(1).scaleY(1).translationY(0).setDuration(800).setStartDelay(2500).start();
+        constraintLayout.animate().translationY(0).alpha(1).setDuration(800).setStartDelay(2500).start();
+
+
     }
 
-    private void signUp() {
-        // get text from username
-        EditText usernameText = findViewById(R.id.username);
-        String username = usernameText.getText().toString();
-        // TODO think of a better way, like searching of the corresponding email to the username as this method doesn't allow duplicate names
-        String email = username + "@temp.com";
+    @Override
+    public void onStart() {
+        super.onStart();
 
-        //get text from password
-        EditText passwordText = findViewById(R.id.password);
-        String password = passwordText.getText().toString();
-
-        if(username.matches("") || password.matches("")) { //checks if the username edit text is not empty
-            Toast.makeText(LoginScreen.this, "Please fill in username or password to sign up", Toast.LENGTH_SHORT).show();
-            return;
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){ // user is still signed in
+            loginSuccess(currentUser);
         }
-        if (password.length() < 6){  // if firebase considers it a weak password
-            Toast.makeText(LoginScreen.this, "Password has to be at least 6 characters", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    }
 
-        activateLoadingAnimation();
+    public void signUp(String username, String email, String password) {
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -150,9 +152,7 @@ public class LoginScreen extends AppCompatActivity {
                         User userProfile = new User(username, user.getUid(), id);
                         databaseReferenceUsers.child(user.getUid()).setValue(userProfile).addOnSuccessListener(success -> {
                             loginSuccess(user);
-                            disableLoadingAnimation();
                         }).addOnFailureListener(error -> {
-                            disableLoadingAnimation();
                             user.delete();
                             Toast.makeText(LoginScreen.this, "Couldn't make a new user, try another username", Toast.LENGTH_SHORT).show();
                         });
@@ -162,7 +162,6 @@ public class LoginScreen extends AppCompatActivity {
 
                         Toast.makeText(LoginScreen.this, "Authentication failed.",
                                 Toast.LENGTH_SHORT).show();
-                        disableLoadingAnimation();
 
                         // TODO show error for example red lines on the input boxes.
 //                            updateUI(null);
@@ -170,54 +169,31 @@ public class LoginScreen extends AppCompatActivity {
                 });
     }
 
-    private void login(){
-        // get text from username
-        EditText usernameText = findViewById(R.id.username);
-        String username = usernameText.getText().toString();
+    public void login(String username, String password){
+        // TODO think of a better way, like searching of the corresponding email to the username as this method doesn't allow duplicate names
+        String email = username;
 
-        //get text from password
-        EditText passwordText = findViewById(R.id.password);
-        String password = passwordText.getText().toString();
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        loginSuccess(user);
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+                        Toast.makeText(LoginScreen.this, "Authentication failed.",
+                                Toast.LENGTH_SHORT).show();
 
-        if(username.matches("")) {  // checks if the username or password edit text is not empty
-            Toast.makeText(this, "Username is missing", Toast.LENGTH_LONG).show();
-        } else if(password.matches("")) {
-            Toast.makeText(this, "Password is missing", Toast.LENGTH_LONG).show();
-        } else {
-            activateLoadingAnimation();
-
-            // TODO think of a better way, like searching of the corresponding email to the username as this method doesn't allow duplicate names
-            String email = username + "@temp.com";
-
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-
-                            disableLoadingAnimation();
-
-                            loginSuccess(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginScreen.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-
-                            // TODO show error for example red lines on the input boxes.
-//                                updateUI(null);
-
-                            disableLoadingAnimation();
-                        }
-                    });
-        }
+                        // TODO show error for example red lines on the input boxes.
+                    }
+                });
     }
 
     private void loginSuccess(FirebaseUser user){
         //starts the service
         Intent startServiceIntent = new Intent(this, DatabaseService.class);
-//        startServiceIntent.putExtra(LOGIN_NAME, "Henk");
         startServiceIntent.putExtra("CurrentUser", mAuth.getCurrentUser());
         startService(startServiceIntent);
 
@@ -226,11 +202,14 @@ public class LoginScreen extends AppCompatActivity {
         Intent mainScreenIntent = new Intent(LoginScreen.this, MainScreen.class);
         finish();
         startActivity(mainScreenIntent);
+    }
 
-        // testing
-//        Intent testIntent = new Intent(LoginScreen.this, TestActivity.class);
-//        finish();
-//        startActivity(testIntent);
+    public void forgotPassword(String email) {
+        mAuth.sendPasswordResetEmail(email).addOnSuccessListener(succes -> {
+            Toast.makeText(this, "Reset mail has been send", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(error -> {
+            Toast.makeText(this, "Could not send mail", Toast.LENGTH_SHORT).show();
+        });
     }
 
 
