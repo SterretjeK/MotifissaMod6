@@ -99,8 +99,8 @@ public class LoginScreen extends AppCompatActivity {
 
         constraintLayout.setAlpha(0f);
 
-        app_logo.setScaleX(2);
-        app_logo.setScaleY(2);
+        app_logo.setScaleX(1.75f);
+        app_logo.setScaleY(1.75f);
         app_title.setScaleX(2);
         app_title.setScaleY(2);
 
