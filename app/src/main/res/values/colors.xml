@@ -10,11 +10,19 @@
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="lighter_grey">#F0F0F0</color>
-    <color name="ok">#E0E0E0</color>
-    <color name="light_grey">#C0C0C0</color>
-    <color name="grey">#808080</color>
-    <color name="dark_grey">#404040</color>
-    <color name="darker_grey">#202020</color>
+    <color name="gray">#808080</color>
+    <color name="dark_gray">#121212</color>
     <color name="error">#FF0000</color>
+
+
+
+    <color name="gray_100">#E6E6E6</color>
+    <color name="gray_200">#CCCCCC</color>
+    <color name="gray_300">#B3B3B3</color>
+    <color name="gray_400">#999999</color>
+    <color name="gray_500">#808080</color>
+    <color name="gray_600">#666666</color>
+    <color name="gray_700">#4C4C4C</color>
+    <color name="gray_800">#333333</color>
+    <color name="gray_900">#1A1A1A</color>
 </resources>
