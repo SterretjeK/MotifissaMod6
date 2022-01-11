@@ -63,7 +63,7 @@ public class ChooseFriendFragment extends Fragment {
         if (challengeActivity.mBounded.get()) { // TODO think of something better
             this.populateList(view);
         } else{
-            challengeActivity.mBounded.setListener((ListenerVariable.ChangeListener<Boolean>) value -> {
+            challengeActivity.mBounded.addListener((ListenerVariable.ChangeListener<Boolean>) value -> {
                 if(value) populateList(view);
             });
         }

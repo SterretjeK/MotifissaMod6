@@ -1,8 +1,10 @@
 package com.example.motifissa;
 
+import java.util.ArrayList;
+
 public class ListenerVariable<T> {
     private T variable;
-    private ChangeListener<T> listener;
+    private ArrayList<ChangeListener<T>> listeners = new ArrayList<>();
 
     public ListenerVariable(T startValue) {
         variable = startValue;
@@ -18,15 +20,18 @@ public class ListenerVariable<T> {
 
     public void set(T variable) {
         this.variable = variable;
-        if (listener != null) listener.onChange(this.variable);
+        if (listeners != null){
+            for (ChangeListener<T> listener : listeners)
+                listener.onChange(this.variable);
+        }
     }
 
-    public ChangeListener<T> getListener() {
-        return listener;
+    public void removeListener(ChangeListener<T> listener){
+        this.listeners.remove(listener);
     }
 
-    public void setListener(ChangeListener<T> listener) {
-        this.listener = listener;
+    public void addListener(ChangeListener<T> listener) {
+        this.listeners.add(listener);
     }
 
 

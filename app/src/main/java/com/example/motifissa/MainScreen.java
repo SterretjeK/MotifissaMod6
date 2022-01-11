@@ -1,5 +1,6 @@
 package com.example.motifissa;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -218,5 +219,46 @@ public class MainScreen extends AppCompatActivity {
     public void showNotifications() {
         View notificationsFragment = findViewById(R.id.notificationsFragment);
         notificationsFragment.setVisibility(View.VISIBLE);
+
+        // This callback will change what happens when the user clicks back
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                View notificationsFragment = findViewById(R.id.notificationsFragment);
+                notificationsFragment.setVisibility(View.INVISIBLE);
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    public Query getNotifications(){
+        if (mBounded.get() && mDatabaseService != null) {
+            try {
+                return mDatabaseService.getNotifications();
+            } catch (Exception e) {
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getNotifications");
+            }
+        }
+
+        if (!mIsConnecting) {
+            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
+            this.connectToService();
+        }
+        return null;
+    }
+
+    public User getUser(String ID){
+        if (mBounded.get()) {
+            try {
+                return mDatabaseService.getUser(ID);
+            } catch (Exception e){
+                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getUser");
+            }
+        }
+
+        if (!mIsConnecting) {
+            this.connectToService();
+        }
+        return null;
     }
 }

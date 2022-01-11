@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -70,7 +71,7 @@ public class FriendsFragment extends Fragment {
             userQuery.addValueEventListener(usersChangeListener);
         }
         else{
-            mainscreen.mBounded.setListener(value -> {
+            mainscreen.mBounded.addListener(value -> {
                 if(value) {
                     userQuery = mainscreen.mDatabaseService.getUsersQuery();
                     userQuery.addValueEventListener(usersChangeListener);
@@ -138,8 +139,8 @@ public class FriendsFragment extends Fragment {
     };
 
 
-    private AdapterView.OnItemClickListener usersListListener = (parent, view, position, id) -> {
-        String UID = friendsListAdaptor.getItem(position).getUID();
+    private final AdapterView.OnItemClickListener usersListListener = (parent, view, position, id) -> {
+        String UID = Objects.requireNonNull(friendsListAdaptor.getItem(position)).getUID();
         mainscreen.toggleFriend(UID).addOnSuccessListener(success ->{
                 if(friends.contains(UID))
                     friends.remove(UID);

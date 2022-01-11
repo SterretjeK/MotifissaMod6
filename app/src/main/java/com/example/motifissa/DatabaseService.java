@@ -29,14 +29,6 @@ public class DatabaseService extends Service {
 
     IBinder mBinder = new LocalBinder();
 
-    // data OLD
-//    JSONObject[] usersArray;
-//    JSONObject users;
-//    JSONObject currentUser;
-//    ArrayList<String> friendsNameArray;
-//    ArrayList<String> friendsIDArray;
-//    JSONObject friends;
-
     // Firebase
     private DatabaseReference databaseReferenceUsers;
     private FirebaseUser currentUser;
@@ -60,9 +52,6 @@ public class DatabaseService extends Service {
          currentUser = (FirebaseUser) intent.getExtras().getParcelable("CurrentUser");
 
          setup();
-//        makeUsers();
-//        String username = intent.getExtras().getString("LOGIN_NAME");
-//        setCurrentUser(username);
         return START_STICKY;
     }
 
@@ -135,6 +124,10 @@ public class DatabaseService extends Service {
 
     public Query getUsersQuery(){
         return databaseReferenceUsers.orderByKey();
+    }
+
+    public Query getNotifications(){
+        return databaseReferenceUsers.child(currentUser.getUid()).child("notifications");
     }
 
     public User getCurrentUser(){
