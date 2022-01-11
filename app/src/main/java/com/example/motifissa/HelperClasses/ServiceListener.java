@@ -99,12 +99,20 @@ public class ServiceListener extends AppCompatActivity {
         return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUser());
     }
 
-    public ListenerTask<ArrayList<String>> getFriendsNames(){
-        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
-    }
-
     public ListenerTask<Task<Void>> sendNotification(String msg, String toUID){
         return new ListenerTask<>(this, () -> mDatabaseService.sendNotification(msg, toUID));
+    }
+
+    public ListenerTask<ArrayList<User>> getFriends(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsData());
+    }
+
+    public ListenerTask<Query> getCurrentUserQuery(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUserQuery());
+    }
+
+    public ListenerTask<ArrayList<String>> getFriendsNames(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
     }
 
     // ----------- Direct service functions  -----------

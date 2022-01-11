@@ -125,6 +125,9 @@ public class DatabaseService extends Service {
     public Query getUsersQuery(){
         return databaseReferenceUsers.orderByKey();
     }
+    public Query getCurrentUserQuery(){
+        return databaseReferenceUsers.child(currentUser.getUid()).child("friends");
+    }
 
     public Query getNotifications(){
         return databaseReferenceUsers.child(currentUser.getUid()).child("notifications");
