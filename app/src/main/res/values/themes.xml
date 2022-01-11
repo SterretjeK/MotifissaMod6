@@ -12,11 +12,12 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="backgroundColor">@color/lighter_grey</item>
-        <item name="colorOnBackground">@color/white</item>
-        <item name="itemTextColor">@color/dark_grey</item>
+        <item name="backgroundColor">@color/white</item>
+        <item name="colorOnBackground">@color/gray_200</item>
+        <item name="itemTextColor">@color/gray_900</item>
         <item name="fontFamily">@font/montserrat</item>
         <item name="colorError">@color/error</item>
+        <item name="elevationOverlayColor">@color/white</item>
     </style>
 
 </resources>
