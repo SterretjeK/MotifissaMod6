@@ -12,7 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Motifissa">
         <activity android:name=".NotificationsActivity"/>
-        <activity android:name=".TestActivity" />
         <activity android:name=".challenge_screens.ChallengeActivity" />
         <activity
             android:name=".MainScreen"

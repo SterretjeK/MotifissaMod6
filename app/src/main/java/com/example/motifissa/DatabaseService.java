@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -17,16 +19,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
 
 public class DatabaseService extends Service {
 
+    private static final String TAG = "DatabaseService";
     IBinder mBinder = new LocalBinder();
 
     // Firebase
@@ -67,6 +65,7 @@ public class DatabaseService extends Service {
                     User user = data.getValue(User.class);
                     usersArray.add(user);
 
+                    assert user != null;
                     users.put(user.getUID(), user);
                 }
 
@@ -82,6 +81,7 @@ public class DatabaseService extends Service {
                         friendsUIDArray.add(friendUID);
                         User friend = users.get(friendUID);
                         friendsData.add(friend);
+                        assert friend != null;
                         friendsNameArray.add(friend.getName());
                     }
                 } catch(NullPointerException ignored){
@@ -174,7 +174,23 @@ public class DatabaseService extends Service {
 
     public Task<Void> sendNotification(String msg, String UID){
         User tempUser = users.get(UID);
-        tempUser.addNotification(msg + "|" + currentUserData.getUID());
+        if (tempUser != null) {
+            tempUser.addNotification(msg + "|" + currentUserData.getUID());
+        } else{
+            Toast.makeText(getBaseContext(), "User doesn't exists, trying to remove friend..", Toast.LENGTH_SHORT).show();
+            // remove the UID from the users friend list if it doesn't exist anymore
+            if (friendsUIDArray.contains(UID)){
+                User user = currentUserData;
+                if (user.removeFriend(UID)){ // if the friend could be removed
+                    databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData)
+                            .addOnSuccessListener(success ->  Toast.makeText(getBaseContext(), "successfully removed unknown friend", Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(error ->{
+                                Toast.makeText(getBaseContext(), "Couldn't remove friend", Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Couldn't remove unknown friend, error: " + error);
+                            });
+                }
+            }
+        }
         return databaseReferenceUsers.child(UID).setValue(tempUser);
     }
 }

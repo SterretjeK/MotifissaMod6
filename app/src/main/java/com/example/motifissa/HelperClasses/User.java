@@ -1,4 +1,4 @@
-package com.example.motifissa;
+package com.example.motifissa.HelperClasses;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,6 @@ public class User {
         this.Score = 0;
         this.isOnline = true;
         this.Friends = new ArrayList<>();
-        this.Friends.add("rKjspnNlU7OWs4BOGeQR59g5VQ23"); // add the TestAccount to their friends
         this.Notifications = new ArrayList<>();
     }
 
@@ -101,5 +100,11 @@ public class User {
         }
     }
 
+    public boolean removeFriend(String UID) {
+        if(Friends.contains(UID)){
+            Friends.remove(UID);
+            return true;
+        } else return false;
+    }
 }
 

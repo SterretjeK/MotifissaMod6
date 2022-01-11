@@ -3,30 +3,17 @@ package com.example.motifissa.challenge_screens;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-import com.example.motifissa.DatabaseService;
-import com.example.motifissa.ListenerVariable;
+import com.example.motifissa.HelperClasses.ListenerTask;
 import com.example.motifissa.R;
-import com.example.motifissa.ServiceListener;
-import com.example.motifissa.User;
+import com.example.motifissa.HelperClasses.ServiceListener;
 import com.google.android.gms.tasks.Task;
-
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class ChallengeActivity extends ServiceListener {
 
@@ -57,7 +44,7 @@ public class ChallengeActivity extends ServiceListener {
             @Override
             public void handleOnBackPressed() {
                 if (currentFragment > 1)
-                    changeFragment(currentFragment-1);
+                    changeFragment(currentFragment - 1);
                 else
                     finish();
             }
@@ -79,10 +66,10 @@ public class ChallengeActivity extends ServiceListener {
     }
 
 
-    public void changeFragment(int changeToFragment){
+    public void changeFragment(int changeToFragment) {
         Fragment selectedFragment;
 
-        switch (changeToFragment){
+        switch (changeToFragment) {
             case 1:
                 selectedFragment = chooseFriendFragment;
                 break;
@@ -115,14 +102,14 @@ public class ChallengeActivity extends ServiceListener {
     }
 
 
-    public void moveUpFragment(){
-        changeFragment(currentFragment+1);
+    public void moveUpFragment() {
+        changeFragment(currentFragment + 1);
         // This callback will change what happens when the user clicks back
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
                 if (currentFragment > 1)
-                    changeFragment(currentFragment-1);
+                    changeFragment(currentFragment - 1);
                 else
                     finish();
             }
@@ -130,13 +117,14 @@ public class ChallengeActivity extends ServiceListener {
         this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
-    public void moveBackFragment(){
+    public void moveBackFragment() {
         if (currentFragment > 1)
-            changeFragment(currentFragment-1);
+            changeFragment(currentFragment - 1);
         else
             finish();
     }
-    public void moveBackFragment(int amount){
+
+    public void moveBackFragment(int amount) {
         if (currentFragment - amount > 0)
             changeFragment(currentFragment - amount);
         else
@@ -257,25 +245,15 @@ public class ChallengeActivity extends ServiceListener {
 //        return null;
 //    }
 
-//    public Task<Void> challengeFriend(){
-//        if (mBounded.get()) {
-//            try {
-//                return mDatabaseService.sendNotification("Challenge", selectedFriend);
-//            } catch (Exception e){
-//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
-//            }
-//        }
-//
-//        if (!mIsConnecting) {
-//            this.connectToService();
-//        }
-//        return null;
-//    }
+    public ListenerTask<Task<Void>> challengeFriend() {
+        return sendNotification("Challenge", selectedFriend);
+    }
 
     public String getSelectedFriend() {
         return selectedFriend;
     }
-    public void setSelectedFriend(String newID){
+
+    public void setSelectedFriend(String newID) {
         selectedFriend = newID;
     }
 }

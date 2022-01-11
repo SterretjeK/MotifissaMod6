@@ -1,7 +1,4 @@
-package com.example.motifissa;
-
-import android.util.Log;
-import android.widget.Toast;
+package com.example.motifissa.HelperClasses;
 
 public class ListenerTask<T> {
     private SuccessListener<T> successListener;

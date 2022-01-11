@@ -1,4 +1,4 @@
-package com.example.motifissa;
+package com.example.motifissa.HelperClasses;
 
 import java.util.ArrayList;
 

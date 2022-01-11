@@ -1,15 +1,16 @@
-package com.example.motifissa;
+package com.example.motifissa.HelperClasses;
 
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.motifissa.DatabaseService;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
@@ -100,6 +101,10 @@ public class ServiceListener extends AppCompatActivity {
 
     public ListenerTask<ArrayList<String>> getFriendsNames(){
         return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
+    }
+
+    public ListenerTask<Task<Void>> sendNotification(String msg, String toUID){
+        return new ListenerTask<>(this, () -> mDatabaseService.sendNotification(msg, toUID));
     }
 
     // ----------- Direct service functions  -----------

@@ -1,10 +1,15 @@
-package com.example.motifissa;
+package com.example.motifissa.HelperClasses;
 
 import android.content.Context;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+
+import com.example.motifissa.LoginTabFragment;
+import com.example.motifissa.SignupTabFragment;
+
+import org.jetbrains.annotations.NotNull;
 
 public class LoginAdapter extends FragmentPagerAdapter {
 
@@ -22,16 +27,15 @@ public class LoginAdapter extends FragmentPagerAdapter {
         return totalTabs;
     }
 
+    @NotNull
     public Fragment getItem(int position){
         switch (position){
             case 0:
-                LoginTabFragment loginTabFragment = new LoginTabFragment();
-                return loginTabFragment;
+                return new LoginTabFragment();
             case 1:
-                SignupTabFragment signupTabFragment = new SignupTabFragment();
-                return signupTabFragment;
+                return new SignupTabFragment();
             default:
-                return null;
+                return new LoginTabFragment();
         }
     }
 }
