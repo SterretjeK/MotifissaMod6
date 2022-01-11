@@ -20,8 +20,11 @@ import androidx.fragment.app.Fragment;
 import com.example.motifissa.DatabaseService;
 import com.example.motifissa.ListenerVariable;
 import com.example.motifissa.R;
+import com.example.motifissa.User;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class ChallengeActivity extends AppCompatActivity {
 
@@ -189,7 +192,7 @@ public class ChallengeActivity extends AppCompatActivity {
         mIsConnecting = false;
     }
 
-    public JSONObject[] getUsers(){
+    public ArrayList<User> getUsersArray(){
         if (mBounded.get() && mDatabaseService != null) {
             try {
                 return mDatabaseService.getUsersArray();
@@ -204,7 +207,7 @@ public class ChallengeActivity extends AppCompatActivity {
         return null;
     }
 
-    public JSONObject getUser(String ID){
+    public User getUser(String ID){
         if (mBounded.get()) {
             try {
                 return mDatabaseService.getUser(ID);
@@ -219,7 +222,7 @@ public class ChallengeActivity extends AppCompatActivity {
         return null;
     }
 
-    public String[] getFriends(){
+    public ArrayList<String> getFriends(){
         if (mBounded.get()) {
             try {
                 return mDatabaseService.getFriendsNameArray();
@@ -234,10 +237,10 @@ public class ChallengeActivity extends AppCompatActivity {
         return null;
     }
 
-    public String[] getFriendsID(){
+    public ArrayList<String> getFriendsID(){
         if (mBounded.get()) {
             try {
-                return mDatabaseService.getFriendsIDArray();
+                return mDatabaseService.getFriendsUIDArray();
             } catch (Exception e){
                 Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
             }
@@ -249,10 +252,10 @@ public class ChallengeActivity extends AppCompatActivity {
         return null;
     }
 
-    public JSONObject getCurrentUser() {
+    public User getCurrentUser() {
         if (mBounded.get()) {
             try {
-                return mDatabaseService.getCurrentUser();
+                return mDatabaseService.getCurrentUserData();
             } catch (Exception e){
                 Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
             }
