@@ -16,11 +16,12 @@ import java.util.ArrayList;
 
 public class ServiceListener extends AppCompatActivity {
     // service
-    ListenerVariable<Boolean> mBounded = new ListenerVariable<>(false); // a custom type, that allows us to add listeners to variables
-    boolean mIsConnecting;
-    DatabaseService mDatabaseService;
+    protected ListenerVariable<Boolean> mBounded; // a custom type, that allows us to add listeners to variables
+    protected boolean mIsConnecting;
+    protected DatabaseService mDatabaseService;
 
     public ServiceListener() {
+        mBounded = new ListenerVariable<>(false);
     }
 
     @Override
@@ -38,17 +39,18 @@ public class ServiceListener extends AppCompatActivity {
 
     protected void onServiceConnect(){}
 
-    // -------- connect to service --------
-    private void connectToService(){
+    // ----------------  Connect to service  ----------------
+    public void connectToService(){
         if (!mBounded.get()) {
             mIsConnecting = true;
-            mBounded = new ListenerVariable<>(false);
+//            mBounded = new ListenerVariable<>(false);
+            mBounded.set(false);
             Intent serviceIntent = new Intent(this, DatabaseService.class);
             bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
         }
     }
 
-    ServiceConnection mConnection = new ServiceConnection() {
+    protected ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
 //            Toast.makeText(getBaseContext(), "Service is disconnected", Toast.LENGTH_SHORT).show();
@@ -83,18 +85,27 @@ public class ServiceListener extends AppCompatActivity {
         mIsConnecting = false;
     }
 
-    // -------- service functions  --------
-//    public QueueItem<Query> getNotifications(){
-//        QueueItem<Query> queueItem = new QueueItem<>();
-//        return queueItem;
-//    }
-
+    // ---------------- Service functions ----------------
     public ListenerTask<Query> getNotifications(){
-        return new ListenerTask<>(mBounded, () -> mDatabaseService.getNotifications());
+        return new ListenerTask<>(this, () -> mDatabaseService.getNotifications());
     }
 
     public ListenerTask<User> getUser(String UID){
-        return new ListenerTask<>(mBounded, () -> mDatabaseService.getUser(UID));
+        return new ListenerTask<>(this, () -> mDatabaseService.getUser(UID));
+    }
+
+    public ListenerTask<User> getCurrentUser(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUser());
+    }
+
+    public ListenerTask<ArrayList<String>> getFriendsNames(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
+    }
+
+    // ----------- Direct service functions  -----------
+    // DON't USE THESE AS THEY COULD TROW A NULLPOINTER ERROR because the connection isn't checked
+    public User getUserDirect(String UID){
+        return mDatabaseService.getUser(UID);
     }
 
 }

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,13 @@ import android.widget.ListView;
 
 import com.example.motifissa.ListenerVariable;
 import com.example.motifissa.R;
+import com.example.motifissa.ServiceListener;
 
 import java.util.ArrayList;
 
 public class ChooseFriendFragment extends Fragment {
 
-    ChallengeActivity challengeActivity;
+    ServiceListener serviceListener;
     ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> friends;
     private ArrayList<String> friendsID;
@@ -46,8 +48,8 @@ public class ChooseFriendFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof ChallengeActivity) {
-            challengeActivity = (ChallengeActivity) context;
+        if (context instanceof ServiceListener) {
+            serviceListener = (ServiceListener) context;
         } else {
             throw new RuntimeException(context.toString() + " must be MainScreen");
         }
@@ -59,45 +61,39 @@ public class ChooseFriendFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_choose_friend, container, false);
 
-        // setup the list view for the users
-        if (challengeActivity.mBounded.get()) { // TODO think of something better
-            this.populateList(view);
-        } else{
-            challengeActivity.mBounded.addListener((ListenerVariable.ChangeListener<Boolean>) value -> {
-                if(value) populateList(view);
-            });
-        }
+        populateList(view);
 
         return view;
     }
 
     public void populateList(View view){
         // setup the list view for the users
-        friends = challengeActivity.getFriends();
-        friendsID = challengeActivity.getFriendsID();
+//        friends = challengeActivity.getFriends();
+//        friendsID = challengeActivity.getFriendsID();
+        // TODO make a custom list adaptor
+        serviceListener.getFriendsNames().setSuccessListener(friends -> {
+            this.friends = friends;
 
-        ListView friendslist = view.findViewById(R.id.C_friends_list);
+            ListView friendsList = view.findViewById(R.id.C_friends_list);
 
-        arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1,friends);
+            arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1,friends);
 //        friendsListAdaptor = new FriendsListAdaptor(getActivity(), users, friends);
-        friendslist.setAdapter(arrayAdapter);
+            friendsList.setAdapter(arrayAdapter);
 
-        friendslist.setOnItemClickListener(friendsListListener);
+            friendsList.setOnItemClickListener(friendsListListener);
 
-        // setup the search field:
-        EditText searchField = view.findViewById(R.id.C_search_friends);
-        searchField.addTextChangedListener(searchTextWatcher);
+            // setup the search field:
+            EditText searchField = view.findViewById(R.id.C_search_friends);
+            searchField.addTextChangedListener(searchTextWatcher);
+        });
     }
 
 
-    private final AdapterView.OnItemClickListener friendsListListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // TODO make a new intent to go to the next fragment and send with the username of the friend
-            challengeActivity.setSelectedFriend(friendsID.get(position));
-            challengeActivity.moveUpFragment();
+    private final AdapterView.OnItemClickListener friendsListListener = (parent, view, position, id) -> {
+        //String friendID = arrayAdapter.getItem(position).getUID();
+//            challengeActivity.setSelectedFriend(friendsID.get(position));
+//            challengeActivity.moveUpFragment();
 
-        }
     };
 
 

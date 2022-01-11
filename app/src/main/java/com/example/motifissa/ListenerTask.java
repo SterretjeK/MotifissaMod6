@@ -1,28 +1,21 @@
 package com.example.motifissa;
 
+import android.util.Log;
+import android.widget.Toast;
+
 public class ListenerTask<T> {
     private SuccessListener<T> successListener;
-    private ServiceFunction<T> serviceFunction;
     private boolean completed;
     private T result;
-    private final ListenerVariable<Boolean> mBounded;
+//    private final ListenerVariable<Boolean> mBounded;
 
-    public ListenerTask(ListenerVariable<Boolean> mBounded, ServiceFunction<T> serviceFunction) {
-        this.mBounded = mBounded;
-        if(mBounded.get()){
+    public ListenerTask(ServiceListener serviceListener, ServiceFunction<T> serviceFunction) {
+        if(serviceListener.mBounded.get()){
             completed = true;
             result = serviceFunction.function();
         } else{
             completed = false;
-            mBounded.addListener(changeListener);
-
-        }
-    }
-
-    ListenerVariable.ChangeListener<Boolean> changeListener = new ListenerVariable.ChangeListener<Boolean>() {
-        @Override
-        public void onChange(Boolean value) {
-            if(value) {
+            serviceListener.mBounded.addSuccessListener(() -> {
                 result = serviceFunction.function();
                 completed = true;
 
@@ -31,12 +24,13 @@ public class ListenerTask<T> {
                     successListener.onSuccess(result);
                     successListener = null;
                 }
+            });
 
-                //remove it self
-                mBounded.removeListener(changeListener);
-            }
+            // reconnect to the service if it isn't already
+            if(!serviceListener.mIsConnecting)
+                serviceListener.connectToService();
         }
-    };
+    }
 
 
 

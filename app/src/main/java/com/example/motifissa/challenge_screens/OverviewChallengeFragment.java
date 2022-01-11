@@ -53,8 +53,8 @@ public class OverviewChallengeFragment extends Fragment {
             throw new RuntimeException(context.toString() + " must be challengeActivity");
         }
 
-        selectedUser = challengeActivity.getUser(challengeActivity.getSelectedFriend());
-        currentUser = challengeActivity.getCurrentUser();
+        challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> selectedUser = result);
+        challengeActivity.getCurrentUser().setSuccessListener(result -> currentUser = result);
     }
 
     @Override
@@ -84,8 +84,8 @@ public class OverviewChallengeFragment extends Fragment {
 
         Button challengeFriend_button = v.findViewById(R.id.ChallengeFriendButton);
         challengeFriend_button.setOnClickListener(view -> {
-            challengeActivity.challengeFriend().addOnSuccessListener(success -> challengeActivity.moveUpFragment())
-                    .addOnFailureListener(error -> Toast.makeText(getContext(), "Couldn't sent notification", Toast.LENGTH_SHORT).show());
+//            challengeActivity.challengeFriend().addOnSuccessListener(success -> challengeActivity.moveUpFragment())
+//                    .addOnFailureListener(error -> Toast.makeText(getContext(), "Couldn't sent notification", Toast.LENGTH_SHORT).show());
         });
 
         return v;

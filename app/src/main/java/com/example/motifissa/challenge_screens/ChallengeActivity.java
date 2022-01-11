@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.example.motifissa.DatabaseService;
 import com.example.motifissa.ListenerVariable;
 import com.example.motifissa.R;
+import com.example.motifissa.ServiceListener;
 import com.example.motifissa.User;
 import com.google.android.gms.tasks.Task;
 
@@ -27,12 +28,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ChallengeActivity extends AppCompatActivity {
+public class ChallengeActivity extends ServiceListener {
 
     // service
-    ListenerVariable<Boolean> mBounded = new ListenerVariable<>(false); // a custom type, that allows us to add listeners to variables
-    boolean mIsConnecting;
-    DatabaseService mDatabaseService;
+//    ListenerVariable<Boolean> mBounded = new ListenerVariable<>(false); // a custom type, that allows us to add listeners to variables
+//    boolean mIsConnecting;
+//    DatabaseService mDatabaseService;
 
     // fragments
     int currentFragment = 1;
@@ -77,13 +78,6 @@ public class ChallengeActivity extends AppCompatActivity {
         changeFragment(1);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // setup the service that connects to the database (just mock data for now)
-        this.connectToService();
-    }
 
     public void changeFragment(int changeToFragment){
         Fragment selectedFragment;
@@ -149,137 +143,134 @@ public class ChallengeActivity extends AppCompatActivity {
             finish();
     }
 
-//    public void changeFragment(int from, int to){
-//        // TODO make this if necessary
+
+//    public void connectToService(){
+//        mIsConnecting  = true;
+//        mBounded.set(false);
+//        Intent serviceIntent = new Intent(this, DatabaseService.class);
+//        bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
+//    }
+//
+//    ServiceConnection mConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            mBounded.set(false);
+//            mIsConnecting = false;
+//            mDatabaseService = null;
+//        }
+//
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
+//            mDatabaseService = mLocalBinder.getServerInstance();
+//            mBounded.set(true);
+//            mIsConnecting = false;
+//
+////            Toast.makeText(ChallengeActivity.this, "Service is connected Challenge screen", Toast.LENGTH_SHORT).show();
+//        }
+//    };
+
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        //when the activity is stopped, release the server
+//        if(mBounded.get()) {
+//            unbindService(mConnection);
+//            mBounded.set(false);
+//        }
+//        mIsConnecting = false;
 //    }
 
-    private void connectToService(){
-        mIsConnecting  = true;
-        mBounded.set(false);
-        Intent serviceIntent = new Intent(this, DatabaseService.class);
-        bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
-    }
+//    public ArrayList<User> getUsersArray(){
+//        if (mBounded.get() && mDatabaseService != null) {
+//            try {
+//                return mDatabaseService.getUsersArray();
+//            } catch (Exception e) {
+//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
+//            }
+//        }
+//
+//        if (!mIsConnecting) {
+//            this.connectToService();
+//        }
+//        return null;
+//    }
 
-    ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBounded.set(false);
-            mIsConnecting = false;
-            mDatabaseService = null;
-        }
+//    public User getUser(String ID){
+//        if (mBounded.get()) {
+//            try {
+//                return mDatabaseService.getUser(ID);
+//            } catch (Exception e){
+//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getUser");
+//            }
+//        }
+//
+//        if (!mIsConnecting) {
+//            this.connectToService();
+//        }
+//        return null;
+//    }
 
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
-            mDatabaseService = mLocalBinder.getServerInstance();
-            mBounded.set(true);
-            mIsConnecting = false;
+//    public ArrayList<String> getFriends(){
+//        if (mBounded.get()) {
+//            try {
+//                return mDatabaseService.getFriendsNameArray();
+//            } catch (Exception e){
+//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
+//            }
+//        }
+//
+//        if (!mIsConnecting) {
+//            this.connectToService();
+//        }
+//        return null;
+//    }
 
-//            Toast.makeText(ChallengeActivity.this, "Service is connected Challenge screen", Toast.LENGTH_SHORT).show();
-        }
-    };
+//    public ArrayList<String> getFriendsID(){
+//        if (mBounded.get()) {
+//            try {
+//                return mDatabaseService.getFriendsUIDArray();
+//            } catch (Exception e){
+//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
+//            }
+//        }
+//
+//        if (!mIsConnecting) {
+//            this.connectToService();
+//        }
+//        return null;
+//    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
+//    public User getCurrentUser() {
+//        if (mBounded.get()) {
+//            try {
+//                return mDatabaseService.getCurrentUserData();
+//            } catch (Exception e){
+//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
+//            }
+//        }
+//
+//        if (!mIsConnecting) {
+//            this.connectToService();
+//        }
+//        return null;
+//    }
 
-        //when the activity is stopped, release the server
-        if(mBounded.get()) {
-            unbindService(mConnection);
-            mBounded.set(false);
-        }
-        mIsConnecting = false;
-    }
-
-    public ArrayList<User> getUsersArray(){
-        if (mBounded.get() && mDatabaseService != null) {
-            try {
-                return mDatabaseService.getUsersArray();
-            } catch (Exception e) {
-                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
-            }
-        }
-
-        if (!mIsConnecting) {
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public User getUser(String ID){
-        if (mBounded.get()) {
-            try {
-                return mDatabaseService.getUser(ID);
-            } catch (Exception e){
-                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getUser");
-            }
-        }
-
-        if (!mIsConnecting) {
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public ArrayList<String> getFriends(){
-        if (mBounded.get()) {
-            try {
-                return mDatabaseService.getFriendsNameArray();
-            } catch (Exception e){
-                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
-            }
-        }
-
-        if (!mIsConnecting) {
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public ArrayList<String> getFriendsID(){
-        if (mBounded.get()) {
-            try {
-                return mDatabaseService.getFriendsUIDArray();
-            } catch (Exception e){
-                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
-            }
-        }
-
-        if (!mIsConnecting) {
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public User getCurrentUser() {
-        if (mBounded.get()) {
-            try {
-                return mDatabaseService.getCurrentUserData();
-            } catch (Exception e){
-                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
-            }
-        }
-
-        if (!mIsConnecting) {
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public Task<Void> challengeFriend(){
-        if (mBounded.get()) {
-            try {
-                return mDatabaseService.sendNotification("Challenge", selectedFriend);
-            } catch (Exception e){
-                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
-            }
-        }
-
-        if (!mIsConnecting) {
-            this.connectToService();
-        }
-        return null;
-    }
+//    public Task<Void> challengeFriend(){
+//        if (mBounded.get()) {
+//            try {
+//                return mDatabaseService.sendNotification("Challenge", selectedFriend);
+//            } catch (Exception e){
+//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
+//            }
+//        }
+//
+//        if (!mIsConnecting) {
+//            this.connectToService();
+//        }
+//        return null;
+//    }
 
     public String getSelectedFriend() {
         return selectedFriend;

@@ -42,8 +42,8 @@ public class ChallengeSentFragment extends Fragment {
             throw new RuntimeException(context.toString() + " must be challengeActivity");
         }
 
-        selectedUser = challengeActivity.getUser(challengeActivity.getSelectedFriend());
-        currentUser = challengeActivity.getCurrentUser();
+        challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> selectedUser = result);
+        challengeActivity.getCurrentUser().setSuccessListener(result -> currentUser = result);
     }
 
     @Override
