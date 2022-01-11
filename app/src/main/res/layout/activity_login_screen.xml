@@ -8,18 +8,6 @@
     android:layout_height="match_parent"
     tools:context="LoginScreen">
 
-<!--    <ImageView-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:src="@drawable/motifissa_logo"-->
-<!--        app:layout_constraintHeight_percent=".27"-->
-<!--        android:scaleType="centerCrop"-->
-<!--        app:layout_constraintVertical_bias="0"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
@@ -56,7 +44,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
-        android:id="@+id/imageView8"
+        android:id="@+id/logo"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:src="@drawable/motifissa_logo_round"
@@ -77,9 +65,7 @@
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView8" />
-
-
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
