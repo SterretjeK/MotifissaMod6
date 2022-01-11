@@ -76,8 +76,6 @@ public class MainScreen extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
-        View notificationsFragment = findViewById(R.id.notificationsFragment);
-        notificationsFragment.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -217,18 +215,8 @@ public class MainScreen extends AppCompatActivity {
     }
 
     public void showNotifications() {
-        View notificationsFragment = findViewById(R.id.notificationsFragment);
-        notificationsFragment.setVisibility(View.VISIBLE);
-
-        // This callback will change what happens when the user clicks back
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-            @Override
-            public void handleOnBackPressed() {
-                View notificationsFragment = findViewById(R.id.notificationsFragment);
-                notificationsFragment.setVisibility(View.INVISIBLE);
-            }
-        };
-        this.getOnBackPressedDispatcher().addCallback(this, callback);
+        Intent notificationsIntent = new Intent(MainScreen.this, NotificationsActivity.class);
+        startActivity(notificationsIntent);
     }
 
     public Query getNotifications(){

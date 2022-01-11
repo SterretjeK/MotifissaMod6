@@ -63,15 +63,15 @@ public class ChallengeActivity extends AppCompatActivity {
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
 
+        // set the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // calling the action bar
+        // setup the action bar
         ActionBar actionBar = getSupportActionBar();
-        // showing the back button in action bar
-        assert actionBar != null; // to make sure that this activity has an action bar, idk wou die graag
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(R.layout.action_bar);
+        assert actionBar != null; // to make sure that this activity has an action bar
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); // showing the back button in action bar
+        actionBar.setCustomView(R.layout.action_bar); // set our custom action bar
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         changeFragment(1);
@@ -107,17 +107,15 @@ public class ChallengeActivity extends AppCompatActivity {
         this.currentFragment = changeToFragment;
     }
 
-    // this event will enable the back
-    // function to the button on press
+    // this event will handle the bck arrow on the action bar
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (currentFragment > 1)
-                    changeFragment(currentFragment-1);
-                else
-                    finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            if (currentFragment > 1)
+                changeFragment(currentFragment - 1);
+            else
+                finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
