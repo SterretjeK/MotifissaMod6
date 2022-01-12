@@ -47,7 +47,7 @@ public class DatabaseService extends Service {
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
         databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
 
-         currentUser = (FirebaseUser) intent.getExtras().getParcelable("CurrentUser");
+         currentUser = intent.getExtras().getParcelable("CurrentUser");
 
          setup();
         return START_STICKY;
@@ -175,10 +175,10 @@ public class DatabaseService extends Service {
         return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
     }
 
-    public Task<Void> sendNotification(String msg, String UID){
+    public Task<Void> sendNotification(String msg, String UID, String date){
         User tempUser = users.get(UID);
         if (tempUser != null) {
-            tempUser.addNotification(msg + "|" + currentUserData.getUID());
+            tempUser.addNotification(msg + "|" + currentUserData.getUID() + "|" + date);
         } else{
             Toast.makeText(getBaseContext(), "User doesn't exists, trying to remove friend..", Toast.LENGTH_SHORT).show();
             // remove the UID from the users friend list if it doesn't exist anymore

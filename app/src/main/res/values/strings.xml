@@ -130,4 +130,5 @@
     <string name="friends_Tab">Friends</string>
     <string name="challenges_Tab">Challenges</string>
     <string name="all_Tab">All</string>
+    <string name="icon_description">icon</string>
 </resources>

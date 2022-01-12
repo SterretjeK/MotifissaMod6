@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.example.motifissa.HelperClasses.ListenerTask;
+import com.example.motifissa.HelperClasses.Notification;
 import com.example.motifissa.R;
 import com.example.motifissa.HelperClasses.ServiceListener;
 import com.google.android.gms.tasks.Task;
@@ -52,7 +53,7 @@ public class ChallengeActivity extends ServiceListener {
         this.getOnBackPressedDispatcher().addCallback(this, callback);
 
         // set the toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // setup the action bar
@@ -246,7 +247,7 @@ public class ChallengeActivity extends ServiceListener {
 //    }
 
     public ListenerTask<Task<Void>> challengeFriend() {
-        return sendNotification("Challenge", selectedFriend);
+        return sendNotification(Notification.NotificationType.CHALLENGE.toString(), selectedFriend);
     }
 
     public String getSelectedFriend() {

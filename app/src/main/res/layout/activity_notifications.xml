@@ -19,29 +19,32 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/NotificationsTitle"
+        android:textColor="?itemTextColor"
+        android:textStyle="bold"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="20dp"
         android:text="@string/Notifications"
-        android:textSize="24sp"
+        android:textSize="@dimen/titleSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
+<!--    TODO give it a different background-->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/NotificationsTabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6"
-        android:layout_marginTop="20dp"
-        android:background="?backgroundColor"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        >
+        android:background="?backgroundColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tabTextColor="?itemTextColor"
+        app:tabSelectedTextColor="@color/color_primary"
+        app:layout_constraintTop_toBottomOf="@id/NotificationsTitle">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"

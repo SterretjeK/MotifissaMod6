@@ -13,7 +13,11 @@ import com.example.motifissa.DatabaseService;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.Query;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class ServiceListener extends AppCompatActivity {
     // service
@@ -100,7 +104,11 @@ public class ServiceListener extends AppCompatActivity {
     }
 
     public ListenerTask<Task<Void>> sendNotification(String msg, String toUID){
-        return new ListenerTask<>(this, () -> mDatabaseService.sendNotification(msg, toUID));
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        String formattedDate = df.format(c);
+
+        return new ListenerTask<>(this, () -> mDatabaseService.sendNotification(msg, toUID, formattedDate));
     }
 
     public ListenerTask<ArrayList<User>> getFriends(){
@@ -113,6 +121,11 @@ public class ServiceListener extends AppCompatActivity {
 
     public ListenerTask<ArrayList<String>> getFriendsNames(){
         return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
+    }
+
+    // this function can be used if you want to get more values at the same time, because in this success listener you could call the direct functions
+    public ListenerTask<Boolean> isBounded(){
+        return new ListenerTask<>(this, () -> mBounded.get());
     }
 
     // ----------- Direct service functions  -----------
