@@ -17,24 +17,24 @@ import com.example.motifissa.R;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
-public class ChallengeFriendsArrayAdaptor extends ArrayAdapter<User> implements Filterable {
-    private ArrayList<User> friends;
-    private ArrayList<User> originalFriends;
+public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable {
+    private ArrayList<User> users;
+    private ArrayList<User> originalUsers;
     private final Activity context;
 
-    public ChallengeFriendsArrayAdaptor(Activity context, ArrayList<User> friends) {
-        super(context, R.layout.list_friends, friends);
+    public UsersArrayAdaptor(Activity context, ArrayList<User> users) {
+        super(context, R.layout.list_friends, users);
         this.context = context;
-        this.friends = friends;
-        this.originalFriends = this.friends;
+        this.users = users;
+        this.originalUsers = this.users;
     }
 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ChallengeFriendsArrayAdaptor.ViewHolder viewHolder;
+        UsersArrayAdaptor.ViewHolder viewHolder;
         if (convertView == null){ // if the element isn't generated before (or deleted), make a new one
-            viewHolder = new ChallengeFriendsArrayAdaptor.ViewHolder();
+            viewHolder = new UsersArrayAdaptor.ViewHolder();
 
             LayoutInflater inflater = context.getLayoutInflater();
             convertView = inflater.inflate(R.layout.list_friends, parent, false);
@@ -47,13 +47,13 @@ public class ChallengeFriendsArrayAdaptor extends ArrayAdapter<User> implements 
             convertView.setTag(viewHolder);
 
         } else { // else use the old one
-            viewHolder = (ChallengeFriendsArrayAdaptor.ViewHolder) convertView.getTag();
+            viewHolder = (UsersArrayAdaptor.ViewHolder) convertView.getTag();
         }
 
         //change the contents of the view element
         //try catch because working with JSON
-        viewHolder.textViewName.setText(this.friends.get(position).getName());
-        viewHolder.textViewDesc.setText(MessageFormat.format("#{0}", this.friends.get(position).getID()));
+        viewHolder.textViewName.setText(this.users.get(position).getName());
+        viewHolder.textViewDesc.setText(MessageFormat.format("#{0}", this.users.get(position).getID()));
         viewHolder.icon.setVisibility(View.GONE);
 
         return convertView;
@@ -82,8 +82,8 @@ public class ChallengeFriendsArrayAdaptor extends ArrayAdapter<User> implements 
 
             //constraint is the result from text you want to filter against.
             //objects is your data set you will filter from
-            if(originalFriends != null) {
-                for (User user : originalFriends) {
+            if(originalUsers != null) {
+                for (User user : originalUsers) {
                     String userName = user.getName();
                     String userID = user.getID();
 
@@ -103,7 +103,7 @@ public class ChallengeFriendsArrayAdaptor extends ArrayAdapter<User> implements 
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            friends = (ArrayList<User>) results.values;
+            users = (ArrayList<User>) results.values;
             if (results.count > 0) {
                 notifyDataSetChanged();
             } else {
@@ -113,18 +113,18 @@ public class ChallengeFriendsArrayAdaptor extends ArrayAdapter<User> implements 
     };
 
     public int getCount () {
-        return friends.size();
+        return users.size();
     }
 
     @Nullable
     @Override
     public User getItem(int position) {
-        return this.friends.get(position);
+        return this.users.get(position);
     }
 
-    public void changeFriends(ArrayList<User> friends) {
-        this.friends = friends;
-        this.originalFriends = this.friends;
+    public void changeUsers(ArrayList<User> users) {
+        this.users = users;
+        this.originalUsers = this.users;
         notifyDataSetChanged();
     }
 }

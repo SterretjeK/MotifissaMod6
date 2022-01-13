@@ -15,7 +15,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.example.motifissa.HelperClasses.ChallengeFriendsArrayAdaptor;
+import com.example.motifissa.HelperClasses.UsersArrayAdaptor;
 import com.example.motifissa.R;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class ChooseFriendFragment extends Fragment {
     ChallengeActivity challengeActivity;
     private ArrayList<String> friends;
     private ArrayList<String> friendsID;
-    private ChallengeFriendsArrayAdaptor arrayAdaptor;
+    private UsersArrayAdaptor arrayAdaptor;
 
     public ChooseFriendFragment() {
         // Required empty public constructor
@@ -69,7 +69,7 @@ public class ChooseFriendFragment extends Fragment {
         challengeActivity.getFriends().setSuccessListener(friends -> {
             ListView friendsList = view.findViewById(R.id.C_friends_list);
 
-            arrayAdaptor = new ChallengeFriendsArrayAdaptor(getActivity(), friends);
+            arrayAdaptor = new UsersArrayAdaptor(getActivity(), friends);
             friendsList.setAdapter(arrayAdaptor);
 
             friendsList.setOnItemClickListener(friendsListListener);
