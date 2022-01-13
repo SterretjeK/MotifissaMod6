@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +13,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.motifissa.R;
-import com.example.motifissa.User;
+import com.example.motifissa.HelperClasses.User;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChallengeSentFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ChallengeSentFragment extends Fragment {
 
     private ChallengeActivity challengeActivity;
@@ -47,8 +38,8 @@ public class ChallengeSentFragment extends Fragment {
             throw new RuntimeException(context.toString() + " must be challengeActivity");
         }
 
-        selectedUser = challengeActivity.getUser(challengeActivity.getSelectedFriend());
-        currentUser = challengeActivity.getCurrentUser();
+        challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> selectedUser = result);
+        challengeActivity.getCurrentUser().setSuccessListener(result -> currentUser = result);
     }
 
     @Override

@@ -14,7 +14,7 @@
         android:layout_marginTop="24dp"
         android:text="@string/Friends_Title"
         android:textColor="?itemTextColor"
-        android:textSize="48sp"
+        android:textSize="@dimen/titleSize"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

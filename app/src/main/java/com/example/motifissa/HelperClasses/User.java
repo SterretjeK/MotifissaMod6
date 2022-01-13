@@ -1,4 +1,4 @@
-package com.example.motifissa;
+package com.example.motifissa.HelperClasses;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,9 @@ public class User {
     private String ID;
     private String UID;
     private int Score;
-    private boolean isOnline;
+    private boolean Online;
     private List<String> Friends;
+    private List<String> Notifications;
 
     public User(){}
     public User(String name, String UID, String ID){
@@ -18,9 +19,9 @@ public class User {
         this.UID = UID;
         this.ID = ID;
         this.Score = 0;
-        this.isOnline = true;
+        this.Online = true;
         this.Friends = new ArrayList<>();
-        this.Friends.add("rKjspnNlU7OWs4BOGeQR59g5VQ23"); // add the TestAccount to their friends
+        this.Notifications = new ArrayList<>();
     }
 
     public String getName() {
@@ -55,16 +56,20 @@ public class User {
         Score = score;
     }
 
-    public boolean isOnline() {
-        return isOnline;
+    public boolean getOnline() {
+        return Online;
     }
 
     public void setOnline(boolean online) {
-        isOnline = online;
+        Online = online;
     }
 
     public List<String> getFriends() {
         return Friends;
+    }
+
+    public void setFriends(List<String> friends) {
+        Friends = friends;
     }
 
     public void toggleFriend(String UID){
@@ -75,8 +80,31 @@ public class User {
             Friends.add(UID);
     }
 
-    public void setFriends(List<String> friends) {
-        Friends = friends;
+    public List<String> getNotifications() {
+        return Notifications;
+    }
+
+    public void setNotifications(List<String> notifications) {
+        Notifications = notifications;
+    }
+
+    public void addNotification(String notification){
+        if (Notifications == null)
+            Notifications = new ArrayList<>();
+        Notifications.add(notification);
+    }
+
+    public void removeNotification(String notification){
+        if(Notifications != null){
+            Notifications.remove(notification);
+        }
+    }
+
+    public boolean removeFriend(String UID) {
+        if(Friends.contains(UID)){
+            Friends.remove(UID);
+            return true;
+        } else return false;
     }
 }
 

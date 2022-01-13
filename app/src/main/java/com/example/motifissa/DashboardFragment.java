@@ -1,17 +1,25 @@
 package com.example.motifissa;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.motifissa.challenge_screens.ChallengeActivity;
+
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,24 +34,27 @@ public class DashboardFragment extends Fragment {
     public static final String LOGIN_NAME = "LOGIN_NAME";
 
     private String Login_name;
+    private MainScreen mainscreen;
 
     public DashboardFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param Login_name Parameter 1.
-     * @return A new instance of fragment DashboardFragment.
-     */
     public static DashboardFragment newInstance(String Login_name) {
         DashboardFragment fragment = new DashboardFragment();
         Bundle args = new Bundle();
         args.putString(LOGIN_NAME, Login_name);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MainScreen) {
+            mainscreen = (MainScreen) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must be MainScreen");
+        }
     }
 
     @Override
@@ -66,10 +77,32 @@ public class DashboardFragment extends Fragment {
 
          // setup the scoreboard fragment
         scoreboardFragment = new ScoreboardFragment();
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.scoreboard_container, scoreboardFragment).commit();
+        Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.scoreboard_container, scoreboardFragment).commit();
 
         Button challengeButton = view.findViewById(R.id.dashboard_tile_challenge);
         challengeButton.setOnClickListener(challengeOnClickListener);
+
+        ImageButton menuButton = view.findViewById(R.id.moreMenuButton);
+        menuButton.setOnClickListener(v -> {
+            //Creating the instance of PopupMenu
+            PopupMenu popup = new PopupMenu(getContext(), menuButton);
+            //Inflating the Popup using xml file
+            popup.getMenuInflater().inflate(R.menu.dashboard_menu, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                public boolean onMenuItemClick(MenuItem item) {
+//                    Toast.makeText(getContext(),"You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                    if (item.getTitle().equals(getResources().getString(R.string.logout))) {
+                        mainscreen.logout();
+                    } else if (item.getTitle().equals(getResources().getString(R.string.Notifications))){
+                        mainscreen.showNotifications();
+                    }
+                    return true;
+                }
+            });
+
+            popup.show();
+        });
 
         return view;
     }

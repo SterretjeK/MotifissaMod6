@@ -11,12 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.motifissa.R;
-import com.example.motifissa.User;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.motifissa.HelperClasses.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,8 +50,8 @@ public class OverviewChallengeFragment extends Fragment {
             throw new RuntimeException(context.toString() + " must be challengeActivity");
         }
 
-        selectedUser = challengeActivity.getUser(challengeActivity.getSelectedFriend());
-        currentUser = challengeActivity.getCurrentUser();
+        challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> selectedUser = result);
+        challengeActivity.getCurrentUser().setSuccessListener(result -> currentUser = result);
     }
 
     @Override
@@ -62,11 +60,11 @@ public class OverviewChallengeFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_overview_challenge, container, false);
 
-        if(selectedUser != null){ // if the user is selected replace the texts so it's about the current user and his opponent
+        if (selectedUser != null) { // if the user is selected replace the texts so it's about the current user and his opponent
             TextView introTxtField = v.findViewById(R.id.Challenge_IntroTxtField);
             TextView subTxtField = v.findViewById(R.id.challenge_subText);
             String introTxt = getResources().getString(R.string.Challenge_IntroTxt);
-            String username =  selectedUser.getName();
+            String username = selectedUser.getName();
             introTxt = introTxt.replaceAll("username", username);
             introTxtField.setText(introTxt);
 
@@ -75,14 +73,18 @@ public class OverviewChallengeFragment extends Fragment {
 
             int scoreDiff = selectedUser.getScore() - currentUser.getScore(); // the amount the opponent (selected user is ahead of you)
             subTxt = subTxt.replaceAll("scoreDiff", (scoreDiff > 0 ? "+" : "") + scoreDiff);
-            subTxt = subTxt.replaceAll("aheadOf/behind", (scoreDiff >= 0 ? "ahead of" : "behind") );
+            subTxt = subTxt.replaceAll("aheadOf/behind", (scoreDiff >= 0 ? "ahead of" : "behind"));
 
             subTxtField.setText(subTxt);
 
         }
 
         Button challengeFriend_button = v.findViewById(R.id.ChallengeFriendButton);
-        challengeFriend_button.setOnClickListener(view -> challengeActivity.moveUpFragment());
+        challengeFriend_button.setOnClickListener(view ->
+                challengeActivity.challengeFriend().setSuccessListener(task ->
+                        task.addOnSuccessListener(success -> challengeActivity.moveUpFragment())
+                                .addOnFailureListener(error -> Toast.makeText(getContext(), "Couldn't sent notification", Toast.LENGTH_SHORT).show())
+                ));
 
         return v;
     }

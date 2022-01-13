@@ -1,6 +1,5 @@
 package com.example.motifissa;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.ViewPager;
@@ -8,27 +7,19 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.motifissa.HelperClasses.LoginAdapter;
+import com.example.motifissa.HelperClasses.User;
 import com.google.android.material.tabs.TabLayout;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.w3c.dom.Text;
 
 import java.util.Random;
 
@@ -117,7 +108,7 @@ public class LoginScreen extends AppCompatActivity {
 
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){ // user is still signed in
+        if (currentUser != null) { // user is still signed in
             loginSuccess(currentUser);
         }
     }
@@ -150,12 +141,11 @@ public class LoginScreen extends AppCompatActivity {
                         String id = "" + random.nextInt(1000);
 
                         User userProfile = new User(username, user.getUid(), id);
-                        databaseReferenceUsers.child(user.getUid()).setValue(userProfile).addOnSuccessListener(success -> {
-                            loginSuccess(user);
-                        }).addOnFailureListener(error -> {
-                            user.delete();
-                            Toast.makeText(LoginScreen.this, "Couldn't make a new user, try another username", Toast.LENGTH_SHORT).show();
-                        });
+                        databaseReferenceUsers.child(user.getUid()).setValue(userProfile).addOnSuccessListener(success -> loginSuccess(user))
+                                .addOnFailureListener(error -> {
+                                    user.delete();
+                                    Toast.makeText(LoginScreen.this, "Couldn't make a new user, try another username", Toast.LENGTH_SHORT).show();
+                                });
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -169,7 +159,7 @@ public class LoginScreen extends AppCompatActivity {
                 });
     }
 
-    public void login(String username, String password){
+    public void login(String username, String password) {
         // TODO think of a better way, like searching of the corresponding email to the username as this method doesn't allow duplicate names
         String email = username;
 
@@ -191,7 +181,7 @@ public class LoginScreen extends AppCompatActivity {
                 });
     }
 
-    private void loginSuccess(FirebaseUser user){
+    private void loginSuccess(FirebaseUser user) {
         //starts the service
         Intent startServiceIntent = new Intent(this, DatabaseService.class);
         startServiceIntent.putExtra("CurrentUser", mAuth.getCurrentUser());
@@ -205,11 +195,8 @@ public class LoginScreen extends AppCompatActivity {
     }
 
     public void forgotPassword(String email) {
-        mAuth.sendPasswordResetEmail(email).addOnSuccessListener(succes -> {
-            Toast.makeText(this, "Reset mail has been send", Toast.LENGTH_SHORT).show();
-        }).addOnFailureListener(error -> {
-            Toast.makeText(this, "Could not send mail", Toast.LENGTH_SHORT).show();
-        });
+        mAuth.sendPasswordResetEmail(email).addOnSuccessListener(succes -> Toast.makeText(this, "Reset mail has been send", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(error -> Toast.makeText(this, "Could not send mail", Toast.LENGTH_SHORT).show());
     }
 
 
