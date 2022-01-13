@@ -146,11 +146,14 @@ public class MainScreen extends AppCompatActivity {
     };
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+//        super.onStop();
+        super.onDestroy();
 
         //when the activity is stopped, release the server
-        if(mBounded.get()) {
+        if (mBounded.get()) {
+            // set the user as offline, might disable this if it cost too much MB upload
+            mDatabaseService.toggleOnlineUser(currentUser.getUid(), false);
             unbindService(mConnection);
         }
         mBounded = new ListenerVariable<>(false);

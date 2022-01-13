@@ -49,6 +49,9 @@ public class DatabaseService extends Service {
 
          currentUser = intent.getExtras().getParcelable("CurrentUser");
 
+        // set the user to online
+        databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(true);
+
          setup();
         return START_STICKY;
     }
@@ -195,5 +198,10 @@ public class DatabaseService extends Service {
             }
         }
         return databaseReferenceUsers.child(UID).setValue(tempUser);
+    }
+
+    public Task<Void> toggleOnlineUser(String UID, boolean state){
+        // set the user to offline or offline
+        return databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(state);
     }
 }

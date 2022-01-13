@@ -9,7 +9,7 @@ public class User {
     private String ID;
     private String UID;
     private int Score;
-    private boolean isOnline;
+    private boolean Online;
     private List<String> Friends;
     private List<String> Notifications;
 
@@ -19,7 +19,7 @@ public class User {
         this.UID = UID;
         this.ID = ID;
         this.Score = 0;
-        this.isOnline = true;
+        this.Online = true;
         this.Friends = new ArrayList<>();
         this.Notifications = new ArrayList<>();
     }
@@ -56,12 +56,12 @@ public class User {
         Score = score;
     }
 
-    public boolean isOnline() {
-        return isOnline;
+    public boolean getOnline() {
+        return Online;
     }
 
     public void setOnline(boolean online) {
-        isOnline = online;
+        Online = online;
     }
 
     public List<String> getFriends() {
