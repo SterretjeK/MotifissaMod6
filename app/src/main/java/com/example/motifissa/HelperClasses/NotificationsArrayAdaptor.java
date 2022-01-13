@@ -55,7 +55,7 @@ public class NotificationsArrayAdaptor extends ArrayAdapter<Notification> implem
         //change the contents of the view element
         //try catch because working with JSON
         viewHolder.textViewName.setText(this.notifications.get(position).getMessage());
-        viewHolder.textViewDesc.setText(MessageFormat.format("Date: {0}", this.notifications.get(position).getDate()));
+        viewHolder.textViewDesc.setText(this.notifications.get(position).getDate());
         switch (this.notifications.get(position).getType()){
             case CHALLENGE:
                 viewHolder.icon.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_challenge_icon));
@@ -70,8 +70,6 @@ public class NotificationsArrayAdaptor extends ArrayAdapter<Notification> implem
                 viewHolder.icon.setVisibility(View.INVISIBLE);
                 break;
         }
-
-
         return convertView;
     }
 
@@ -101,7 +99,6 @@ public class NotificationsArrayAdaptor extends ArrayAdapter<Notification> implem
             if(originalNotifications != null && !constraint.equals("ALL")) {
                 for (Notification notification : originalNotifications) {
                     Notification.NotificationType notificationType = notification.getType();
-
 
                     if (notificationType.toString().equals(input))
                         filteredList.add(notification);
