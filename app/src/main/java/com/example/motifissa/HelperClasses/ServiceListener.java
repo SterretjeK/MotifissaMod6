@@ -128,6 +128,10 @@ public class ServiceListener extends AppCompatActivity {
         return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
     }
 
+    public ListenerTask<ListenerVariable<Boolean>> getUpdateListener(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
+    }
+
     // this function can be used if you want to get more values at the same time, because in this success listener you could call the direct functions
     public ListenerTask<Boolean> isBounded(){
         return new ListenerTask<>(this, () -> mBounded.get());

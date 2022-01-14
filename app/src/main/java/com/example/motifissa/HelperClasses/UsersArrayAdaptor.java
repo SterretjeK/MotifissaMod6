@@ -1,34 +1,49 @@
 package com.example.motifissa.HelperClasses;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import com.example.motifissa.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable {
     private ArrayList<User> users;
     private ArrayList<User> originalUsers;
     private final Activity context;
+    private boolean showOnline;
 
-    public UsersArrayAdaptor(Activity context, ArrayList<User> users) {
-        super(context, R.layout.list_friends, users);
+    public UsersArrayAdaptor(Activity context, ArrayList<User> users, boolean showOnline) {
+        super(context, R.layout.list_notifications, users);
         this.context = context;
         this.users = users;
         this.originalUsers = this.users;
+        this.showOnline = showOnline;
+        sortArray();
     }
 
+    // sorts the array to make sure everyone who are online are at the top
+    private void sortArray(){
+        Comparator<User> comparator = (o1, o2) -> (o2.getOnline() ? 1 : 0) - (o1.getOnline() ? 1 : 0);
+        users.sort(comparator);
+        this.originalUsers = this.users;
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -37,11 +52,11 @@ public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable 
             viewHolder = new UsersArrayAdaptor.ViewHolder();
 
             LayoutInflater inflater = context.getLayoutInflater();
-            convertView = inflater.inflate(R.layout.list_friends, parent, false);
+            convertView = inflater.inflate(R.layout.list_notifications, parent, false);
 
             viewHolder.textViewName = convertView.findViewById(R.id.textViewName);
             viewHolder.textViewDesc = convertView.findViewById(R.id.textViewDesc);
-            viewHolder.icon = convertView.findViewById(R.id.icon_view);
+            viewHolder.icon = convertView.findViewById(R.id.icon);
 
             // set the tag so it can be recovered
             convertView.setTag(viewHolder);
@@ -51,10 +66,20 @@ public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable 
         }
 
         //change the contents of the view element
-        //try catch because working with JSON
         viewHolder.textViewName.setText(this.users.get(position).getName());
         viewHolder.textViewDesc.setText(MessageFormat.format("#{0}", this.users.get(position).getID()));
-        viewHolder.icon.setVisibility(View.GONE);
+
+        // icon
+        if (!showOnline)
+            viewHolder.icon.setVisibility(View.GONE);
+        else{
+            viewHolder.icon.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.custom_online_icon));
+            if (this.users.get(position).getOnline()){
+                viewHolder.icon.setImageTintList(getContext().getColorStateList(R.color.color_primary));
+            } else {
+                viewHolder.icon.setImageTintList(getContext().getColorStateList(R.color.gray_500));
+            }
+        }
 
         return convertView;
     }
@@ -62,7 +87,7 @@ public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable 
     private static class ViewHolder{
         private TextView textViewName;
         private TextView textViewDesc;
-        private TextView icon;
+        private ImageView icon;
     }
 
     @NonNull
@@ -124,7 +149,12 @@ public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable 
 
     public void changeUsers(ArrayList<User> users) {
         this.users = users;
-        this.originalUsers = this.users;
+//        this.originalUsers = this.users;
+        sortArray();
         notifyDataSetChanged();
+    }
+
+    public ArrayList<User> getCurrentUsers(){
+        return originalUsers;
     }
 }

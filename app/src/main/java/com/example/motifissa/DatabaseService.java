@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.motifissa.HelperClasses.ListenerVariable;
 import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +41,7 @@ public class DatabaseService extends Service {
     private ArrayList<String> friendsUIDArray = new ArrayList<>();
     private ArrayList<String> friendsNameArray = new ArrayList<>();
     private ArrayList<User> friendsData = new ArrayList<>();
+    ListenerVariable<Boolean> updateListener = new ListenerVariable<>(false);
 
 
     // ------------ Setup functions ------------
@@ -49,7 +51,9 @@ public class DatabaseService extends Service {
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
         databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
 
+        // get the current user, OLD
 //         currentUser = intent.getExtras().getParcelable("CurrentUser");
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         // get the current user
@@ -100,6 +104,8 @@ public class DatabaseService extends Service {
                 } catch(NullPointerException ignored){
 
                 }
+
+                updateListener.set(true);
             }
 
             @Override
@@ -213,5 +219,9 @@ public class DatabaseService extends Service {
     public Task<Void> toggleOnlineUser(String UID, boolean state){
         // set the user to offline or offline
         return databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(state);
+    }
+
+    public ListenerVariable<Boolean> getUpdateListener(){
+        return updateListener;
     }
 }
