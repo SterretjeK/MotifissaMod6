@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,9 +21,10 @@ import java.util.Date;
 import java.util.Locale;
 
 public class ServiceListener extends AppCompatActivity {
+    private static final String TAG = "ServiceListener";
     // service
     protected ListenerVariable<Boolean> mBounded; // a custom type, that allows us to add listeners to variables
-    protected boolean mIsConnecting;
+    protected boolean mIsConnecting = true;
     protected DatabaseService mDatabaseService;
 
     public ServiceListener() {
@@ -32,6 +34,8 @@ public class ServiceListener extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // reset al the listeners
+        mBounded = new ListenerVariable<>(false);
     }
 
     @Override
@@ -48,6 +52,7 @@ public class ServiceListener extends AppCompatActivity {
     public void connectToService(){
         if (!mBounded.get()) {
             mIsConnecting = true;
+//            Log.e(TAG, "-----------------------------------------\n Change: " + mBounded.getChangeListeners().toString() + "\nSuccess: " + mBounded.getSuccessListeners().toString());
 //            mBounded = new ListenerVariable<>(false);
             mBounded.set(false);
             Intent serviceIntent = new Intent(this, DatabaseService.class);

@@ -54,6 +54,13 @@ public class ListenerVariable<T> {
         this.successListeners.add(listener);
     }
 
+    public ArrayList<ChangeListener<T>> getChangeListeners() {
+        return changeListeners;
+    }
+
+    public ArrayList<SuccessListener> getSuccessListeners() {
+        return successListeners;
+    }
 
     public interface ChangeListener<T> {
         void onChange(T value);

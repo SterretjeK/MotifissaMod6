@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,6 +29,7 @@ public class DatabaseService extends Service {
     IBinder mBinder = new LocalBinder();
 
     // Firebase
+    private FirebaseAuth mAuth;
     private DatabaseReference databaseReferenceUsers;
     private FirebaseUser currentUser;
 
@@ -47,7 +49,15 @@ public class DatabaseService extends Service {
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
         databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
 
-         currentUser = intent.getExtras().getParcelable("CurrentUser");
+//         currentUser = intent.getExtras().getParcelable("CurrentUser");
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        // get the current user
+        currentUser = mAuth.getCurrentUser();
+        if (currentUser == null){ //log out if the login isn't valid
+//            logout();
+            Log.e(TAG, "CURRENT USER WAS NULL!!!!!!!!!!!!!!!!!!!!");
+        }
 
         // set the user to online
         databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(true);

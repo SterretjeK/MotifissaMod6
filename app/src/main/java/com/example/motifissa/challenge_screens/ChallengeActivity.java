@@ -36,34 +36,37 @@ public class ChallengeActivity extends ServiceListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_challenge);
 
-        chooseFriendFragment = new ChooseFriendFragment();
-        overviewChallengeFragment = new OverviewChallengeFragment();
-        challengeSentFragment = new ChallengeSentFragment();
+        // wait until the service is bounded
+        isBounded().setSuccessListener(bounded ->{
+            chooseFriendFragment = new ChooseFriendFragment();
+            overviewChallengeFragment = new OverviewChallengeFragment();
+            challengeSentFragment = new ChallengeSentFragment();
 
-        // This callback will change what happens when the user clicks back
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-            @Override
-            public void handleOnBackPressed() {
-                if (currentFragment > 1)
-                    changeFragment(currentFragment - 1);
-                else
-                    finish();
-            }
-        };
-        this.getOnBackPressedDispatcher().addCallback(this, callback);
+            // This callback will change what happens when the user clicks back
+            OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+                @Override
+                public void handleOnBackPressed() {
+                    if (currentFragment > 1)
+                        changeFragment(currentFragment - 1);
+                    else
+                        finish();
+                }
+            };
+            this.getOnBackPressedDispatcher().addCallback(this, callback);
 
-        // set the toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+            // set the toolbar
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
 
-        // setup the action bar
-        ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null; // to make sure that this activity has an action bar
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); // showing the back button in action bar
-        actionBar.setCustomView(R.layout.action_bar); // set our custom action bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
+            // setup the action bar
+            ActionBar actionBar = getSupportActionBar();
+            assert actionBar != null; // to make sure that this activity has an action bar
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); // showing the back button in action bar
+            actionBar.setCustomView(R.layout.action_bar); // set our custom action bar
+            actionBar.setDisplayHomeAsUpEnabled(true);
 
-        changeFragment(1);
+            changeFragment(1);
+        });
     }
 
 
