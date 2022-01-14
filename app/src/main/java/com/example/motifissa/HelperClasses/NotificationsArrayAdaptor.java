@@ -53,7 +53,6 @@ public class NotificationsArrayAdaptor extends ArrayAdapter<Notification> implem
         }
 
         //change the contents of the view element
-        //try catch because working with JSON
         viewHolder.textViewName.setText(this.notifications.get(position).getMessage());
         viewHolder.textViewDesc.setText(this.notifications.get(position).getDate());
         switch (this.notifications.get(position).getType()){
