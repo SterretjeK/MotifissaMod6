@@ -131,4 +131,6 @@
     <string name="challenges_Tab">Challenges</string>
     <string name="all_Tab">All</string>
     <string name="icon_description">icon</string>
+    <string name="placeholder_title">placeholder title</string>
+    <string name="placeholder_subtitle">Placeholder subtitle</string>
 </resources>

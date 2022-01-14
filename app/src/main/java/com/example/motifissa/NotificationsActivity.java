@@ -8,12 +8,15 @@ import androidx.appcompat.widget.Toolbar;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.motifissa.HelperClasses.Notification;
 import com.example.motifissa.HelperClasses.NotificationsArrayAdaptor;
 import com.example.motifissa.HelperClasses.ServiceListener;
+import com.example.motifissa.dialogs.AcceptDenyDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 public class NotificationsActivity extends ServiceListener {
 
@@ -52,11 +56,14 @@ public class NotificationsActivity extends ServiceListener {
         actionBar.setCustomView(R.layout.action_bar); // set our custom action bar
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        // setup the tab bar
         TabLayout tabBar = findViewById(R.id.NotificationsTabs);
 
+        //setup the content description of the tab bar, will be used to filter on
         for(int i = 0; i < tabBar.getTabCount(); i++){
             TabLayout.Tab currentTab = tabBar.getTabAt(i);
-            String tabName = currentTab.getText().toString();
+            assert currentTab != null;
+            String tabName = Objects.requireNonNull(currentTab.getText()).toString();
 
 
             if (tabName.equals(getResources().getString(R.string.all_Tab))){
@@ -71,11 +78,12 @@ public class NotificationsActivity extends ServiceListener {
 
         }
 
+        // filter the data when a tab is clicked
         tabBar.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (notificationsAdaptor != null){
-                    notificationsAdaptor.getFilter().filter(tab.getContentDescription().toString());
+                    notificationsAdaptor.getFilter().filter(Objects.requireNonNull(tab.getContentDescription()).toString());
                 }
             }
 
@@ -89,18 +97,32 @@ public class NotificationsActivity extends ServiceListener {
 
             }
         });
+
+        //add onclick listener to the listView
+        ListView notificationsList = findViewById(R.id.NotificationsList);
+
+        notificationsList.setOnItemClickListener((parent, view, position, id) -> {
+            Notification notification = notificationsAdaptor.getItem(position); // get the selected notification
+            AcceptDenyDialog dialog = new AcceptDenyDialog();                   // create a new dialog
+
+            // set its arguments
+            Bundle bundle = new Bundle();
+            bundle.putString(AcceptDenyDialog.TITLE, notification.getTitle());
+            bundle.putString(AcceptDenyDialog.SUBTITLE, notification.getMessage());
+            dialog.setArguments(bundle);
+
+            // show the dialog
+            dialog.show(getFragmentManager(), notification.getTitle());
+        });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
-    protected void onServiceConnect() {
+    protected void onServiceConnect() { // when the service is connected load the data in the listView
         getNotifications().setSuccessListener(result ->result.addValueEventListener(valueEventListener));
     }
 
+    // the listener that loads the notifications in the listView
     ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -141,6 +163,7 @@ public class NotificationsActivity extends ServiceListener {
 
         }
     };
+
 
 
         // this event will handle the back arrow on the action bar

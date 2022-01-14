@@ -15,6 +15,7 @@
         <item name="backgroundColor">@color/white</item>
         <item name="colorOnBackground">@color/gray_200</item>
         <item name="itemTextColor">@color/gray_900</item>
+        <item name="subtitleTextColor">@color/gray_700</item>
         <item name="fontFamily">@font/montserrat</item>
         <item name="colorError">@color/error</item>
         <item name="elevationOverlayColor">@color/white</item>

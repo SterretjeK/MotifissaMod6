@@ -12,30 +12,7 @@ public class Notification {
     public Notification() {}
 
     public Notification(String type, String sentBy) {
-        this.sentBy = sentBy;
-        read = false;
-        message = "";
-        date = "-";
-
-        if(type.equals(NotificationType.CHALLENGE.toString())){
-            this.type = NotificationType.CHALLENGE;
-        } else if(type.equals(NotificationType.FRIEND_REQUEST.toString())){
-            this.type = NotificationType.FRIEND_REQUEST;
-        } else {
-            this.type = NotificationType.MESSAGE;
-        }
-
-
-        switch (this.type){
-            case CHALLENGE:
-                message = "You have been challenged by username.";
-                break;
-            case FRIEND_REQUEST:
-                message =  "username would like to be your friend";
-                break;
-        }
-
-        title = message;
+        this(type, sentBy, "-");
     }
 
     public Notification(String type, String sentBy, String date) {
@@ -46,24 +23,17 @@ public class Notification {
 
         if(type.equals(NotificationType.CHALLENGE.toString())){
             this.type = NotificationType.CHALLENGE;
+            title = "Challenge";
+            message = "You have been challenged by username.";
         } else if(type.equals(NotificationType.FRIEND_REQUEST.toString())){
             this.type = NotificationType.FRIEND_REQUEST;
+            title = "Friend Request";
+            message =  "username would like to be your friend";
         } else {
             this.type = NotificationType.MESSAGE;
         }
-
-
-        switch (this.type){
-            case CHALLENGE:
-                message = "You have been challenged by username.";
-                break;
-            case FRIEND_REQUEST:
-                message =  "username would like to be your friend";
-                break;
-        }
-
-        title = message;
     }
+
     public Notification(NotificationType type, String sentBy, String message, String title) {
         this.type = type;
         this.sentBy = sentBy;
