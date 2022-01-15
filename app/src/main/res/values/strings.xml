@@ -133,4 +133,8 @@
     <string name="icon_description">icon</string>
     <string name="placeholder_title">placeholder title</string>
     <string name="placeholder_subtitle">Placeholder subtitle</string>
+    <string name="action_accept">Accept</string>
+    <string name="action_deny">Deny</string>
+    <string name="cancel">Cancel</string>
+    <string name="loadingScreen_title">Waiting for username</string>
 </resources>
