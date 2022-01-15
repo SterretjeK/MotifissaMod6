@@ -49,7 +49,7 @@ public class ChooseFriendFragment extends Fragment {
         if (context instanceof ChallengeActivity) {
             challengeActivity = (ChallengeActivity) context;
         } else {
-            throw new RuntimeException(context.toString() + " must be MainScreen");
+            throw new RuntimeException(context.toString() + " must be ChallengeActivity");
         }
     }
 
@@ -57,7 +57,7 @@ public class ChooseFriendFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_choose_friend, container, false);
+        View view = inflater.inflate(R.layout.fragment_challenge_choose_friend, container, false);
 
         populateList(view);
 

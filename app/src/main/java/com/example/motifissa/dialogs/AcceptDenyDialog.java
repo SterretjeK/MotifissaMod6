@@ -1,6 +1,7 @@
 package com.example.motifissa.dialogs;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ public class AcceptDenyDialog extends DialogFragment {
     public static final String TITLE = "TITLE";
     public static final String SUBTITLE = "SUBTITLE";
 
+    AcceptDenyListener listener;
 
     String title;
     String subtitle;
@@ -48,6 +50,10 @@ public class AcceptDenyDialog extends DialogFragment {
         }
     }
 
+    public void setListener(AcceptDenyListener listener) {
+        this.listener = listener;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,13 +67,24 @@ public class AcceptDenyDialog extends DialogFragment {
        Button acceptButton = view.findViewById(R.id.dialog_accept);
        Button denyButton = view.findViewById(R.id.dialog_deny);
 
+        if (listener == null){
+            Log.e(TAG, "-------------------------------------------------------\nlistener was null");
+        }
+
         acceptButton.setOnClickListener(btnView -> {
+            listener.onAccept();
             Objects.requireNonNull(getDialog()).dismiss();
         });
        denyButton.setOnClickListener(btnView -> {
+           listener.onDeny();
            Objects.requireNonNull(getDialog()).dismiss();
        });
 
        return view;
+    }
+
+    public interface AcceptDenyListener{
+        void onAccept();
+        void onDeny();
     }
 }

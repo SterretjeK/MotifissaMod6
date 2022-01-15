@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBar;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -17,17 +18,28 @@ import com.example.motifissa.HelperClasses.ServiceListener;
 import com.google.android.gms.tasks.Task;
 
 public class ChallengeActivity extends ServiceListener {
+    /*
+    Screens
+        - Choose Friend
+        - Overview Friend
+        - Sent
+        - -------
+        - loading/waiting on other user??
+        - choose location
+        - countdown/challengeScreen
+     */
 
-    // service
-//    ListenerVariable<Boolean> mBounded = new ListenerVariable<>(false); // a custom type, that allows us to add listeners to variables
-//    boolean mIsConnecting;
-//    DatabaseService mDatabaseService;
+    public static final String START_FRAGMENT = "START_FRAGMENT";
+    public static final String START_SELECTED_FRIEND_UID = "START_SELECTED_FRIEND_UID";
+
 
     // fragments
     int currentFragment = 1;
     ChooseFriendFragment chooseFriendFragment;
     OverviewChallengeFragment overviewChallengeFragment;
     ChallengeSentFragment challengeSentFragment;
+    ChallengeLoadingFragment challengeLoadingFragment;
+    Challenge_MapsFragment challengeMapsFragment;
 
     private String selectedFriend;
 
@@ -41,12 +53,17 @@ public class ChallengeActivity extends ServiceListener {
             chooseFriendFragment = new ChooseFriendFragment();
             overviewChallengeFragment = new OverviewChallengeFragment();
             challengeSentFragment = new ChallengeSentFragment();
+            challengeLoadingFragment = new ChallengeLoadingFragment();
+            challengeMapsFragment = new Challenge_MapsFragment();
+
 
             // This callback will change what happens when the user clicks back
             OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
                 @Override
                 public void handleOnBackPressed() {
-                    if (currentFragment > 1)
+                    if (currentFragment > 1 && currentFragment < 4)
+                        changeFragment(currentFragment - 1);
+                    else if (currentFragment > 4)
                         changeFragment(currentFragment - 1);
                     else
                         finish();
@@ -65,7 +82,17 @@ public class ChallengeActivity extends ServiceListener {
             actionBar.setCustomView(R.layout.action_bar); // set our custom action bar
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-            changeFragment(1);
+            if (getIntent().hasExtra(START_FRAGMENT)){
+                currentFragment = getIntent().getIntExtra(START_FRAGMENT, 1);
+            } else {
+                currentFragment = 1;
+            }
+
+            if (getIntent().hasExtra(START_SELECTED_FRIEND_UID)){
+                selectedFriend = getIntent().getStringExtra(START_SELECTED_FRIEND_UID);
+            }
+
+            changeFragment(currentFragment);
         });
     }
 
@@ -83,9 +110,15 @@ public class ChallengeActivity extends ServiceListener {
             case 3:
                 selectedFragment = challengeSentFragment;
                 break;
+            case 4:
+                selectedFragment = challengeLoadingFragment;
+                break;
+            case 5:
+                selectedFragment = challengeMapsFragment;
+                break;
 
             default:
-//                Toast.makeText(this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "changeToFragment in changeFragment was unknown, " +  changeToFragment, Toast.LENGTH_SHORT).show();
                 return;
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerChallenge, selectedFragment).commit();
@@ -96,7 +129,9 @@ public class ChallengeActivity extends ServiceListener {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            if (currentFragment > 1)
+            if (currentFragment > 1 && currentFragment < 4)
+                changeFragment(currentFragment - 1);
+            else if (currentFragment > 4)
                 changeFragment(currentFragment - 1);
             else
                 finish();
@@ -134,120 +169,6 @@ public class ChallengeActivity extends ServiceListener {
         else
             finish();
     }
-
-
-//    public void connectToService(){
-//        mIsConnecting  = true;
-//        mBounded.set(false);
-//        Intent serviceIntent = new Intent(this, DatabaseService.class);
-//        bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
-//    }
-//
-//    ServiceConnection mConnection = new ServiceConnection() {
-//        @Override
-//        public void onServiceDisconnected(ComponentName name) {
-//            mBounded.set(false);
-//            mIsConnecting = false;
-//            mDatabaseService = null;
-//        }
-//
-//        @Override
-//        public void onServiceConnected(ComponentName name, IBinder service) {
-//            DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
-//            mDatabaseService = mLocalBinder.getServerInstance();
-//            mBounded.set(true);
-//            mIsConnecting = false;
-//
-////            Toast.makeText(ChallengeActivity.this, "Service is connected Challenge screen", Toast.LENGTH_SHORT).show();
-//        }
-//    };
-
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//
-//        //when the activity is stopped, release the server
-//        if(mBounded.get()) {
-//            unbindService(mConnection);
-//            mBounded.set(false);
-//        }
-//        mIsConnecting = false;
-//    }
-
-//    public ArrayList<User> getUsersArray(){
-//        if (mBounded.get() && mDatabaseService != null) {
-//            try {
-//                return mDatabaseService.getUsersArray();
-//            } catch (Exception e) {
-//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
-//            }
-//        }
-//
-//        if (!mIsConnecting) {
-//            this.connectToService();
-//        }
-//        return null;
-//    }
-
-//    public User getUser(String ID){
-//        if (mBounded.get()) {
-//            try {
-//                return mDatabaseService.getUser(ID);
-//            } catch (Exception e){
-//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getUser");
-//            }
-//        }
-//
-//        if (!mIsConnecting) {
-//            this.connectToService();
-//        }
-//        return null;
-//    }
-
-//    public ArrayList<String> getFriends(){
-//        if (mBounded.get()) {
-//            try {
-//                return mDatabaseService.getFriendsNameArray();
-//            } catch (Exception e){
-//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriends");
-//            }
-//        }
-//
-//        if (!mIsConnecting) {
-//            this.connectToService();
-//        }
-//        return null;
-//    }
-
-//    public ArrayList<String> getFriendsID(){
-//        if (mBounded.get()) {
-//            try {
-//                return mDatabaseService.getFriendsUIDArray();
-//            } catch (Exception e){
-//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
-//            }
-//        }
-//
-//        if (!mIsConnecting) {
-//            this.connectToService();
-//        }
-//        return null;
-//    }
-
-//    public User getCurrentUser() {
-//        if (mBounded.get()) {
-//            try {
-//                return mDatabaseService.getCurrentUserData();
-//            } catch (Exception e){
-//                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getFriendsID");
-//            }
-//        }
-//
-//        if (!mIsConnecting) {
-//            this.connectToService();
-//        }
-//        return null;
-//    }
 
     public ListenerTask<Task<Void>> challengeFriend() {
         return sendNotification(Notification.NotificationType.CHALLENGE.toString(), selectedFriend);

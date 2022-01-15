@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -12,10 +13,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.motifissa.HelperClasses.Notification;
 import com.example.motifissa.HelperClasses.NotificationsArrayAdaptor;
 import com.example.motifissa.HelperClasses.ServiceListener;
+import com.example.motifissa.challenge_screens.ChallengeActivity;
 import com.example.motifissa.dialogs.AcceptDenyDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -110,6 +113,25 @@ public class NotificationsActivity extends ServiceListener {
             bundle.putString(AcceptDenyDialog.TITLE, notification.getTitle());
             bundle.putString(AcceptDenyDialog.SUBTITLE, notification.getMessage());
             dialog.setArguments(bundle);
+
+            // set its onclick listeners
+            dialog.setListener(new AcceptDenyDialog.AcceptDenyListener() {
+                @Override
+                public void onAccept() {
+                    // TODO go to the challenge
+                    removeNotification(notification);
+                    Intent challengeIntent = new Intent(getApplicationContext(), ChallengeActivity.class);
+                    challengeIntent.putExtra(ChallengeActivity.START_FRAGMENT, 4);
+                    challengeIntent.putExtra(ChallengeActivity.START_SELECTED_FRIEND_UID, notification.getSentBy());
+                    startActivity(challengeIntent);
+                }
+
+                @Override
+                public void onDeny() {
+                    removeNotification(notification);
+                    Toast.makeText(getApplicationContext(), "Denied " + notification.getTitle().toLowerCase(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
             // show the dialog
             dialog.show(getFragmentManager(), notification.getTitle());

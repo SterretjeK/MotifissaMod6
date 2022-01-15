@@ -120,8 +120,8 @@ public class ServiceListener extends AppCompatActivity {
         return new ListenerTask<>(this, () -> mDatabaseService.getFriendsData());
     }
 
-    public ListenerTask<Query> getCurrentUserQuery(){
-        return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUserQuery());
+    public ListenerTask<Query> getCurrentUserFriendsQuery(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUserFriendsQuery());
     }
 
     public ListenerTask<ArrayList<String>> getFriendsNames(){
@@ -130,6 +130,10 @@ public class ServiceListener extends AppCompatActivity {
 
     public ListenerTask<ListenerVariable<Boolean>> getUpdateListener(){
         return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
+    }
+
+    public ListenerTask<Task<Void>> removeNotification(Notification notification){
+        return new ListenerTask<>(this, () -> mDatabaseService.removeNotification(notification));
     }
 
     // this function can be used if you want to get more values at the same time, because in this success listener you could call the direct functions

@@ -96,4 +96,8 @@ public class Notification {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public String sendData() {
+        return type.toString() + "|" + sentBy + (date.equals("-") ? "": "|" + date);
+    }
 }

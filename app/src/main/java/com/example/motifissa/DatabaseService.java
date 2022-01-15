@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.example.motifissa.HelperClasses.ListenerVariable;
+import com.example.motifissa.HelperClasses.Notification;
 import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -133,67 +134,75 @@ public class DatabaseService extends Service {
 
     // ------------ Firebase functions ------------
 
-    // Firebase get data functions
+    // Users:
     public Task<Void> addUser(User user){
         // TODO validate data
         //  if (user == null) throw ....;
 
         return databaseReferenceUsers.push().setValue(user);
     }
-
     public Query getUsersQuery(){
         return databaseReferenceUsers.orderByKey();
     }
-    public Query getCurrentUserQuery(){
-        return databaseReferenceUsers.child(currentUser.getUid()).child("friends");
+    public HashMap<String, User> getUsers() {
+        return users;
+    }
+    public ArrayList<User> getUsersArray() {
+        return usersArray;
+    }
+    public User getUser(String UID){
+        return users.get(UID);
+    }
+    public Task<Void> toggleOnlineUser(String UID, boolean state){
+        // set the user to offline or offline
+        return databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(state);
+    }
+    public ListenerVariable<Boolean> getUpdateListener(){
+        return updateListener;
     }
 
-    public Query getNotifications(){
-        return databaseReferenceUsers.child(currentUser.getUid()).child("notifications");
-    }
 
+    // Current user:
     public User getCurrentUser(){
         return currentUserData;
     }
-
     public FirebaseUser getCurrentFirebaseUser(){
         return currentUser;
     }
-
     public User getCurrentUserData() {
         return currentUserData;
     }
 
-    public ArrayList<User> getUsersArray() {
-        return usersArray;
-    }
 
-    public HashMap<String, User> getUsers() {
-        return users;
+    // friends
+    public Query getCurrentUserFriendsQuery(){
+        return databaseReferenceUsers.child(currentUser.getUid()).child("friends");
     }
-
     public ArrayList<String> getFriendsUIDArray() {
         return friendsUIDArray;
     }
-
     public ArrayList<String> getFriendsNameArray() {
         return friendsNameArray;
     }
-
     public ArrayList<User> getFriendsData() {
         return friendsData;
     }
-
-    public User getUser(String UID){
-        return users.get(UID);
-    }
-
     public Task<Void> toggleFriend(String UID){
         currentUserData.toggleFriend(UID);
 
         return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
     }
 
+    // notifications
+    public Query getNotifications(){
+        if (currentUser == null) {
+            // Initialize Firebase Auth
+            mAuth = FirebaseAuth.getInstance();
+            // get the current user
+            currentUser = mAuth.getCurrentUser();
+        }
+        return databaseReferenceUsers.child(currentUser.getUid()).child("notifications");
+    }
     public Task<Void> sendNotification(String msg, String UID, String date){
         User tempUser = users.get(UID);
         if (tempUser != null) {
@@ -215,13 +224,15 @@ public class DatabaseService extends Service {
         }
         return databaseReferenceUsers.child(UID).setValue(tempUser);
     }
+    public Task<Void> removeNotification(Notification notification){
 
-    public Task<Void> toggleOnlineUser(String UID, boolean state){
-        // set the user to offline or offline
-        return databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(state);
+        if (currentUserData != null) {
+            currentUserData.removeNotification(notification.sendData());
+        }
+        return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
     }
 
-    public ListenerVariable<Boolean> getUpdateListener(){
-        return updateListener;
-    }
+
+
+
 }
