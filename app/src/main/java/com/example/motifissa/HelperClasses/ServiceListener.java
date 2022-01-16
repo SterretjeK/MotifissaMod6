@@ -6,11 +6,14 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.motifissa.DatabaseService;
+import com.example.motifissa.challenge_screens.ChallengeActivity;
+import com.example.motifissa.dialogs.AcceptDenyDialog;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.Query;
 
@@ -46,7 +49,10 @@ public class ServiceListener extends AppCompatActivity {
     }
 
 
-    protected void onServiceConnect(){}
+    protected void onServiceConnect(){
+        // when a message is received show a accept deny dialog.
+        setupNotificationListener();
+    }
 
     // ----------------  Connect to service  ----------------
     public void connectToService(){
@@ -96,18 +102,37 @@ public class ServiceListener extends AppCompatActivity {
     }
 
     // ---------------- Service functions ----------------
-    public ListenerTask<Query> getNotifications(){
-        return new ListenerTask<>(this, () -> mDatabaseService.getNotifications());
-    }
 
+    // Users:
     public ListenerTask<User> getUser(String UID){
         return new ListenerTask<>(this, () -> mDatabaseService.getUser(UID));
     }
+    public ListenerTask<ListenerVariable<Boolean>> getUpdateListener(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
+    }
 
+
+    // Current user:
     public ListenerTask<User> getCurrentUser(){
         return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUser());
     }
 
+    // Friends:
+    public ListenerTask<ArrayList<User>> getFriends(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsData());
+    }
+    public ListenerTask<Query> getCurrentUserFriendsQuery(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUserFriendsQuery());
+    }
+    public ListenerTask<ArrayList<String>> getFriendsNames(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
+    }
+
+
+    // Notifications:
+    public ListenerTask<Query> getNotifications(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getNotifications());
+    }
     public ListenerTask<Task<Void>> sendNotification(String msg, String toUID){
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
@@ -115,26 +140,13 @@ public class ServiceListener extends AppCompatActivity {
 
         return new ListenerTask<>(this, () -> mDatabaseService.sendNotification(msg, toUID, formattedDate));
     }
-
-    public ListenerTask<ArrayList<User>> getFriends(){
-        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsData());
-    }
-
-    public ListenerTask<Query> getCurrentUserFriendsQuery(){
-        return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUserFriendsQuery());
-    }
-
-    public ListenerTask<ArrayList<String>> getFriendsNames(){
-        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
-    }
-
-    public ListenerTask<ListenerVariable<Boolean>> getUpdateListener(){
-        return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
-    }
-
     public ListenerTask<Task<Void>> removeNotification(Notification notification){
         return new ListenerTask<>(this, () -> mDatabaseService.removeNotification(notification));
     }
+    public ListenerTask<ListenerVariable<Notification>> getNotificationListener(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getNotificationListener());
+    }
+
 
     // this function can be used if you want to get more values at the same time, because in this success listener you could call the direct functions
     public ListenerTask<Boolean> isBounded(){
@@ -145,6 +157,58 @@ public class ServiceListener extends AppCompatActivity {
     // DON't USE THESE AS THEY COULD TROW A NULLPOINTER ERROR because the connection isn't checked
     public User getUserDirect(String UID){
         return mDatabaseService.getUser(UID);
+    }
+
+    protected void acceptChallenge(Notification notification){
+        Intent challengeIntent = new Intent(getApplicationContext(), ChallengeActivity.class);
+        challengeIntent.putExtra(ChallengeActivity.START_FRAGMENT, 4);
+        challengeIntent.putExtra(ChallengeActivity.START_SELECTED_FRIEND_UID, notification.getSentBy());
+        startActivity(challengeIntent);
+    }
+
+
+    private void setupNotificationListener(){
+        getNotificationListener().setSuccessListener(notificationListener -> {
+            notificationListener.removeListeners(); // first delete al the old listeners
+            notificationListener.addListener(notification->{ // then add a new listeners
+
+                // if the new notification is a challenge, show a dialog for it:
+                if (notification.getType() == Notification.NotificationType.CHALLENGE || notification.getType() == Notification.NotificationType.ACCEPTED_CHALLENGE) {
+                    AcceptDenyDialog dialog = new AcceptDenyDialog();                   // create a new dialog
+
+                    // set its arguments
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AcceptDenyDialog.TITLE, notification.getTitle());
+                    bundle.putString(AcceptDenyDialog.SUBTITLE, notification.getMessage());
+                    dialog.setArguments(bundle);
+
+                    // set its onclick listeners
+                    dialog.setListener(new AcceptDenyDialog.AcceptDenyListener() {
+                        @Override
+                        public void onAccept() {
+                            removeNotification(notification);
+                            if (notification.getType() == Notification.NotificationType.CHALLENGE)
+                                sendNotification(Notification.NotificationType.ACCEPTED_CHALLENGE.toString(), notification.getSentBy());
+
+                           acceptChallenge(notification);
+
+                        }
+
+                        @Override
+                        public void onDeny() {
+                            removeNotification(notification);
+                            Toast.makeText(getApplicationContext(), "Denied " + notification.getTitle().toLowerCase(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    // show the dialog
+                    dialog.show(getFragmentManager(), notification.getTitle());
+                }
+
+                // if the new notification is a challenge Accept, show a dialog for that:
+                // Todo, make a separate dialog for this
+            });
+        });
     }
 
 }

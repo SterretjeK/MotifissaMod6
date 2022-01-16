@@ -8,27 +8,33 @@ public class Notification {
     private String message;
     private boolean read;
     private String date;
+    private String username;
 
     public Notification() {}
 
-    public Notification(String type, String sentBy) {
-        this(type, sentBy, "-");
+    public Notification(String type, String sentBy, String username) {
+        this(type, sentBy, "-", username);
     }
 
-    public Notification(String type, String sentBy, String date) {
+    public Notification(String type, String sentBy, String date, String username) {
         this.sentBy = sentBy;
         this.date = date;
+        this.username = username;
         read = false;
         message = "";
 
         if(type.equals(NotificationType.CHALLENGE.toString())){
             this.type = NotificationType.CHALLENGE;
             title = "Challenge";
-            message = "You have been challenged by username.";
+            message = "You have been challenged by username.".replace("username", username);
         } else if(type.equals(NotificationType.FRIEND_REQUEST.toString())){
             this.type = NotificationType.FRIEND_REQUEST;
             title = "Friend Request";
-            message =  "username would like to be your friend";
+            message =  "username would like to be your friend".replace("username", username);
+        } else if(type.equals(NotificationType.ACCEPTED_CHALLENGE.toString())){
+          this.type = NotificationType.ACCEPTED_CHALLENGE;
+          title = "Challenge Accepted";
+          message = "username accepted your challenge".replace("username", username);
         } else {
             this.type = NotificationType.MESSAGE;
         }
@@ -44,6 +50,7 @@ public class Notification {
 
     public enum NotificationType{
         CHALLENGE,
+        ACCEPTED_CHALLENGE,
         FRIEND_REQUEST,
         MESSAGE
     }

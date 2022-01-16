@@ -118,12 +118,10 @@ public class NotificationsActivity extends ServiceListener {
             dialog.setListener(new AcceptDenyDialog.AcceptDenyListener() {
                 @Override
                 public void onAccept() {
-                    // TODO go to the challenge
-                    removeNotification(notification);
-                    Intent challengeIntent = new Intent(getApplicationContext(), ChallengeActivity.class);
-                    challengeIntent.putExtra(ChallengeActivity.START_FRAGMENT, 4);
-                    challengeIntent.putExtra(ChallengeActivity.START_SELECTED_FRIEND_UID, notification.getSentBy());
-                    startActivity(challengeIntent);
+                    if (notification.getType() == Notification.NotificationType.CHALLENGE)
+                        sendNotification(Notification.NotificationType.ACCEPTED_CHALLENGE.toString(), notification.getSentBy());
+                    if (notification.getType() == Notification.NotificationType.CHALLENGE || notification.getType() == Notification.NotificationType.ACCEPTED_CHALLENGE)
+                    acceptChallenge(notification);
                 }
 
                 @Override
@@ -159,11 +157,11 @@ public class NotificationsActivity extends ServiceListener {
                     getUser(notificationCode[1]).setSuccessListener(otherUser -> {
                         Notification notification;
                         if (notificationCode.length <= 2) {
-                            notification = new Notification(notificationCode[0], notificationCode[1]);
+                            notification = new Notification(notificationCode[0], notificationCode[1], otherUser.getName());
                         } else {
-                            notification = new Notification(notificationCode[0], notificationCode[1], notificationCode[2]);
+                            notification = new Notification(notificationCode[0], notificationCode[1], notificationCode[2], otherUser.getName());
                         }
-                        notification.setMessage(notification.getMessage().replaceAll("username", otherUser.getName()));
+//                        notification.setMessage(notification.getMessage().replaceAll("username", otherUser.getName()));
 
                         notifications.add(notification);
                     });
