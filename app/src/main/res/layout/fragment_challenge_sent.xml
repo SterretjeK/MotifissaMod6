@@ -68,7 +68,8 @@
             android:background="@drawable/custom_button"
             android:text="@string/buttonBackTxt"
             android:textColor="?itemTextColor"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/button_home"
@@ -80,20 +81,8 @@
             android:background="@drawable/custom_button"
             android:text="@string/buttonHomeTxt"
             android:textColor="?itemTextColor"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="ButtonStyle" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView_ERROR"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="20dp"
-
-        android:text="NOTE: THEY CAN'T ACCEPT YET"
-        android:textColor="@color/error"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_Note" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,12 +8,16 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.example.motifissa.HelperClasses.ChallengeStatus;
 import com.example.motifissa.HelperClasses.ListenerVariable;
+import com.example.motifissa.HelperClasses.Notification;
 import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +31,7 @@ import java.util.HashMap;
 public class DatabaseService extends Service {
 
     private static final String TAG = "DatabaseService";
+    private static final String challengeStatusStr = "challengeStatus";
     IBinder mBinder = new LocalBinder();
 
     // Firebase
@@ -42,7 +47,9 @@ public class DatabaseService extends Service {
     private ArrayList<String> friendsNameArray = new ArrayList<>();
     private ArrayList<User> friendsData = new ArrayList<>();
     ListenerVariable<Boolean> updateListener = new ListenerVariable<>(false);
+    ListenerVariable<Notification> notificationListener = new ListenerVariable<>();
 
+    // ***!!! IMPORTANT PRESS CTRL SHIFT -. this minimalize everything, making it more readable
 
     // ------------ Setup functions ------------
     @Override
@@ -50,9 +57,6 @@ public class DatabaseService extends Service {
         // firebase setup
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
         databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
-
-        // get the current user, OLD
-//         currentUser = intent.getExtras().getParcelable("CurrentUser");
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -113,6 +117,52 @@ public class DatabaseService extends Service {
 
             }
         });
+
+        // a listener that listens to changes in notifications of the current user
+        databaseReferenceUsers.child(currentUser.getUid()).child("notifications").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String notificationData = snapshot.getValue(String.class); // get the new message
+                if (notificationData == null) {
+                    Log.e(TAG, "notificationData was null, " + notificationData);
+                    return;
+                }
+                String[] notificationCode = notificationData.split("\\|"); // split the message
+
+                User otherUser = getUser(notificationCode[1]); // get the user who sent the message
+                if (otherUser == null){
+                    return;
+                }
+
+                // change the message into a notification
+                Notification notification;
+                if (notificationCode.length <= 2) {
+                    notification = new Notification(notificationCode[0], notificationCode[1], otherUser.getName());
+                } else {
+                    notification = new Notification(notificationCode[0], notificationCode[1], notificationCode[2], otherUser.getName());
+                }
+//                notification.setMessage(notification.getMessage().replaceAll("username", otherUser.getName())); // change the username
+                notificationListener.set(notification);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     @Override
@@ -133,67 +183,73 @@ public class DatabaseService extends Service {
 
     // ------------ Firebase functions ------------
 
-    // Firebase get data functions
+    // Users:
     public Task<Void> addUser(User user){
         // TODO validate data
         //  if (user == null) throw ....;
 
         return databaseReferenceUsers.push().setValue(user);
     }
-
     public Query getUsersQuery(){
         return databaseReferenceUsers.orderByKey();
     }
-    public Query getCurrentUserQuery(){
-        return databaseReferenceUsers.child(currentUser.getUid()).child("friends");
+    public HashMap<String, User> getUsers() {
+        return users;
+    }
+    public ArrayList<User> getUsersArray() {
+        return usersArray;
+    }
+    public User getUser(String UID){
+        return users.get(UID);
+    }
+    public Task<Void> toggleOnlineUser(String UID, boolean state){
+        // set the user to offline or offline
+        return databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(state);
+    }
+    public ListenerVariable<Boolean> getUpdateListener(){
+        return updateListener;
     }
 
-    public Query getNotifications(){
-        return databaseReferenceUsers.child(currentUser.getUid()).child("notifications");
-    }
 
+    // Current user:
     public User getCurrentUser(){
         return currentUserData;
     }
-
     public FirebaseUser getCurrentFirebaseUser(){
+        if (currentUser == null) {
+            mAuth = FirebaseAuth.getInstance();
+            currentUser = mAuth.getCurrentUser();
+        }
         return currentUser;
     }
-
     public User getCurrentUserData() {
         return currentUserData;
     }
 
-    public ArrayList<User> getUsersArray() {
-        return usersArray;
-    }
 
-    public HashMap<String, User> getUsers() {
-        return users;
+    // friends
+    public Query getCurrentUserFriendsQuery(){
+        return databaseReferenceUsers.child(currentUser.getUid()).child("friends");
     }
-
     public ArrayList<String> getFriendsUIDArray() {
         return friendsUIDArray;
     }
-
     public ArrayList<String> getFriendsNameArray() {
         return friendsNameArray;
     }
-
     public ArrayList<User> getFriendsData() {
         return friendsData;
     }
-
-    public User getUser(String UID){
-        return users.get(UID);
-    }
-
     public Task<Void> toggleFriend(String UID){
         currentUserData.toggleFriend(UID);
 
         return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
     }
 
+    // notifications
+    public Query getNotifications(){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child("notifications");
+    }
     public Task<Void> sendNotification(String msg, String UID, String date){
         User tempUser = users.get(UID);
         if (tempUser != null) {
@@ -215,13 +271,25 @@ public class DatabaseService extends Service {
         }
         return databaseReferenceUsers.child(UID).setValue(tempUser);
     }
+    public Task<Void> removeNotification(Notification notification){
 
-    public Task<Void> toggleOnlineUser(String UID, boolean state){
-        // set the user to offline or offline
-        return databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(state);
+        if (currentUserData != null) {
+            currentUserData.removeNotification(notification.sendData());
+        }
+        return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
+    }
+    public ListenerVariable<Notification> getNotificationListener(){
+        return notificationListener;
     }
 
-    public ListenerVariable<Boolean> getUpdateListener(){
-        return updateListener;
+    // challenges
+    public Query getOpponentsChallengeQuery(String UID){
+        return databaseReferenceUsers.child(UID).child(challengeStatusStr);
+    }
+    public Task<Void> changeChallengeStatus(ChallengeStatus challengeStatus){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).setValue(challengeStatus);
+    }
+    public Task<Void> removeChallengeStatus(){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).removeValue();
     }
 }

@@ -58,7 +58,7 @@ public class OverviewChallengeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_overview_challenge, container, false);
+        View v = inflater.inflate(R.layout.fragment_challenge_overview, container, false);
 
         if (selectedUser != null) { // if the user is selected replace the texts so it's about the current user and his opponent
             TextView introTxtField = v.findViewById(R.id.Challenge_IntroTxtField);

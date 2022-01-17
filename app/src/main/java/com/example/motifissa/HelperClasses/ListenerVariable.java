@@ -42,6 +42,10 @@ public class ListenerVariable<T> {
         this.changeListeners.remove(listener);
     }
 
+    public void removeListeners(){
+        this.changeListeners.clear();
+    }
+
     public void addListener(ChangeListener<T> listener) {
         this.changeListeners.add(listener);
     }

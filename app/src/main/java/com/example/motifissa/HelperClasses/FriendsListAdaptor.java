@@ -22,15 +22,18 @@ public class FriendsListAdaptor extends ArrayAdapter<User> implements Filterable
     private ArrayList<User> users;
     private final ArrayList<User> originalUsers;
     private ArrayList<String> friends;
+//    private final User currentUser;
     private final Activity context;
 
-    public FriendsListAdaptor(Activity context, ArrayList<User> users, ArrayList<String> friends) {
+    public FriendsListAdaptor(Activity context, ArrayList<User> users, ArrayList<String> friends){//, User currentUser) {
         super(context, R.layout.list_friends, users);
         this.context = context;
-        this.users = users;
-        this.originalUsers = users;
-
         this.friends = friends;
+
+        this.users = users;
+//        this.currentUser = currentUser;
+//        this.users.remove(currentUser);
+        this.originalUsers = users;
     }
 
 
