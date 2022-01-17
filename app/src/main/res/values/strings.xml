@@ -137,4 +137,7 @@
     <string name="action_deny">Deny</string>
     <string name="cancel">Cancel</string>
     <string name="loadingScreen_title">Waiting for username</string>
+    <string name="Challenge_maps_title">Choose a location</string>
+    <string name="confirm_action">Confirm</string>
+    <string name="change_action">Change</string>
 </resources>

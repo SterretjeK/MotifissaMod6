@@ -1,8 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".challenge_screens.Challenge_MapsFragment" />
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".challenge_screens.Challenge_MapsFragment"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+
+        map:cameraZoom="16"
+        />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/text_margin"
+        android:text="@string/Challenge_maps_title"
+        android:textColor="@color/color_primary_dark"
+        android:textSize="@dimen/titleSize"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="25dp"
+        android:gravity="center">
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/change_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/button_textSize_L"
+            android:fontFamily="@font/montserrat"
+            android:background="@drawable/custom_button"
+            android:layout_marginEnd="75dp"
+            android:text="@string/change_action"
+            android:textColor="?itemTextColor"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/confirm_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/button_textSize_L"
+            android:fontFamily="@font/montserrat"
+            android:background="@drawable/custom_button"
+            android:text="@string/confirm_action"
+            android:textColor="?itemTextColor"
+            tools:ignore="ButtonStyle" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
