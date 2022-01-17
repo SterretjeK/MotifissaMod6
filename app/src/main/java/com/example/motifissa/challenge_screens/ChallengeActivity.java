@@ -187,6 +187,8 @@ public class ChallengeActivity extends ServiceListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 challengeStatusOpponent = snapshot.getValue(ChallengeStatus.class);
+
+                // if
                 if (challengeStatus == null){
                     query.removeEventListener(this);
                     return;
@@ -197,12 +199,17 @@ public class ChallengeActivity extends ServiceListener {
                     cancelChallenge();
                     query.removeEventListener(this);
                     return;
-                } else if (challengeStatusOpponent == null){
+                } else if (challengeStatusOpponent == null && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.WAITING){
+                    challengeStatus.setMaster(true);
+                    changeChallengeStatus(challengeStatus);
+                    return;
+                } else  if (challengeStatusOpponent == null) {
                     return;
                 }
-                if ((challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.WAITING || challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.CONNECTED)  && currentFragment < 5){
+                if (challengeStatusOpponent.shouldBeInSecondPhase()  && currentFragment < 5){
+                    challengeStatus.moveToSecondPhase();
+
                     changeFragment(5);
-                    challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.CONNECTED);
                     changeChallengeStatus(challengeStatus);
                 }
             }
@@ -212,6 +219,18 @@ public class ChallengeActivity extends ServiceListener {
 
             }
         }));
+    }
+
+    public ChallengeStatus getChallengeStatus() {
+        return challengeStatus;
+    }
+
+    public void setChallengeStatus(ChallengeStatus challengeStatus) {
+        this.challengeStatus = challengeStatus;
+    }
+
+    public ChallengeStatus getChallengeStatusOpponent(){
+        return challengeStatusOpponent;
     }
 
     public void cancelChallenge(){

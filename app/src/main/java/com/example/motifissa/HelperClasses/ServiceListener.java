@@ -175,7 +175,7 @@ public class ServiceListener extends AppCompatActivity {
         challengeIntent.putExtra(ChallengeActivity.START_SELECTED_FRIEND_UID, notification.getSentBy());
         startActivity(challengeIntent);
 
-        ChallengeStatus challengeStatus = new ChallengeStatus(notification.getSentBy(), ChallengeStatus.ChallengeState.WAITING);
+        ChallengeStatus challengeStatus = new ChallengeStatus(notification.getSentBy(), ChallengeStatus.ChallengeState.WAITING, true);
         changeChallengeStatus(challengeStatus);
     }
 

@@ -1,15 +1,18 @@
 package com.example.motifissa.challenge_screens;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.motifissa.HelperClasses.ChallengeStatus;
 import com.example.motifissa.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -38,6 +41,21 @@ public class Challenge_MapsFragment extends Fragment {
     //https://techenum.com/how-to-get-current-gps-location-in-android/
 
     Button confirmButton;
+    Button changeButton;
+    TextView titleTxt;
+    ChallengeActivity challengeActivity;
+
+    Marker chosenMarker;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof ChallengeActivity) {
+            challengeActivity = (ChallengeActivity) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must be ChallengeActivity");
+        }
+    }
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -59,12 +77,14 @@ public class Challenge_MapsFragment extends Fragment {
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(userLatLng));
 
 
-            Marker chosenMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Place to meet").visible(false));
+            chosenMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Place to meet").visible(false));
 
             googleMap.setOnMapLongClickListener(latLng -> {
-                chosenMarker.setPosition(latLng);
-                chosenMarker.setVisible(true);
-                confirmButton.setEnabled(true);
+                if (pickingLocation()) {
+                    chosenMarker.setPosition(latLng);
+                    chosenMarker.setVisible(true);
+                    confirmButton.setEnabled(true);
+                }
             });
         }
     };
@@ -77,9 +97,44 @@ public class Challenge_MapsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_challenge__maps, container, false);
 
         confirmButton = view.findViewById(R.id.confirm_button);
+        changeButton = view.findViewById(R.id.change_button);
+        titleTxt = view.findViewById(R.id.maps_title);
+
         confirmButton.setEnabled(false);
+        if (!pickingLocation()){
+            changeButton.setVisibility(View.VISIBLE);
+            changeButton.setEnabled(false);
+
+            challengeActivity.getUser(challengeActivity.getChallengeStatus().getOpponent()).setSuccessListener(opponent ->{
+                titleTxt.setText(getResources().getString(R.string.challenge_maps_title_waiting).replaceAll("username", opponent.getName()));
+            });
+
+            // TODO confirmButton.setOnClickListener();
+        } else {
+            confirmButton.setOnClickListener(v -> {
+                ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
+                challengeStatus.setLatitude(chosenMarker.getPosition().latitude);
+                challengeStatus.setLongitude(chosenMarker.getPosition().longitude);
+
+                challengeActivity.setChallengeStatus(challengeStatus);
+                challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.PICK_LOCATION_DONE);
+                challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> {
+                    task.addOnSuccessListener(success ->{
+                        //TODO this
+                    }).addOnFailureListener(error -> {
+                        //TODO this
+                    });
+                });
+
+                confirmButton.setEnabled(false);
+            });
+        }
 
         return view;
+    }
+
+    private boolean pickingLocation(){
+        return challengeActivity.getChallengeStatus().getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION;
     }
 
     @Override

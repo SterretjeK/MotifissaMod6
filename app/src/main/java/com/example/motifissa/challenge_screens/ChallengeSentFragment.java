@@ -53,8 +53,10 @@ public class ChallengeSentFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_challenge_sent, container, false);
         challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> {
             selectedUser = result;
-            if (selectedUser == null)
+            if (selectedUser == null){
                 challengeActivity.moveBackFragment(2);
+                return;
+            }
 
             TextView introTxt = v.findViewById(R.id.Challenge_sent_IntroTxtField);
             String txt = getResources().getString(R.string.Challenge_sent_IntroTxt);
