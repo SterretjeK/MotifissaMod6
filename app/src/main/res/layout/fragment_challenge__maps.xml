@@ -18,7 +18,7 @@
         xmlns:map="http://schemas.android.com/apk/res-auto"
 
         map:cameraZoom="16"
-        />
+        tools:ignore="FragmentTagUsage" />
 
     <TextView
         android:id="@+id/textView2"
@@ -42,6 +42,7 @@
         android:layout_marginBottom="25dp"
         android:gravity="center">
 
+<!--        TODO make the buttons look better when they are disabled-->
         <Button
             android:visibility="gone"
             android:id="@+id/change_button"
