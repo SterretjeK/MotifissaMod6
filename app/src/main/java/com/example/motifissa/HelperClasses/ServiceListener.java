@@ -147,6 +147,16 @@ public class ServiceListener extends AppCompatActivity {
         return new ListenerTask<>(this, () -> mDatabaseService.getNotificationListener());
     }
 
+    // Challenges:
+    public ListenerTask<Query> getOpponentsChallengeQuery(String UID){
+        return new ListenerTask<>(this, () -> mDatabaseService.getOpponentsChallengeQuery(UID));
+    }
+    public ListenerTask<Task<Void>> changeChallengeStatus(ChallengeStatus challengeStatus){
+        return new ListenerTask<>(this, () -> mDatabaseService.changeChallengeStatus(challengeStatus));
+    }
+    public ListenerTask<Task<Void>> removeChallengeStatus(){
+        return new ListenerTask<>(this, () -> mDatabaseService.removeChallengeStatus());
+    }
 
     // this function can be used if you want to get more values at the same time, because in this success listener you could call the direct functions
     public ListenerTask<Boolean> isBounded(){
@@ -164,6 +174,9 @@ public class ServiceListener extends AppCompatActivity {
         challengeIntent.putExtra(ChallengeActivity.START_FRAGMENT, 4);
         challengeIntent.putExtra(ChallengeActivity.START_SELECTED_FRIEND_UID, notification.getSentBy());
         startActivity(challengeIntent);
+
+        ChallengeStatus challengeStatus = new ChallengeStatus(notification.getSentBy(), ChallengeStatus.ChallengeState.WAITING);
+        changeChallengeStatus(challengeStatus);
     }
 
 

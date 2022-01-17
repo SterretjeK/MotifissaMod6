@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.motifissa.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 public class ChallengeLoadingFragment extends Fragment {
 
@@ -36,6 +39,7 @@ public class ChallengeLoadingFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString() + " must be ChallengeActivity");
         }
+        challengeActivity.startChallenge();
     }
 
 
@@ -51,7 +55,7 @@ public class ChallengeLoadingFragment extends Fragment {
         });
 
         Button cancelButton = view.findViewById(R.id.loading_cancel_button);
-        cancelButton.setOnClickListener(v -> challengeActivity.finish());
+        cancelButton.setOnClickListener(v -> challengeActivity.cancelChallenge());
 
         return view;
     }

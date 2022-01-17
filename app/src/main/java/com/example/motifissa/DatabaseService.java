@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.motifissa.HelperClasses.ChallengeStatus;
 import com.example.motifissa.HelperClasses.ListenerVariable;
 import com.example.motifissa.HelperClasses.Notification;
 import com.example.motifissa.HelperClasses.User;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 public class DatabaseService extends Service {
 
     private static final String TAG = "DatabaseService";
+    private static final String challengeStatusStr = "challengeStatus";
     IBinder mBinder = new LocalBinder();
 
     // Firebase
@@ -47,7 +49,7 @@ public class DatabaseService extends Service {
     ListenerVariable<Boolean> updateListener = new ListenerVariable<>(false);
     ListenerVariable<Notification> notificationListener = new ListenerVariable<>();
 
-
+    // ***!!! IMPORTANT PRESS CTRL SHIFT -. this minimalize everything, making it more readable
 
     // ------------ Setup functions ------------
     @Override
@@ -124,7 +126,7 @@ public class DatabaseService extends Service {
                 if (notificationData == null) {
                     Log.e(TAG, "notificationData was null, " + notificationData);
                     return;
-                };
+                }
                 String[] notificationCode = notificationData.split("\\|"); // split the message
 
                 User otherUser = getUser(notificationCode[1]); // get the user who sent the message
@@ -214,6 +216,10 @@ public class DatabaseService extends Service {
         return currentUserData;
     }
     public FirebaseUser getCurrentFirebaseUser(){
+        if (currentUser == null) {
+            mAuth = FirebaseAuth.getInstance();
+            currentUser = mAuth.getCurrentUser();
+        }
         return currentUser;
     }
     public User getCurrentUserData() {
@@ -242,13 +248,7 @@ public class DatabaseService extends Service {
 
     // notifications
     public Query getNotifications(){
-        if (currentUser == null) {
-            // Initialize Firebase Auth
-            mAuth = FirebaseAuth.getInstance();
-            // get the current user
-            currentUser = mAuth.getCurrentUser();
-        }
-        return databaseReferenceUsers.child(currentUser.getUid()).child("notifications");
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child("notifications");
     }
     public Task<Void> sendNotification(String msg, String UID, String date){
         User tempUser = users.get(UID);
@@ -282,4 +282,14 @@ public class DatabaseService extends Service {
         return notificationListener;
     }
 
+    // challenges
+    public Query getOpponentsChallengeQuery(String UID){
+        return databaseReferenceUsers.child(UID).child(challengeStatusStr);
+    }
+    public Task<Void> changeChallengeStatus(ChallengeStatus challengeStatus){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).setValue(challengeStatus);
+    }
+    public Task<Void> removeChallengeStatus(){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).removeValue();
+    }
 }

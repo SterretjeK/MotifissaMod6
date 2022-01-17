@@ -38,7 +38,6 @@ public class ChallengeSentFragment extends Fragment {
             throw new RuntimeException(context.toString() + " must be challengeActivity");
         }
 
-        challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> selectedUser = result);
         challengeActivity.getCurrentUser().setSuccessListener(result -> currentUser = result);
     }
 
@@ -52,18 +51,22 @@ public class ChallengeSentFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_challenge_sent, container, false);
+        challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> {
+            selectedUser = result;
+            if (selectedUser == null)
+                challengeActivity.moveBackFragment(2);
 
-        TextView introTxt = v.findViewById(R.id.Challenge_sent_IntroTxtField);
-        String txt = getResources().getString(R.string.Challenge_sent_IntroTxt);
-        txt = txt.replaceAll("username", selectedUser.getName());
-        introTxt.setText(txt);
+            TextView introTxt = v.findViewById(R.id.Challenge_sent_IntroTxtField);
+            String txt = getResources().getString(R.string.Challenge_sent_IntroTxt);
+            txt = txt.replaceAll("username", selectedUser.getName());
+            introTxt.setText(txt);
 
-        Button list = v.findViewById(R.id.button_back);
-        Button home = v.findViewById(R.id.button_home);
+            Button list = v.findViewById(R.id.button_back);
+            Button home = v.findViewById(R.id.button_home);
 
-        list.setOnClickListener(view -> challengeActivity.moveBackFragment(2));
-        home.setOnClickListener(view -> challengeActivity.moveBackFragment(3));
-
+            list.setOnClickListener(view -> challengeActivity.moveBackFragment(2));
+            home.setOnClickListener(view -> challengeActivity.moveBackFragment(3));
+        });
         return v;
     }
 }

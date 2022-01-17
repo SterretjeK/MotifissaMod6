@@ -5,30 +5,37 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.example.motifissa.HelperClasses.ChallengeStatus;
 import com.example.motifissa.HelperClasses.ListenerTask;
 import com.example.motifissa.HelperClasses.Notification;
 import com.example.motifissa.R;
 import com.example.motifissa.HelperClasses.ServiceListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class ChallengeActivity extends ServiceListener {
     /*
     Screens
-        - Choose Friend
-        - Overview Friend
-        - Sent
+        -1 Choose Friend
+        -2 Overview Friend
+        -3 Sent
         - -------
-        - loading/waiting on other user??
-        - choose location
-        - countdown/challengeScreen
+        -4 loading/waiting on other user??
+        -5 choose location
+        -6 countdown/challengeScreen
      */
 
+    private static final String TAG = "ChallengeActivity";
     public static final String START_FRAGMENT = "START_FRAGMENT";
     public static final String START_SELECTED_FRIEND_UID = "START_SELECTED_FRIEND_UID";
 
@@ -40,6 +47,10 @@ public class ChallengeActivity extends ServiceListener {
     ChallengeSentFragment challengeSentFragment;
     ChallengeLoadingFragment challengeLoadingFragment;
     Challenge_MapsFragment challengeMapsFragment;
+
+    // the actual challenge:
+    ChallengeStatus challengeStatus;
+    ChallengeStatus challengeStatusOpponent;
 
     private String selectedFriend;
 
@@ -61,12 +72,7 @@ public class ChallengeActivity extends ServiceListener {
             OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
                 @Override
                 public void handleOnBackPressed() {
-                    if (currentFragment > 1 && currentFragment < 4)
-                        changeFragment(currentFragment - 1);
-                    else if (currentFragment > 4)
-                        changeFragment(currentFragment - 1);
-                    else
-                        finish();
+                    onBackPress();
                 }
             };
             this.getOnBackPressedDispatcher().addCallback(this, callback);
@@ -129,12 +135,7 @@ public class ChallengeActivity extends ServiceListener {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            if (currentFragment > 1 && currentFragment < 4)
-                changeFragment(currentFragment - 1);
-            else if (currentFragment > 4)
-                changeFragment(currentFragment - 1);
-            else
-                finish();
+            onBackPress();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -147,10 +148,7 @@ public class ChallengeActivity extends ServiceListener {
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
-                if (currentFragment > 1)
-                    changeFragment(currentFragment - 1);
-                else
-                    finish();
+                onBackPress();
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
@@ -180,5 +178,56 @@ public class ChallengeActivity extends ServiceListener {
 
     public void setSelectedFriend(String newID) {
         selectedFriend = newID;
+    }
+
+    public void startChallenge(){
+        challengeStatus = new ChallengeStatus(selectedFriend, ChallengeStatus.ChallengeState.WAITING);
+
+        getOpponentsChallengeQuery(getSelectedFriend()).setSuccessListener(query -> query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                challengeStatusOpponent = snapshot.getValue(ChallengeStatus.class);
+                if (challengeStatus == null){
+                    query.removeEventListener(this);
+                    return;
+                }
+                if (challengeStatusOpponent == null && challengeStatus.getChallengeState() != ChallengeStatus.ChallengeState.WAITING){
+                    if (challengeStatus != null)
+                        getUser(getSelectedFriend()).setSuccessListener(friend -> Toast.makeText(ChallengeActivity.this, "username disconnected".replaceAll("username", friend.getName()), Toast.LENGTH_SHORT).show());
+                    cancelChallenge();
+                    query.removeEventListener(this);
+                    return;
+                } else if (challengeStatusOpponent == null){
+                    return;
+                }
+                if ((challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.WAITING || challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.CONNECTED)  && currentFragment < 5){
+                    changeFragment(5);
+                    challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.CONNECTED);
+                    changeChallengeStatus(challengeStatus);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        }));
+    }
+
+    public void cancelChallenge(){
+        challengeStatus = null;
+        removeChallengeStatus().setSuccessListener(task -> task.addOnSuccessListener(success -> finish())
+                .addOnFailureListener(error -> {
+                    Toast.makeText(this, "Couldn't cancel challenge", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Couldn't cancel challenge error: " + error);
+                }));
+    }
+
+    public void onBackPress(){
+        if (currentFragment > 1 && currentFragment < 4)
+            changeFragment(currentFragment - 1);
+        else if (currentFragment > 4)
+            cancelChallenge();
+        else finish();
     }
 }
