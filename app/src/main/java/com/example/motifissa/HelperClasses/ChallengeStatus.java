@@ -1,7 +1,5 @@
 package com.example.motifissa.HelperClasses;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 
 public class ChallengeStatus {
@@ -25,12 +23,12 @@ public class ChallengeStatus {
 
     public boolean chosenPosIsEmpty() {
         if (chosenPos == null) return false;
-        return chosenPos.isEmpty();
+        return chosenPos.empty();
     }
 
     public boolean ownPosIsEmpty() {
         if (ownPos == null) return false;
-        return ownPos.isEmpty();
+        return ownPos.empty();
     }
 
     public enum ChallengeState{
@@ -115,7 +113,7 @@ public class ChallengeStatus {
             this.longitude = longitude;
         }
 
-        public LatLng getPos(){
+        public LatLng changeToLatLng(){
             return new LatLng(latitude, longitude);
         }
 
@@ -135,7 +133,7 @@ public class ChallengeStatus {
             this.longitude = longitude;
         }
 
-        public boolean isEmpty() {
+        public boolean empty() {
             return longitude == 0 && latitude == 0;
         }
     }

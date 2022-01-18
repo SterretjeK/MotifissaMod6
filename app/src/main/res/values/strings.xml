@@ -143,4 +143,6 @@
     <string name="challenge_maps_title_waiting">username is choosing a spot to meet up</string>
     <string name="challenge_maps_title_chosen">Accept this location?</string>
     <string name="challenge_maps_title_find">Go find each other</string>
+    <string name="challenge_maps_title_locationChosen">Waiting on username to accept</string>
+    <string name="action_arrived_temp">Arrived</string>
 </resources>

@@ -16,8 +16,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.motifissa.HelperClasses.ChallengeStatus;
 import com.example.motifissa.R;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +27,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -46,7 +43,7 @@ public class Challenge_MapsFragment extends Fragment {
     //https://techenum.com/how-to-get-current-gps-location-in-android/
     private static final String TAG = "Challenge_MapsFragment";
     private static final int ZOOM_LEVEL = 15;
-    private static final int MAPS_ZOOM_PADDING = 150;
+    private static final int MAPS_ZOOM_PADDING = 200;
 
     Button confirmButton;
     Button changeButton;
@@ -94,14 +91,14 @@ public class Challenge_MapsFragment extends Fragment {
             maps = googleMap;
 
 //            LatLng userLatLng = new LatLng(52.24655176852505, 6.847529082501974);
-            LatLng userLatLng = userPos.getPos();
+            LatLng userLatLng = userPos.changeToLatLng();
             userMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Your location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
             userMarker.showInfoWindow();
 
             chosenMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Place to meet").visible(false));
             opponentMarker = googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Opponents location").visible(false).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
             if (opponentsPos != null) {
-                opponentMarker.setPosition(opponentsPos.getPos());
+                opponentMarker.setPosition(opponentsPos.changeToLatLng());
                 opponentMarker.setVisible(true);
             }
 
@@ -133,43 +130,7 @@ public class Challenge_MapsFragment extends Fragment {
         changeButton = view.findViewById(R.id.change_button);
         titleTxt = view.findViewById(R.id.maps_title);
 
-        confirmButton.setEnabled(false);
-
-        // show different screens to the master and slave
-        if (!pickingLocation()) { // slave, the one waiting for the other user
-            changeButton.setVisibility(View.VISIBLE);
-            changeButton.setEnabled(false);
-
-            challengeActivity.getUser(challengeActivity.getChallengeStatus().getOpponent()).setSuccessListener(opponent -> {
-                titleTxt.setText(getResources().getString(R.string.challenge_maps_title_waiting).replaceAll("username", opponent.getName()));
-            });
-
-            confirmButton.setOnClickListener(v -> {
-                acceptedLocation();
-            });
-
-            changeButton.setOnClickListener(v -> {
-                // TODO Change Button Onclick listener
-            });
-        } else { // master, the one first picking a location
-            confirmButton.setOnClickListener(v -> {
-                ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
-                challengeStatus.setChosenPos(new ChallengeStatus.Position(chosenMarker.getPosition()));
-
-                challengeActivity.setChallengeStatus(challengeStatus);
-                challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.PICK_LOCATION_DONE);
-                challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> {
-                    task.addOnSuccessListener(success -> {
-                        //TODO this
-                    }).addOnFailureListener(error -> {
-                        Toast.makeText(getContext(), "Couldn't send location, " + error, Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Couldn't send location, " + error);
-                    });
-                });
-
-                confirmButton.setEnabled(false);
-            });
-        }
+        setupView();
 
         return view;
     }
@@ -193,11 +154,11 @@ public class Challenge_MapsFragment extends Fragment {
             Log.e(TAG, "Maps not yet initialized");
         }
         // set marker on the chosen spot
-        chosenMarker.setPosition(pos.getPos());
+        chosenMarker.setPosition(pos.changeToLatLng());
         chosenMarker.setVisible(true);
 
         //zoom to the chosen marker
-        maps.animateCamera(CameraUpdateFactory.newLatLngZoom(pos.getPos(), ZOOM_LEVEL));
+        maps.animateCamera(CameraUpdateFactory.newLatLngZoom(pos.changeToLatLng(), ZOOM_LEVEL));
 
         confirmButton.setEnabled(true);
         changeButton.setEnabled(true);
@@ -208,8 +169,9 @@ public class Challenge_MapsFragment extends Fragment {
 
     public void updateOpponentsPos(ChallengeStatus.Position opponentsPos) {
         if (opponentMarker != null && opponentsPos != this.opponentsPos) {
-            opponentMarker.setPosition(opponentsPos.getPos());
+            opponentMarker.setPosition(opponentsPos.changeToLatLng());
             opponentMarker.setVisible(true);
+            this.opponentsPos = opponentsPos;
             centerCamera();
         }
         this.opponentsPos = opponentsPos;
@@ -217,8 +179,8 @@ public class Challenge_MapsFragment extends Fragment {
 
     private void centerCamera() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(userPos.getPos());
-        builder.include(opponentsPos.getPos());
+        builder.include(userPos.changeToLatLng());
+        builder.include(opponentsPos.changeToLatLng());
 
         LatLngBounds bounds = builder.build();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, MAPS_ZOOM_PADDING);
@@ -228,8 +190,8 @@ public class Challenge_MapsFragment extends Fragment {
 
     private void centerCameraChosenPos() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(userPos.getPos());
-        builder.include(opponentsPos.getPos());
+        builder.include(userPos.changeToLatLng());
+        builder.include(opponentsPos.changeToLatLng());
         builder.include(chosenMarker.getPosition());
 
         LatLngBounds bounds = builder.build();
@@ -241,23 +203,77 @@ public class Challenge_MapsFragment extends Fragment {
     public void acceptedLocation() {
         changeButton.setVisibility(View.GONE);
         confirmButton.setEnabled(true);
+        confirmButton.setVisibility(View.VISIBLE);
 
         // TODO Temp, should be changed with a position check or with box if they are connected.
-        confirmButton.setText("Arrived");
+        confirmButton.setText(R.string.action_arrived_temp);
         titleTxt.setText(R.string.challenge_maps_title_find);
 
         ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
         challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.FINDING_EACH_OTHER);
         challengeActivity.setChallengeStatus(challengeStatus);
-        challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> {
-            task.addOnSuccessListener(success -> {
-                //TODO this
-            }).addOnFailureListener(error -> {
-                Toast.makeText(getContext(), "Couldn't accept challenge, " + error, Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Couldn't accept challenge, " + error);
-            });
-        });
+        challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> task.addOnSuccessListener(success -> {
+            //TODO this
+            // and this
+        }).addOnFailureListener(error -> {
+            Toast.makeText(getContext(), "Couldn't accept challenge, " + error, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Couldn't accept challenge, " + error);
+        }));
 
         centerCameraChosenPos();
+    }
+
+    public void setupView() {
+
+        confirmButton.setEnabled(false);
+        confirmButton.setVisibility(View.VISIBLE);
+
+        // show different screens to the master and slave
+        if (!pickingLocation()) { // slave, the one waiting for the other user
+            changeButton.setVisibility(View.VISIBLE);
+            changeButton.setEnabled(false);
+
+            challengeActivity.getUser(challengeActivity.getChallengeStatus().getOpponent()).setSuccessListener(opponent ->
+                    titleTxt.setText(getResources().getString(R.string.challenge_maps_title_waiting).replaceAll("username", opponent.getName())));
+
+            confirmButton.setOnClickListener(v -> acceptedLocation());
+
+            changeButton.setOnClickListener(v -> {
+                changeButton.setEnabled(false);
+                ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
+                challengeStatus.setChosenPos(null);
+                challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.PICK_LOCATION);
+                challengeActivity.setChallengeStatus(challengeStatus);
+                challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> task.addOnSuccessListener(success -> setupView())
+                        .addOnFailureListener(error -> {
+                            Toast.makeText(getContext(), "Couldn't deny location, " + error, Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "Couldn't deny location, " + error);
+                        }));
+            });
+        } else { // master, the one first picking a location
+            titleTxt.setText(R.string.Challenge_maps_title);
+            changeButton.setVisibility(View.GONE);
+
+            confirmButton.setOnClickListener(v -> {
+                ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
+                challengeStatus.setChosenPos(new ChallengeStatus.Position(chosenMarker.getPosition()));
+
+                challengeActivity.setChallengeStatus(challengeStatus);
+                challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.PICK_LOCATION_DONE);
+                challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> task.addOnSuccessListener(success -> {
+                    //TODO this
+                    challengeActivity.getUser(challengeActivity.getChallengeStatus().getOpponent()).setSuccessListener(opponent -> {
+                        // set the title and hide the confirm button
+                        titleTxt.setText(getResources().getString(R.string.challenge_maps_title_locationChosen).replaceAll("username", opponent.getName()));
+                        confirmButton.setVisibility(View.INVISIBLE);
+                    });
+                }).addOnFailureListener(error -> {
+                    Toast.makeText(getContext(), "Couldn't send location, " + error, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Couldn't send location, " + error);
+                }));
+
+                confirmButton.setEnabled(false);
+            });
+        }
     }
 }

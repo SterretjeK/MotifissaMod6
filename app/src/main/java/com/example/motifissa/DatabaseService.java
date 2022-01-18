@@ -98,12 +98,24 @@ public class DatabaseService extends Service {
                 friendsData = new ArrayList<>();
 
                 try {
+                    ArrayList<String> invalidFriends = new ArrayList<>();
                     for (String friendUID : currentUserData.getFriends()) {
                         friendsUIDArray.add(friendUID);
                         User friend = users.get(friendUID);
+
+                        // if the friend doesn't exists anymore, remove him from the list
+                        if (friend == null){
+                            Log.e(TAG, "Invalid Friend: " + friendUID);
+                            friendsUIDArray.remove(friendUID);
+                            invalidFriends.add(friendUID);
+                            continue;
+                        }
                         friendsData.add(friend);
-                        assert friend != null;
                         friendsNameArray.add(friend.getName());
+                    }
+
+                    if (invalidFriends.size() > 0){ // if the friend doesn't exists anymore, remove him from the list
+                        databaseReferenceUsers.child(currentUser.getUid()).child("friends").setValue(friendsUIDArray);
                     }
                 } catch(NullPointerException ignored){
 

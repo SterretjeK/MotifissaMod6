@@ -224,13 +224,22 @@ public class ChallengeActivity extends ServiceListener {
                 }
 
                 // if the other user choose a new location sent that trough to the maps fragment
-                if (currentFragment == 5 && !challengeStatusOpponent.chosenPosIsEmpty() && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE){
+                if (currentFragment == 5 && !challengeStatusOpponent.chosenPosIsEmpty() && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_WAITING){
                     challengeMapsFragment.otherChooseLocation(challengeStatusOpponent.getChosenPos());
                 }
 
                 // if the other user accepted the location
                 if (currentFragment == 5 && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.FINDING_EACH_OTHER){
                     challengeMapsFragment.acceptedLocation();
+                }
+
+                // if the other user didn't accept the location and pressed change:
+                if (currentFragment == 5 && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION){
+                    challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.PICK_LOCATION_WAITING);
+                    changeChallengeStatus(challengeStatus).setSuccessListener(task -> task.addOnSuccessListener(success -> challengeMapsFragment.setupView()).addOnFailureListener(error -> {
+                        Log.e(TAG, "couldn't update challengeState to reflect the other users denial of the proposed location");
+                        // TODO this, add error something
+                    }));
                 }
             }
 
