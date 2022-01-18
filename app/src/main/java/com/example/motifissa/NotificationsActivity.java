@@ -139,6 +139,7 @@ public class NotificationsActivity extends ServiceListener {
 
     @Override
     protected void onServiceConnect() { // when the service is connected load the data in the listView
+        super.onServiceConnect();
         getNotifications().setSuccessListener(result ->result.addValueEventListener(valueEventListener));
     }
 
