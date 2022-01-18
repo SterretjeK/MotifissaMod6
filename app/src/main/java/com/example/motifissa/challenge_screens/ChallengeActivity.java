@@ -227,6 +227,11 @@ public class ChallengeActivity extends ServiceListener {
                 if (currentFragment == 5 && !challengeStatusOpponent.chosenPosIsEmpty() && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE){
                     challengeMapsFragment.otherChooseLocation(challengeStatusOpponent.getChosenPos());
                 }
+
+                // if the other user accepted the location
+                if (currentFragment == 5 && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.FINDING_EACH_OTHER){
+                    challengeMapsFragment.acceptedLocation();
+                }
             }
 
             @Override
