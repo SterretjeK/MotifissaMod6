@@ -2,6 +2,7 @@ package com.example.motifissa.challenge_screens;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +17,19 @@ import com.example.motifissa.HelperClasses.ChallengeStatus;
 import com.example.motifissa.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * Description of how this fragment works:
@@ -39,13 +44,21 @@ import java.util.Objects;
 public class Challenge_MapsFragment extends Fragment {
     // initializing FusedLocationProviderClient
     //https://techenum.com/how-to-get-current-gps-location-in-android/
+    private static final String TAG = "Challenge_MapsFragment";
+    private static final int ZOOM_LEVEL = 15;
+    private static final int MAPS_ZOOM_PADDING = 100;
 
     Button confirmButton;
     Button changeButton;
     TextView titleTxt;
     ChallengeActivity challengeActivity;
 
+    // maps
+    GoogleMap maps;
     Marker chosenMarker;
+    Marker opponentMarker;
+    ChallengeStatus.Position userPos;
+    ChallengeStatus.Position opponentsPos;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -55,6 +68,11 @@ public class Challenge_MapsFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString() + " must be ChallengeActivity");
         }
+
+        // TODO change this to the users current location:
+        Random random = new Random();
+        userPos = new ChallengeStatus.Position(52.24655176852505 + (0.5 - random.nextDouble())*0.01, 6.847529082501974 + (0.5 - random.nextDouble())*0.01);
+        challengeActivity.setOwnPos(userPos);
     }
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
@@ -71,13 +89,25 @@ public class Challenge_MapsFragment extends Fragment {
         // https://developers.google.com/maps/documentation/android-sdk/events
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            // TODO change this to the users current location:
-            LatLng userLatLng = new LatLng(52.24655176852505, 6.847529082501974);
-            googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Your location"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(userLatLng));
+            maps = googleMap;
 
+//            LatLng userLatLng = new LatLng(52.24655176852505, 6.847529082501974);
+            LatLng userLatLng = userPos.getPos();
+            googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Your location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
             chosenMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Place to meet").visible(false));
+            opponentMarker = googleMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Opponents location").visible(false).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+            if (opponentsPos != null){
+                opponentMarker.setPosition(opponentsPos.getPos());
+                opponentMarker.setVisible(true);
+            }
+
+            // set the start zoom and place
+            if (opponentsPos != null) {
+                centerCamera();
+            } else {
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, ZOOM_LEVEL));
+            }
 
             googleMap.setOnMapLongClickListener(latLng -> {
                 if (pickingLocation()) {
@@ -101,7 +131,9 @@ public class Challenge_MapsFragment extends Fragment {
         titleTxt = view.findViewById(R.id.maps_title);
 
         confirmButton.setEnabled(false);
-        if (!pickingLocation()){
+
+        // show different screens to the master and slave
+        if (!pickingLocation()){ // slave, the one waiting for the other user
             changeButton.setVisibility(View.VISIBLE);
             changeButton.setEnabled(false);
 
@@ -110,11 +142,10 @@ public class Challenge_MapsFragment extends Fragment {
             });
 
             // TODO confirmButton.setOnClickListener();
-        } else {
+        } else { // master, the one first picking a location
             confirmButton.setOnClickListener(v -> {
                 ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
-                challengeStatus.setLatitude(chosenMarker.getPosition().latitude);
-                challengeStatus.setLongitude(chosenMarker.getPosition().longitude);
+                challengeStatus.setChosenPos(new ChallengeStatus.Position(chosenMarker.getPosition()));
 
                 challengeActivity.setChallengeStatus(challengeStatus);
                 challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.PICK_LOCATION_DONE);
@@ -147,5 +178,67 @@ public class Challenge_MapsFragment extends Fragment {
         }
     }
 
+    public void otherChooseLocation(ChallengeStatus.Position pos){
+        if (maps == null) {
+            Log.e(TAG, "Maps not yet initialized");
+        }
+        // set marker on the chosen spot
+        chosenMarker.setPosition(pos.getPos());
+        chosenMarker.setVisible(true);
 
+        //zoom to the chosen marker
+        maps.animateCamera(CameraUpdateFactory.newLatLngZoom(pos.getPos(), ZOOM_LEVEL));
+
+        confirmButton.setEnabled(true);
+        changeButton.setEnabled(true);
+
+        titleTxt.setText(R.string.challenge_maps_title_chosen);
+        centerCameraChosenPos();
+    }
+
+    public void updateOpponentsPos(ChallengeStatus.Position opponentsPos) {
+        if (opponentMarker != null && opponentsPos != this.opponentsPos){
+            opponentMarker.setPosition(opponentsPos.getPos());
+            opponentMarker.setVisible(true);
+            centerCamera();
+        }
+        this.opponentsPos = opponentsPos;
+    }
+
+    private void centerCamera(){
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(userPos.getPos());
+        builder.include(opponentsPos.getPos());
+
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, MAPS_ZOOM_PADDING);
+
+        maps.animateCamera(cameraUpdate);
+    }
+
+    private void centerCameraChosenPos(){
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(userPos.getPos());
+        builder.include(opponentsPos.getPos());
+        builder.include(chosenMarker.getPosition());
+
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, MAPS_ZOOM_PADDING);
+
+        maps.animateCamera(cameraUpdate);
+    }
+
+    public void acceptedLocation(){
+        changeButton.setVisibility(View.GONE);
+        confirmButton.setEnabled(true);
+        // TODO Temp, should be changed with a position check or with box if they are connected.
+        confirmButton.setText("Arrived");
+        titleTxt.setText(R.string.challenge_maps_title_find);
+
+
+        //TODO rewrite this NOW
+        ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
+        challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.FINDING_EACH_OTHER);
+        challengeActivity.changeChallengeStatus(challengeStatus);
+    }
 }

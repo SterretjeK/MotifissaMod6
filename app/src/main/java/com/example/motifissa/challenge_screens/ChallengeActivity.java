@@ -188,29 +188,44 @@ public class ChallengeActivity extends ServiceListener {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 challengeStatusOpponent = snapshot.getValue(ChallengeStatus.class);
 
-                // if
+                // if canceled remove the event listener
                 if (challengeStatus == null){
                     query.removeEventListener(this);
                     return;
                 }
+                // if the other user canceled cancel this one as well
                 if (challengeStatusOpponent == null && challengeStatus.getChallengeState() != ChallengeStatus.ChallengeState.WAITING){
                     if (challengeStatus != null)
                         getUser(getSelectedFriend()).setSuccessListener(friend -> Toast.makeText(ChallengeActivity.this, "username disconnected".replaceAll("username", friend.getName()), Toast.LENGTH_SHORT).show());
                     cancelChallenge();
                     query.removeEventListener(this);
                     return;
+
+                // if the other user isn't connected yet then make this user the master
                 } else if (challengeStatusOpponent == null && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.WAITING){
                     challengeStatus.setMaster(true);
                     changeChallengeStatus(challengeStatus);
                     return;
+                // if the other user isn't connected yet and, wait this one is never called :) , just keep it in to fix unknown errors
                 } else  if (challengeStatusOpponent == null) {
+                    Log.e(TAG, "this shouldn't be called :) , startChallenge() in challenge activity");
                     return;
                 }
+                // it the other user connected and this one is still loading go to the second phase.
                 if (challengeStatusOpponent.shouldBeInSecondPhase()  && currentFragment < 5){
                     challengeStatus.moveToSecondPhase();
 
                     changeFragment(5);
                     changeChallengeStatus(challengeStatus);
+                }
+                // if the other shared their location and the user is still in the maps fragment
+                if (currentFragment == 5 && !challengeStatusOpponent.ownPosIsEmpty()){
+                    challengeMapsFragment.updateOpponentsPos(challengeStatusOpponent.getOwnPos());
+                }
+
+                // if the other user choose a new location sent that trough to the maps fragment
+                if (currentFragment == 5 && !challengeStatusOpponent.chosenPosIsEmpty() && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE){
+                    challengeMapsFragment.otherChooseLocation(challengeStatusOpponent.getChosenPos());
                 }
             }
 
@@ -227,6 +242,10 @@ public class ChallengeActivity extends ServiceListener {
 
     public void setChallengeStatus(ChallengeStatus challengeStatus) {
         this.challengeStatus = challengeStatus;
+    }
+    public void setOwnPos(ChallengeStatus.Position pos){
+        challengeStatus.setOwnPos(pos);
+        changeChallengeStatus(challengeStatus);
     }
 
     public ChallengeStatus getChallengeStatusOpponent(){

@@ -8,8 +8,8 @@ public class ChallengeStatus {
     private String opponent;
     private ChallengeState challengeState;
     private boolean master;
-    private double latitude;
-    private double longitude;
+    private Position ownPos;
+    private Position chosenPos;
 
     public ChallengeStatus() { // required by firebase
     }
@@ -23,12 +23,23 @@ public class ChallengeStatus {
         this.master = master;
     }
 
+    public boolean chosenPosIsEmpty() {
+        if (chosenPos == null) return false;
+        return chosenPos.isEmpty();
+    }
+
+    public boolean ownPosIsEmpty() {
+        if (ownPos == null) return false;
+        return ownPos.isEmpty();
+    }
+
     public enum ChallengeState{
         WAITING,
         PICK_LOCATION,
         PICK_LOCATION_WAITING,
         PICK_LOCATION_DONE,
         FINDING_EACH_OTHER,
+        FOUND,
         COUNTDOWN,
         CHALLENGE_START
     }
@@ -72,19 +83,60 @@ public class ChallengeStatus {
         this.master = master;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public Position getOwnPos() {
+        return ownPos;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
+    public void setOwnPos(Position ownPos) {
+        this.ownPos = ownPos;
     }
 
-    public double getLongitude() {
-        return longitude;
+    public Position getChosenPos() {
+        return chosenPos;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public void setChosenPos(Position chosenPos) {
+        this.chosenPos = chosenPos;
+    }
+
+    public static class Position{
+        private double longitude;
+        private double latitude;
+
+        public Position() {}
+
+        public Position(LatLng latLng){
+            this.latitude = latLng.latitude;
+            this.longitude = latLng.longitude;
+        }
+
+        public Position(double latitude, double longitude){
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public LatLng getPos(){
+            return new LatLng(latitude, longitude);
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(double latitude) {
+            this.latitude = latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
+
+        public boolean isEmpty() {
+            return longitude == 0 && latitude == 0;
+        }
     }
 }
