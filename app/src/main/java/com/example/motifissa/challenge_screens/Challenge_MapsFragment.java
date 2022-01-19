@@ -1,6 +1,9 @@
 package com.example.motifissa.challenge_screens;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,10 +15,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.motifissa.HelperClasses.ChallengeStatus;
+import com.example.motifissa.MainScreen;
 import com.example.motifissa.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,13 +37,19 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Random;
 
+// TODO rework entire gps: https://www.youtube.com/watch?v=77BO6UiWt4A
+//                         https://www.youtube.com/watch?v=uTxItxrDVSk
+//  BUG: when the one who proposed the pos clicked on the arrived button something happes :(
+
+
 /**
- * Description of how this fragment works:
+ * <h2>Description of how this fragment works:</h2>
  * <p>
- * One user (the master) the one who started the challenge chooses a location on the map and then confirms
- * Then the other user is shown this location and can choose to accept or to change it
- * If accepted he chances his state and continues on then the other uses sees that state change and continues with him
- * If he didn't accept and he can change it and sent it trough to the other user where he can do the same again
+ * One user (the master) the one who started the challenge chooses a location on the map and then confirms              <br>
+ * Then the other user is shown this location and can choose to accept or to change it                                  <br>
+ * If accepted he chances his state and continues on then the other uses sees that state change and continues with him  <br>
+ * If he didn't accept and he can change it and sent it trough to the other user where he can do the same again         <br>
+ * </p>
  */
 
 public class Challenge_MapsFragment extends Fragment {
@@ -44,6 +58,9 @@ public class Challenge_MapsFragment extends Fragment {
     private static final String TAG = "Challenge_MapsFragment";
     private static final int ZOOM_LEVEL = 15;
     private static final int MAPS_ZOOM_PADDING = 200;
+    public static final int DEFAULT_GPS_INTERFAL = 60000;
+    public static final int FASTEST_GPS_INTERVAL = 10000;
+    private static final int PERMISSION_FINE_LOCATION = 69;
 
     Button confirmButton;
     Button changeButton;
@@ -58,6 +75,10 @@ public class Challenge_MapsFragment extends Fragment {
     ChallengeStatus.Position userPos;
     ChallengeStatus.Position opponentsPos;
 
+    // GPS location
+    FusedLocationProviderClient fusedLocationProviderClient;
+    LocationRequest locationRequest;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -69,9 +90,54 @@ public class Challenge_MapsFragment extends Fragment {
 
         // TODO change this to the users current location:
         // get the location of the user
-        Random random = new Random();
-        userPos = new ChallengeStatus.Position(52.24655176852505 + (0.5 - random.nextDouble()) * 0.01, 6.847529082501974 + (0.5 - random.nextDouble()) * 0.01);
-        challengeActivity.setOwnPos(userPos); // the the users location to the opponents
+//        if (Build.FINGERPRINT.contains("generic")) { // if run on an emulator:
+            Random random = new Random();
+            userPos = new ChallengeStatus.Position(52.24655176852505 + (0.5 - random.nextDouble()) * 0.01, 6.847529082501974 + (0.5 - random.nextDouble()) * 0.01);
+//            challengeActivity.setOwnPos(userPos); // the the users location to the opponents
+//        } else {
+            // setup the setting for the gps:
+            locationRequest = new LocationRequest();
+            locationRequest.setInterval(DEFAULT_GPS_INTERFAL); // 1 min when the phone is in energy saving modes
+            locationRequest.setFastestInterval(FASTEST_GPS_INTERVAL); // 10 sec on fastest
+            locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY); // TODO might change this to high accuracy mode, idk
+            setup_GPS();
+//        }
+    }
+
+    private void setup_GPS(){
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+
+        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){ // if the permission is granted
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location ->{
+               //TODO this
+                if (location != null){
+                    Log.e(TAG, location.toString());
+                    userPos = new ChallengeStatus.Position(location.getLatitude(), location.getLongitude());
+                    if (userMarker != null){
+                        userMarker.setPosition(userPos.changeToLatLng());
+                    }
+                    challengeActivity.setOwnPos(userPos);
+                    centerCamera();
+                } else
+                    Log.e(TAG, "null");
+            });
+        } else {
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PERMISSION_FINE_LOCATION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                setup_GPS();
+            else {
+                Toast.makeText(getContext(), "Can't challenge without location permission", Toast.LENGTH_LONG).show();
+                challengeActivity.cancelChallenge();
+            }
+        }
     }
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
@@ -90,7 +156,6 @@ public class Challenge_MapsFragment extends Fragment {
         public void onMapReady(GoogleMap googleMap) {
             maps = googleMap;
 
-//            LatLng userLatLng = new LatLng(52.24655176852505, 6.847529082501974);
             LatLng userLatLng = userPos.changeToLatLng();
             userMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Your location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
             userMarker.showInfoWindow();
@@ -164,7 +229,7 @@ public class Challenge_MapsFragment extends Fragment {
         changeButton.setEnabled(true);
 
         titleTxt.setText(R.string.challenge_maps_title_chosen);
-        centerCameraChosenPos();
+        centerCamera();
     }
 
     public void updateOpponentsPos(ChallengeStatus.Position opponentsPos) {
@@ -180,7 +245,13 @@ public class Challenge_MapsFragment extends Fragment {
     private void centerCamera() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(userPos.changeToLatLng());
-        builder.include(opponentsPos.changeToLatLng());
+        if (opponentMarker != null && opponentMarker.isVisible() && opponentsPos != null) {
+            builder.include(opponentsPos.changeToLatLng());
+        }
+
+        if (chosenMarker != null && chosenMarker.isVisible()){
+            builder.include(chosenMarker.getPosition());
+        }
 
         LatLngBounds bounds = builder.build();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, MAPS_ZOOM_PADDING);
@@ -220,7 +291,7 @@ public class Challenge_MapsFragment extends Fragment {
             Log.e(TAG, "Couldn't accept challenge, " + error);
         }));
 
-        centerCameraChosenPos();
+        centerCamera();
     }
 
     public void setupView() {

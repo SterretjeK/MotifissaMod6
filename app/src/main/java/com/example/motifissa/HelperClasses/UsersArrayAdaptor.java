@@ -40,7 +40,7 @@ public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable 
 
     // sorts the array to make sure everyone who are online are at the top
     private void sortArray(){
-        Comparator<User> comparator = (o1, o2) -> (o2.getOnline() ? 1 : 0) - (o1.getOnline() ? 1 : 0);
+        Comparator<User> comparator = (o1, o2) -> (o2.isOnline() ? 1 : 0) - (o1.isOnline() ? 1 : 0);
         users.sort(comparator);
         this.originalUsers = this.users;
     }
@@ -74,7 +74,7 @@ public class UsersArrayAdaptor extends ArrayAdapter<User> implements Filterable 
             viewHolder.icon.setVisibility(View.GONE);
         else{
             viewHolder.icon.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.custom_online_icon));
-            if (this.users.get(position).getOnline()){
+            if (this.users.get(position).isOnline()){
                 viewHolder.icon.setImageTintList(getContext().getColorStateList(R.color.color_primary));
             } else {
                 viewHolder.icon.setImageTintList(getContext().getColorStateList(R.color.gray_500));
