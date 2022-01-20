@@ -7,4 +7,5 @@
     <dimen name="sub_text_size">18sp</dimen>
     <dimen name="titleSize">32sp</dimen>
     <dimen name="button_textSize">10sp</dimen>
+    <dimen name="button_textSize_L">20sp</dimen>
 </resources>

@@ -12,6 +12,7 @@ public class User {
     private boolean Online;
     private List<String> Friends;
     private List<String> Notifications;
+    private ChallengeStatus challengeStatus;
 
     public User(){}
     public User(String name, String UID, String ID){
@@ -56,14 +57,6 @@ public class User {
         Score = score;
     }
 
-    public boolean getOnline() {
-        return Online;
-    }
-
-    public void setOnline(boolean online) {
-        Online = online;
-    }
-
     public List<String> getFriends() {
         return Friends;
     }
@@ -105,6 +98,22 @@ public class User {
             Friends.remove(UID);
             return true;
         } else return false;
+    }
+
+    public boolean isOnline() {
+        return Online;
+    }
+
+    public void setOnline(boolean online) {
+        Online = online;
+    }
+
+    public ChallengeStatus getChallengeStatus() {
+        return challengeStatus;
+    }
+
+    public void setChallengeStatus(ChallengeStatus challengeStatus) {
+        this.challengeStatus = challengeStatus;
     }
 }
 
