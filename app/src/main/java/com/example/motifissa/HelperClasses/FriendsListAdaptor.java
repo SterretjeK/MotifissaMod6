@@ -1,41 +1,39 @@
-package com.example.motifissa;
+package com.example.motifissa.HelperClasses;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.motifissa.R;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class FriendsListAdaptor extends ArrayAdapter<User> implements Filterable {
 
     private ArrayList<User> users;
     private final ArrayList<User> originalUsers;
     private ArrayList<String> friends;
+//    private final User currentUser;
     private final Activity context;
 
-    public FriendsListAdaptor(Activity context, ArrayList<User> users, ArrayList<String> friends) {
+    public FriendsListAdaptor(Activity context, ArrayList<User> users, ArrayList<String> friends){//, User currentUser) {
         super(context, R.layout.list_friends, users);
         this.context = context;
-        this.users = users;
-        this.originalUsers = users;
-
         this.friends = friends;
+
+        this.users = users;
+//        this.currentUser = currentUser;
+//        this.users.remove(currentUser);
+        this.originalUsers = users;
     }
 
 

@@ -9,21 +9,17 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.example.motifissa.HelperClasses.ListenerVariable;
+import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.Query;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -57,16 +53,9 @@ public class MainScreen extends AppCompatActivity {
         // get the current user
         currentUser = mAuth.getCurrentUser();
         if (currentUser == null){ //log out if the login isn't valid
-            mAuth.signOut();
-            finish();
-            Intent loginPageIntent = new Intent(this, LoginScreen.class);
-            startActivity(loginPageIntent);
+            logout();
         }
         loginName = currentUser.getDisplayName();
-
-//        // get the login name from the intent
-//        Intent intent = getIntent();
-//        loginName = intent.getStringExtra(LoginScreen.LOGIN_NAME);
 
         // setup the dashboard fragment
         dashboardFragment = new DashboardFragment();
@@ -82,14 +71,6 @@ public class MainScreen extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
-        // setup logout button
-        FloatingActionButton logoutButton = findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(view -> {
-            mAuth.signOut();
-            finish();
-            Intent loginPageIntent = new Intent(this, LoginScreen.class);
-            startActivity(loginPageIntent);
-        });
     }
 
     @Override
@@ -100,6 +81,12 @@ public class MainScreen extends AppCompatActivity {
         this.connectToService();
     }
 
+    public void logout(){
+        mAuth.signOut();
+        finish();
+        Intent loginPageIntent = new Intent(this, LoginScreen.class);
+        startActivity(loginPageIntent);
+    }
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -159,11 +146,14 @@ public class MainScreen extends AppCompatActivity {
     };
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+//        super.onStop();
+        super.onDestroy();
 
         //when the activity is stopped, release the server
-        if(mBounded.get()) {
+        if (mBounded.get()) {
+            // set the user as offline, might disable this if it cost too much MB upload
+            mDatabaseService.toggleOnlineUser(currentUser.getUid(), false);
             unbindService(mConnection);
         }
         mBounded = new ListenerVariable<>(false);
@@ -220,5 +210,41 @@ public class MainScreen extends AppCompatActivity {
 
     public FirebaseUser getCurrentUser(){
         return currentUser;
+    }
+
+    public void showNotifications() {
+        Intent notificationsIntent = new Intent(MainScreen.this, NotificationsActivity.class);
+        startActivity(notificationsIntent);
+    }
+
+    public Query getNotifications(){
+        if (mBounded.get() && mDatabaseService != null) {
+            try {
+                return mDatabaseService.getNotifications();
+            } catch (Exception e) {
+                Log.e("MainScreen", "Database not bound, but said it was when trying to access getNotifications");
+            }
+        }
+
+        if (!mIsConnecting) {
+            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
+            this.connectToService();
+        }
+        return null;
+    }
+
+    public User getUser(String ID){
+        if (mBounded.get()) {
+            try {
+                return mDatabaseService.getUser(ID);
+            } catch (Exception e){
+                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getUser");
+            }
+        }
+
+        if (!mIsConnecting) {
+            this.connectToService();
+        }
+        return null;
     }
 }

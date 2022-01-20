@@ -5,11 +5,19 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.example.motifissa.HelperClasses.ChallengeStatus;
+import com.example.motifissa.HelperClasses.ListenerVariable;
+import com.example.motifissa.HelperClasses.Notification;
+import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,27 +25,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
 
 public class DatabaseService extends Service {
 
+    private static final String TAG = "DatabaseService";
+    private static final String challengeStatusStr = "challengeStatus";
     IBinder mBinder = new LocalBinder();
 
-    // data OLD
-//    JSONObject[] usersArray;
-//    JSONObject users;
-//    JSONObject currentUser;
-//    ArrayList<String> friendsNameArray;
-//    ArrayList<String> friendsIDArray;
-//    JSONObject friends;
-
     // Firebase
+    private FirebaseAuth mAuth;
     private DatabaseReference databaseReferenceUsers;
     private FirebaseUser currentUser;
 
@@ -48,7 +46,10 @@ public class DatabaseService extends Service {
     private ArrayList<String> friendsUIDArray = new ArrayList<>();
     private ArrayList<String> friendsNameArray = new ArrayList<>();
     private ArrayList<User> friendsData = new ArrayList<>();
+    ListenerVariable<Boolean> updateListener = new ListenerVariable<>(false);
+    ListenerVariable<Notification> notificationListener = new ListenerVariable<>();
 
+    // ***!!! IMPORTANT PRESS CTRL SHIFT -. this minimalize everything, making it more readable
 
     // ------------ Setup functions ------------
     @Override
@@ -57,12 +58,19 @@ public class DatabaseService extends Service {
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
         databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
 
-         currentUser = (FirebaseUser) intent.getExtras().getParcelable("CurrentUser");
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        // get the current user
+        currentUser = mAuth.getCurrentUser();
+        if (currentUser == null){ //log out if the login isn't valid
+//            logout();
+            Log.e(TAG, "CURRENT USER WAS NULL!!!!!!!!!!!!!!!!!!!!");
+        }
+
+        // set the user to online
+        databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(true);
 
          setup();
-//        makeUsers();
-//        String username = intent.getExtras().getString("LOGIN_NAME");
-//        setCurrentUser(username);
         return START_STICKY;
     }
 
@@ -78,6 +86,7 @@ public class DatabaseService extends Service {
                     User user = data.getValue(User.class);
                     usersArray.add(user);
 
+                    assert user != null;
                     users.put(user.getUID(), user);
                 }
 
@@ -89,15 +98,30 @@ public class DatabaseService extends Service {
                 friendsData = new ArrayList<>();
 
                 try {
+                    ArrayList<String> invalidFriends = new ArrayList<>();
                     for (String friendUID : currentUserData.getFriends()) {
                         friendsUIDArray.add(friendUID);
                         User friend = users.get(friendUID);
+
+                        // if the friend doesn't exists anymore, remove him from the list
+                        if (friend == null){
+                            Log.e(TAG, "Invalid Friend: " + friendUID);
+                            friendsUIDArray.remove(friendUID);
+                            invalidFriends.add(friendUID);
+                            continue;
+                        }
                         friendsData.add(friend);
                         friendsNameArray.add(friend.getName());
+                    }
+
+                    if (invalidFriends.size() > 0){ // if the friend doesn't exists anymore, remove him from the list
+                        databaseReferenceUsers.child(currentUser.getUid()).child("friends").setValue(friendsUIDArray);
                     }
                 } catch(NullPointerException ignored){
 
                 }
+
+                updateListener.set(true);
             }
 
             @Override
@@ -105,6 +129,52 @@ public class DatabaseService extends Service {
 
             }
         });
+
+        // a listener that listens to changes in notifications of the current user
+        databaseReferenceUsers.child(currentUser.getUid()).child("notifications").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String notificationData = snapshot.getValue(String.class); // get the new message
+                if (notificationData == null) {
+                    Log.e(TAG, "notificationData was null, " + notificationData);
+                    return;
+                }
+                String[] notificationCode = notificationData.split("\\|"); // split the message
+
+                User otherUser = getUser(notificationCode[1]); // get the user who sent the message
+                if (otherUser == null){
+                    return;
+                }
+
+                // change the message into a notification
+                Notification notification;
+                if (notificationCode.length <= 2) {
+                    notification = new Notification(notificationCode[0], notificationCode[1], otherUser.getName());
+                } else {
+                    notification = new Notification(notificationCode[0], notificationCode[1], notificationCode[2], otherUser.getName());
+                }
+//                notification.setMessage(notification.getMessage().replaceAll("username", otherUser.getName())); // change the username
+                notificationListener.set(notification);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     @Override
@@ -125,187 +195,113 @@ public class DatabaseService extends Service {
 
     // ------------ Firebase functions ------------
 
-    // Firebase get data functions
+    // Users:
     public Task<Void> addUser(User user){
         // TODO validate data
         //  if (user == null) throw ....;
 
         return databaseReferenceUsers.push().setValue(user);
     }
-
     public Query getUsersQuery(){
         return databaseReferenceUsers.orderByKey();
     }
+    public HashMap<String, User> getUsers() {
+        return users;
+    }
+    public ArrayList<User> getUsersArray() {
+        return usersArray;
+    }
+    public User getUser(String UID){
+        return users.get(UID);
+    }
+    public Task<Void> toggleOnlineUser(String UID, boolean state){
+        // set the user to offline or offline
+        return databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(state);
+    }
+    public ListenerVariable<Boolean> getUpdateListener(){
+        return updateListener;
+    }
 
+
+    // Current user:
     public User getCurrentUser(){
         return currentUserData;
     }
-
     public FirebaseUser getCurrentFirebaseUser(){
+        if (currentUser == null) {
+            mAuth = FirebaseAuth.getInstance();
+            currentUser = mAuth.getCurrentUser();
+        }
         return currentUser;
     }
-
     public User getCurrentUserData() {
         return currentUserData;
     }
 
-    public ArrayList<User> getUsersArray() {
-        return usersArray;
-    }
 
-    public HashMap<String, User> getUsers() {
-        return users;
+    // friends
+    public Query getCurrentUserFriendsQuery(){
+        return databaseReferenceUsers.child(currentUser.getUid()).child("friends");
     }
-
     public ArrayList<String> getFriendsUIDArray() {
         return friendsUIDArray;
     }
-
     public ArrayList<String> getFriendsNameArray() {
         return friendsNameArray;
     }
-
     public ArrayList<User> getFriendsData() {
         return friendsData;
     }
-
-    public User getUser(String UID){
-        return users.get(UID);
-    }
-
     public Task<Void> toggleFriend(String UID){
         currentUserData.toggleFriend(UID);
 
         return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
     }
 
-    // ------------ Mock data ------------
-    // mock Data TODO remove this:
-//    public JSONObject getUsers(){
-//        return users;
-//    }
-//
-//    public JSONObject getUser(String ID){
-//        try{
-//            return users.getJSONObject(ID);
-//        } catch (JSONException e) {
-//            Log.e("Database/getUsers", String.format("Can't find a user by the ID: %s, in getUser()", ID));
-//            return null;
-//        }
-//    }
-//
-//    public JSONObject[] getUsersArray(){
-//        return usersArray;
-//    }
-//
-//    public String[] getFriendsNameArray() {
-//       return toArray(friendsNameArray);
-//    }
-//    public String[] getFriendsIDArray(){
-//        return toArray(friendsIDArray);
-//    }
-//
-//    // TODO rework adding and deleting users
-//    public void toggleFriend(String friendsID){
-//        if (friends.has(friendsID)) friends.remove(friendsID); // remove friend
-//        else { // add friend
-//            try {
-//                friends.put(friendsID, users.get(friendsID));
-//            } catch (JSONException e){
-//                Log.e("DatabaseService", "couldn't find the user by the ID " + friendsID);
-//            }
-//        }
-//
-//        splitFriendsToArray();
-//    }
-//
-////    public JSONObject getCurrentUser(){
-////        return currentUser;
-////    }
-//
-//    // temp, for mock data:
-//    public void setCurrentUser(String name){
-//        currentUser = new JSONObject();
-//        try {
-//            Random random = new Random();
-//            currentUser.put("Name", name);
-//            currentUser.put("Online", true);
-//            currentUser.put("Score", random.nextInt(25));
-//
-//            String id = "";
-//            while (users.has(id))
-//                id = "" + random.nextInt(1000);
-//
-//            currentUser.put("ID", id);
-//
-//        } catch (JSONException e){
-//            Log.e("DatabaseService/setUser", "Failed to set user: \n" + e);
-//        }
-//    }
-//
-//    // mock data:
-//    public void makeUsers() {
-//        String[] names = new String[]{"Henkie", "Sterre", "Jelle", "Floor", "Sil", "Frank", "Henkie 2", "Sallie", "Carmine", "Norbert", "Pam", "Deon", "Modesto", "Isaac", "Robert", "Bernie", "Rodrigo", "Yesenia", "Rosalinda", "Mohammed", "Britt", "Candace", "Ginger", "Zelma", "Patricia", "Aurelio", "Carlos", "Emmitt", "Garfield", "Charley", "Blanche", "Efren", "Kay", "Pam", "Robert", "Pearlie", "Imelda", "Daryl", "Latonya", "Jami", "Jere", "Dwain", "Randolph", "Ina", "Karla", "Ellen", "Aimee", "Malcolm", "Antione", "Lana", "Sherrie", "Carlo", "Anastasia", "Tonya", "Harris", "Roslyn"};
-//
-//        usersArray = new JSONObject[names.length];
-//        users = new JSONObject();
-//        friends = new JSONObject();
-//
-//        Random random = new Random();
-//
-//        for (int i = 0; i < usersArray.length; i++) {
-//            try {
-//                // data of the user
-//                JSONObject userData = new JSONObject();
-//                userData.put("Name", names[i]);
-//                userData.put("Online", random.nextInt(3) == 0);
-//                userData.put("Score", random.nextInt(25));
-//
-//                // ID of the user
-//                String id = "";
-//                if (names[i].equals("Frank"))
-//                    id = "666";
-//                else
-//                    while (users.has(id) || id.equals("666"))
-//                        id = "" + random.nextInt(1000);
-//
-//                // put it al together in an array and JSONObject (the JSONObject is how we will get it from the database)
-//                userData.put("ID", id);
-//                usersArray[i] = userData;
-//                users.put(id, userData);
-//
-//                // if they are the current users friend
-//                if (i > 0 && i < 6)
-//                    friends.put(id, userData);
-//            } catch (Exception e){
-//                Log.e("DatabaseServie/makeUser", "failed to create user " + names[i] + "\n" + e);
-//            }
-//        }
-//
-//        splitFriendsToArray();
-////            Log.e("Test", users.toString());
-////            Log.e("test", friends.toString());
-//    }
-//
-//    private void splitFriendsToArray(){
-//        friendsNameArray = new ArrayList<>();
-//        friendsIDArray = new ArrayList<>();
-//        Iterator<String> keys = friends.keys();
-//        while (keys.hasNext()){
-//            String key = keys.next();
-//            friendsIDArray.add(key);
-//            try{
-//                friendsNameArray.add(users.getJSONObject(key).getString("Name"));
-//            }catch (JSONException e){
-//                Log.e("DatabaseService/MakeUsers", "whiles making user, users doesn't got an name " + key);
-//            }
-//        }
-////        Log.e("test", friends.toString());
-//    }
-//
-//    private String[] toArray(ArrayList<String> arrayListIn){
-//        String[] _array = new String[arrayListIn.size()];
-//        arrayListIn.toArray(_array);
-//        return _array;
-//    }
+    // notifications
+    public Query getNotifications(){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child("notifications");
+    }
+    public Task<Void> sendNotification(String msg, String UID, String date){
+        User tempUser = users.get(UID);
+        if (tempUser != null) {
+            tempUser.addNotification(msg + "|" + currentUserData.getUID() + "|" + date);
+        } else{
+            Toast.makeText(getBaseContext(), "User doesn't exists, trying to remove friend..", Toast.LENGTH_SHORT).show();
+            // remove the UID from the users friend list if it doesn't exist anymore
+            if (friendsUIDArray.contains(UID)){
+                User user = currentUserData;
+                if (user.removeFriend(UID)){ // if the friend could be removed
+                    databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData)
+                            .addOnSuccessListener(success ->  Toast.makeText(getBaseContext(), "successfully removed unknown friend", Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(error ->{
+                                Toast.makeText(getBaseContext(), "Couldn't remove friend", Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Couldn't remove unknown friend, error: " + error);
+                            });
+                }
+            }
+        }
+        return databaseReferenceUsers.child(UID).setValue(tempUser);
+    }
+    public Task<Void> removeNotification(Notification notification){
+
+        if (currentUserData != null) {
+            currentUserData.removeNotification(notification.sendData());
+        }
+        return databaseReferenceUsers.child(currentUserData.getUID()).setValue(currentUserData);
+    }
+    public ListenerVariable<Notification> getNotificationListener(){
+        return notificationListener;
+    }
+
+    // challenges
+    public Query getOpponentsChallengeQuery(String UID){
+        return databaseReferenceUsers.child(UID).child(challengeStatusStr);
+    }
+    public Task<Void> changeChallengeStatus(ChallengeStatus challengeStatus){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).setValue(challengeStatus);
+    }
+    public Task<Void> removeChallengeStatus(){
+        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).removeValue();
+    }
 }

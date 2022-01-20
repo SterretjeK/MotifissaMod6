@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +13,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.motifissa.R;
-import com.example.motifissa.User;
+import com.example.motifissa.HelperClasses.User;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChallengeSentFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ChallengeSentFragment extends Fragment {
 
     private ChallengeActivity challengeActivity;
@@ -47,8 +38,7 @@ public class ChallengeSentFragment extends Fragment {
             throw new RuntimeException(context.toString() + " must be challengeActivity");
         }
 
-        selectedUser = challengeActivity.getUser(challengeActivity.getSelectedFriend());
-        currentUser = challengeActivity.getCurrentUser();
+        challengeActivity.getCurrentUser().setSuccessListener(result -> currentUser = result);
     }
 
     @Override
@@ -61,18 +51,24 @@ public class ChallengeSentFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_challenge_sent, container, false);
+        challengeActivity.getUser(challengeActivity.getSelectedFriend()).setSuccessListener(result -> {
+            selectedUser = result;
+            if (selectedUser == null){
+                challengeActivity.moveBackFragment(2);
+                return;
+            }
 
-        TextView introTxt = v.findViewById(R.id.Challenge_sent_IntroTxtField);
-        String txt = getResources().getString(R.string.Challenge_sent_IntroTxt);
-        txt = txt.replaceAll("username", selectedUser.getName());
-        introTxt.setText(txt);
+            TextView introTxt = v.findViewById(R.id.Challenge_sent_IntroTxtField);
+            String txt = getResources().getString(R.string.Challenge_sent_IntroTxt);
+            txt = txt.replaceAll("username", selectedUser.getName());
+            introTxt.setText(txt);
 
-        Button list = v.findViewById(R.id.button_back);
-        Button home = v.findViewById(R.id.button_home);
+            Button list = v.findViewById(R.id.button_back);
+            Button home = v.findViewById(R.id.button_home);
 
-        list.setOnClickListener(view -> challengeActivity.moveBackFragment(2));
-        home.setOnClickListener(view -> challengeActivity.moveBackFragment(3));
-
+            list.setOnClickListener(view -> challengeActivity.moveBackFragment(2));
+            home.setOnClickListener(view -> challengeActivity.moveBackFragment(3));
+        });
         return v;
     }
 }
