@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".ScoreboardFragment"
-    android:background="@drawable/custom_tile">
+    tools:context=".ScoreboardFragment">
 
 
     <TextView

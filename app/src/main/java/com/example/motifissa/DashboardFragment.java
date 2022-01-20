@@ -3,6 +3,7 @@ package com.example.motifissa;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -65,10 +66,10 @@ public class DashboardFragment extends Fragment {
          Username_welcome.setText(Login_name);
 
          // setup the scoreboard fragment
-        scoreboardFragment = new ScoreboardFragment();
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.scoreboard_container, scoreboardFragment).commit();
+//        scoreboardFragment = new ScoreboardFragment();
+//        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.scoreboard_container, scoreboardFragment).commit();
 
-        Button challengeButton = view.findViewById(R.id.dashboard_tile_challenge);
+        CardView challengeButton = view.findViewById(R.id.dashboard_tile_challenge);
         challengeButton.setOnClickListener(challengeOnClickListener);
 
         return view;
