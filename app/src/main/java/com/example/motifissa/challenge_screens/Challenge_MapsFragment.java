@@ -93,52 +93,52 @@ public class Challenge_MapsFragment extends Fragment {
 //        if (Build.FINGERPRINT.contains("generic")) { // if run on an emulator:
             Random random = new Random();
             userPos = new ChallengeStatus.Position(52.24655176852505 + (0.5 - random.nextDouble()) * 0.01, 6.847529082501974 + (0.5 - random.nextDouble()) * 0.01);
-//            challengeActivity.setOwnPos(userPos); // the the users location to the opponents
+            challengeActivity.setOwnPos(userPos); // the the users location to the opponents
 //        } else {
             // setup the setting for the gps:
-            locationRequest = new LocationRequest();
-            locationRequest.setInterval(DEFAULT_GPS_INTERFAL); // 1 min when the phone is in energy saving modes
-            locationRequest.setFastestInterval(FASTEST_GPS_INTERVAL); // 10 sec on fastest
-            locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY); // TODO might change this to high accuracy mode, idk
-            setup_GPS();
+//            locationRequest = new LocationRequest();
+//            locationRequest.setInterval(DEFAULT_GPS_INTERFAL); // 1 min when the phone is in energy saving modes
+//            locationRequest.setFastestInterval(FASTEST_GPS_INTERVAL); // 10 sec on fastest
+//            locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY); // TODO might change this to high accuracy mode, idk
+//            setup_GPS();
 //        }
     }
 
-    private void setup_GPS(){
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-
-        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){ // if the permission is granted
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location ->{
-               //TODO this
-                if (location != null){
-                    Log.e(TAG, location.toString());
-                    userPos = new ChallengeStatus.Position(location.getLatitude(), location.getLongitude());
-                    if (userMarker != null){
-                        userMarker.setPosition(userPos.changeToLatLng());
-                    }
-                    challengeActivity.setOwnPos(userPos);
-                    centerCamera();
-                } else
-                    Log.e(TAG, "null");
-            });
-        } else {
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PERMISSION_FINE_LOCATION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                setup_GPS();
-            else {
-                Toast.makeText(getContext(), "Can't challenge without location permission", Toast.LENGTH_LONG).show();
-                challengeActivity.cancelChallenge();
-            }
-        }
-    }
+//    private void setup_GPS(){
+//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+//
+//        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){ // if the permission is granted
+//            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location ->{
+//               //TODO this
+//                if (location != null){
+//                    Log.e(TAG, location.toString());
+//                    userPos = new ChallengeStatus.Position(location.getLatitude(), location.getLongitude());
+//                    if (userMarker != null){
+//                        userMarker.setPosition(userPos.changeToLatLng());
+//                    }
+//                    challengeActivity.setOwnPos(userPos);
+//                    centerCamera();
+//                } else
+//                    Log.e(TAG, "null");
+//            });
+//        } else {
+//            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
+//        }
+//    }
+//
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        if (requestCode == PERMISSION_FINE_LOCATION) {
+//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+//                setup_GPS();
+//            else {
+//                Toast.makeText(getContext(), "Can't challenge without location permission", Toast.LENGTH_LONG).show();
+//                challengeActivity.cancelChallenge();
+//            }
+//        }
+//    }
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -158,11 +158,12 @@ public class Challenge_MapsFragment extends Fragment {
 
             LatLng userLatLng = userPos.changeToLatLng();
             userMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Your location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            assert userMarker != null;
             userMarker.showInfoWindow();
 
             chosenMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Place to meet").visible(false));
             opponentMarker = googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Opponents location").visible(false).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-            if (opponentsPos != null) {
+            if (opponentsPos != null && opponentMarker != null) {
                 opponentMarker.setPosition(opponentsPos.changeToLatLng());
                 opponentMarker.setVisible(true);
             }
