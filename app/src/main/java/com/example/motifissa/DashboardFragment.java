@@ -8,6 +8,7 @@ import androidx.cardview.widget.CardView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +25,7 @@ import java.util.Objects;
 
 public class DashboardFragment extends Fragment {
     View view;
-
+    private static final String TAG = "DashboardFragment";
     ScoreboardFragment scoreboardFragment;
 
     private MainScreen mainscreen;
@@ -55,13 +56,10 @@ public class DashboardFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-        mainscreen.getUpdateListener().setSuccessListener(listener -> listener.addListener(value -> {
-            mainscreen.getCurrentUser().setSuccessListener(user -> {
-                // set the login name to the screen's textview
-                TextView Username_welcome = (TextView) view.findViewById(R.id.username_hello);
-                Username_welcome.setText(user.getName());
-            });
-        }));
+        mainscreen.getCurrentUser().setSuccessListener(user ->{
+            TextView Username_welcome = view.findViewById(R.id.username_welcome);
+            Username_welcome.setText(user.getName());
+        });
 
          // setup the scoreboard fragment
 //        scoreboardFragment = new ScoreboardFragment();
