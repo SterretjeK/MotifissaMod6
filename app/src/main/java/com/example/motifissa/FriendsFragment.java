@@ -77,7 +77,7 @@ public class FriendsFragment extends Fragment {
     @Override
     public void onDetach() { // called when the fragment is detached, so when it isn't visible anymore to the user
         super.onDetach();
-        if (userQuery != null)
+        if (userQuery != null && usersChangeListener != null)
             userQuery.removeEventListener(usersChangeListener);
     }
 

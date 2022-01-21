@@ -96,10 +96,10 @@ public class ServiceListener extends AppCompatActivity {
 
         //when the activity is stopped, release the server
         if (mBounded.get()) {
-            if (this instanceof MainScreen) {
-                // set the user as offline, might disable this if it cost too much MB upload
-                mDatabaseService.toggleOnlineUser(mDatabaseService.getCurrentUser().getUID(), false);
-            }
+//            if (this instanceof MainScreen) {
+//                // set the user as offline, might disable this if it cost too much MB upload
+//                mDatabaseService.toggleOnlineUser(mDatabaseService.getCurrentUser().getUID(), false);
+//            }
             unbindService(mConnection);
         }
         // delete all bound listeners:
