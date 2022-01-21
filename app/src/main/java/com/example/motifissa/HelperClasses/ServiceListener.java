@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.motifissa.DatabaseService;
+import com.example.motifissa.MainScreen;
 import com.example.motifissa.challenge_screens.ChallengeActivity;
 import com.example.motifissa.dialogs.AcceptDenyDialog;
 import com.google.android.gms.tasks.Task;
@@ -95,6 +96,10 @@ public class ServiceListener extends AppCompatActivity {
 
         //when the activity is stopped, release the server
         if (mBounded.get()) {
+            if (this instanceof MainScreen) {
+                // set the user as offline, might disable this if it cost too much MB upload
+                mDatabaseService.toggleOnlineUser(mDatabaseService.getCurrentUser().getUID(), false);
+            }
             unbindService(mConnection);
         }
         // delete all bound listeners:
@@ -114,7 +119,9 @@ public class ServiceListener extends AppCompatActivity {
     public ListenerTask<ListenerVariable<Boolean>> getUpdateListener() {
         return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
     }
-
+    public ListenerTask<Query> getUsersQuery(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getUsersQuery());
+    }
 
     // Current user:
     public ListenerTask<User> getCurrentUser() {
@@ -133,6 +140,13 @@ public class ServiceListener extends AppCompatActivity {
     public ListenerTask<ArrayList<String>> getFriendsNames() {
         return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
     }
+    public ListenerTask<ArrayList<String>> getFriendsUID() {
+        return new ListenerTask<>(this, () -> mDatabaseService.getFriendsUIDArray());
+    }
+    public ListenerTask<Task<Void>> toggleFriend(String UID){
+        return new ListenerTask<>(this, () -> mDatabaseService.toggleFriend(UID));
+    }
+
 
 
     // Notifications:

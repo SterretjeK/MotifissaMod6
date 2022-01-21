@@ -59,18 +59,11 @@ public class FriendsFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString() + " must be MainScreen");
         }
-        if (mainscreen.mBounded.get()){
-            userQuery = mainscreen.mDatabaseService.getUsersQuery();
+
+        mainscreen.getUsersQuery().setSuccessListener(queryIn -> {
+            userQuery = queryIn;
             userQuery.addValueEventListener(usersChangeListener);
-        }
-        else{
-            mainscreen.mBounded.addListener(value -> {
-                if(value) {
-                    userQuery = mainscreen.mDatabaseService.getUsersQuery();
-                    userQuery.addValueEventListener(usersChangeListener);
-                }
-            });
-        }
+        });
     }
 
     @Override
@@ -78,22 +71,14 @@ public class FriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_friends, container, false);
 
-        // setup the list view for the users
-//        if (mainscreen.mBounded.get())
-//            this.populateList();
-//        else{
-//            mainscreen.mBounded.setListener(value -> {
-//             if(value) populateList();
-//            });
-//        }
-
         return view;
     }
 
     @Override
     public void onDetach() { // called when the fragment is detached, so when it isn't visible anymore to the user
         super.onDetach();
-        userQuery.removeEventListener(usersChangeListener);
+        if (userQuery != null)
+            userQuery.removeEventListener(usersChangeListener);
     }
 
     public void populateList(ArrayList<User> users, ArrayList<String> friends){
@@ -121,8 +106,10 @@ public class FriendsFragment extends Fragment {
             }
 
 
-            friends = mainscreen.getFriendsUID();
-            populateList(users, friends);
+            mainscreen.getFriendsUID().setSuccessListener(friendsIn ->{
+                friends = friendsIn;
+                populateList(users, friends);
+            });
         }
 
         @Override
@@ -134,7 +121,9 @@ public class FriendsFragment extends Fragment {
 
     private final AdapterView.OnItemClickListener usersListListener = (parent, view, position, id) -> {
         String UID = Objects.requireNonNull(friendsListAdaptor.getItem(position)).getUID();
-        mainscreen.toggleFriend(UID).addOnSuccessListener(success ->{
+
+
+        mainscreen.toggleFriend(UID).setSuccessListener(task -> task.addOnSuccessListener(succes ->{
                 if(friends.contains(UID))
                     friends.remove(UID);
                 else friends.add(UID);
@@ -143,7 +132,7 @@ public class FriendsFragment extends Fragment {
             }).addOnFailureListener(error -> {
                 Toast.makeText(getContext(), "Couldn't add friend", Toast.LENGTH_SHORT).show();
                 Log.e("FriendsFragment", "Couldn't toggle friend: " + error);
-            });
+            }));
     };
 
     private final TextWatcher searchTextWatcher = new TextWatcher(){
