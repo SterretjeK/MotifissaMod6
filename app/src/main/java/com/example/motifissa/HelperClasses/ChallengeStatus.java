@@ -27,7 +27,7 @@ public class ChallengeStatus {
     }
 
     public boolean ownPosIsEmpty() {
-        if (ownPos == null) return false;
+        if (ownPos == null) return true;
         return ownPos.empty();
     }
 

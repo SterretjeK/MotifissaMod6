@@ -243,7 +243,10 @@ public class ServiceListener extends AppCompatActivity {
             });
 
             // show the dialog
-            dialog.show(getFragmentManager(), notification.getTitle());
+//            android.support.v4.app.FragmentActivity.getSupportFragmentManager()
+            try {
+                dialog.show(getFragmentManager(), notification.getTitle());
+            } catch (Exception ignored){}
         }
 
         // if the new notification is a challenge Accept, show a dialog for that:

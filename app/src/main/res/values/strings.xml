@@ -101,7 +101,7 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="dashboard">Dashboard</string>
-    <string name="friends">Friends</string>
+    <string name="friends_tile">Friends</string>
     <string name="prompt_search_user">Enter name or ID</string>
     <string name="prompt_search_friend">Enter name</string>
     <string name="Friends_Title">Add Friends</string>
@@ -145,4 +145,6 @@
     <string name="challenge_maps_title_find">Go find each other</string>
     <string name="challenge_maps_title_locationChosen">Waiting on username to accept</string>
     <string name="action_arrived_temp">Arrived</string>
+    <string name="friends">Friends</string>
+    <string name="DatabaseChallengesRoot">Challenges</string>
 </resources>
