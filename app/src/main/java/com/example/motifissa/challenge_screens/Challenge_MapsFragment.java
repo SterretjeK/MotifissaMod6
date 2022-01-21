@@ -2,7 +2,8 @@ package com.example.motifissa.challenge_screens;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,15 +16,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.motifissa.HelperClasses.ChallengeStatus;
-import com.example.motifissa.MainScreen;
 import com.example.motifissa.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -52,15 +50,13 @@ import java.util.Random;
  * </p>
  */
 
-public class Challenge_MapsFragment extends Fragment {
+public class Challenge_MapsFragment extends Fragment{
     // initializing FusedLocationProviderClient
     //https://techenum.com/how-to-get-current-gps-location-in-android/
     private static final String TAG = "Challenge_MapsFragment";
     private static final int ZOOM_LEVEL = 15;
     private static final int MAPS_ZOOM_PADDING = 200;
-    public static final int DEFAULT_GPS_INTERFAL = 60000;
-    public static final int FASTEST_GPS_INTERVAL = 10000;
-    private static final int PERMISSION_FINE_LOCATION = 69;
+
 
     Button confirmButton;
     Button changeButton;
@@ -93,52 +89,10 @@ public class Challenge_MapsFragment extends Fragment {
 //        if (Build.FINGERPRINT.contains("generic")) { // if run on an emulator:
             Random random = new Random();
             userPos = new ChallengeStatus.Position(52.24655176852505 + (0.5 - random.nextDouble()) * 0.01, 6.847529082501974 + (0.5 - random.nextDouble()) * 0.01);
-            challengeActivity.setOwnPos(userPos); // the the users location to the opponents
-//        } else {
-            // setup the setting for the gps:
-//            locationRequest = new LocationRequest();
-//            locationRequest.setInterval(DEFAULT_GPS_INTERFAL); // 1 min when the phone is in energy saving modes
-//            locationRequest.setFastestInterval(FASTEST_GPS_INTERVAL); // 10 sec on fastest
-//            locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY); // TODO might change this to high accuracy mode, idk
-//            setup_GPS();
-//        }
-    }
 
-//    private void setup_GPS(){
-//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-//
-//        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){ // if the permission is granted
-//            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location ->{
-//               //TODO this
-//                if (location != null){
-//                    Log.e(TAG, location.toString());
-//                    userPos = new ChallengeStatus.Position(location.getLatitude(), location.getLongitude());
-//                    if (userMarker != null){
-//                        userMarker.setPosition(userPos.changeToLatLng());
-//                    }
-//                    challengeActivity.setOwnPos(userPos);
-//                    centerCamera();
-//                } else
-//                    Log.e(TAG, "null");
-//            });
-//        } else {
-//            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
-//        }
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//
-//        if (requestCode == PERMISSION_FINE_LOCATION) {
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//                setup_GPS();
-//            else {
-//                Toast.makeText(getContext(), "Can't challenge without location permission", Toast.LENGTH_LONG).show();
-//                challengeActivity.cancelChallenge();
-//            }
-//        }
-//    }
+
+        challengeActivity.setupGPS();
+    }
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -201,10 +155,6 @@ public class Challenge_MapsFragment extends Fragment {
         return view;
     }
 
-    private boolean pickingLocation() {
-        return challengeActivity.getChallengeStatus().getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION;
-    }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -213,6 +163,17 @@ public class Challenge_MapsFragment extends Fragment {
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+    }
+
+
+    public void updateOpponentsPos(ChallengeStatus.Position opponentsPos) {
+        if (opponentMarker != null && opponentsPos != this.opponentsPos) {
+            opponentMarker.setPosition(opponentsPos.changeToLatLng());
+            opponentMarker.setVisible(true);
+            this.opponentsPos = opponentsPos;
+            centerCamera();
+        }
+        this.opponentsPos = opponentsPos;
     }
 
     public void otherChooseLocation(ChallengeStatus.Position pos) {
@@ -231,45 +192,6 @@ public class Challenge_MapsFragment extends Fragment {
 
         titleTxt.setText(R.string.challenge_maps_title_chosen);
         centerCamera();
-    }
-
-    public void updateOpponentsPos(ChallengeStatus.Position opponentsPos) {
-        if (opponentMarker != null && opponentsPos != this.opponentsPos) {
-            opponentMarker.setPosition(opponentsPos.changeToLatLng());
-            opponentMarker.setVisible(true);
-            this.opponentsPos = opponentsPos;
-            centerCamera();
-        }
-        this.opponentsPos = opponentsPos;
-    }
-
-    private void centerCamera() {
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(userPos.changeToLatLng());
-        if (opponentMarker != null && opponentMarker.isVisible() && opponentsPos != null) {
-            builder.include(opponentsPos.changeToLatLng());
-        }
-
-        if (chosenMarker != null && chosenMarker.isVisible()){
-            builder.include(chosenMarker.getPosition());
-        }
-
-        LatLngBounds bounds = builder.build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, MAPS_ZOOM_PADDING);
-
-        maps.animateCamera(cameraUpdate);
-    }
-
-    private void centerCameraChosenPos() {
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(userPos.changeToLatLng());
-        builder.include(opponentsPos.changeToLatLng());
-        builder.include(chosenMarker.getPosition());
-
-        LatLngBounds bounds = builder.build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, MAPS_ZOOM_PADDING);
-
-        maps.animateCamera(cameraUpdate);
     }
 
     public void acceptedLocation() {
@@ -346,6 +268,35 @@ public class Challenge_MapsFragment extends Fragment {
 
                 confirmButton.setEnabled(false);
             });
+        }
+    }
+
+    private void centerCamera() {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(userPos.changeToLatLng());
+        if (opponentMarker != null && opponentMarker.isVisible() && opponentsPos != null) {
+            builder.include(opponentsPos.changeToLatLng());
+        }
+
+        if (chosenMarker != null && chosenMarker.isVisible()){
+            builder.include(chosenMarker.getPosition());
+        }
+
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, MAPS_ZOOM_PADDING);
+
+        maps.animateCamera(cameraUpdate);
+    }
+
+    private boolean pickingLocation() {
+        return challengeActivity.getChallengeStatus().getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION;
+    }
+
+    public void updatePos(ChallengeStatus.Position position) {
+        userPos = position;
+        if (userMarker != null){
+            userMarker.setPosition(position.changeToLatLng());
+            centerCamera();
         }
     }
 }
