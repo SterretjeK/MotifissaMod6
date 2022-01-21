@@ -48,6 +48,9 @@ public class ListenerVariable<T> {
 
     public void addListener(ChangeListener<T> listener) {
         this.changeListeners.add(listener);
+
+        if (variable instanceof Boolean)
+            listener.onChange(variable);
     }
 
     public void removeSuccessListener(SuccessListener listener){

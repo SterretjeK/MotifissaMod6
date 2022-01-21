@@ -96,10 +96,10 @@ public class ServiceListener extends AppCompatActivity {
 
         //when the activity is stopped, release the server
         if (mBounded.get()) {
-            if (this instanceof MainScreen) {
-                // set the user as offline, might disable this if it cost too much MB upload
-                mDatabaseService.toggleOnlineUser(mDatabaseService.getCurrentUser().getUID(), false);
-            }
+//            if (this instanceof MainScreen) {
+//                // set the user as offline, might disable this if it cost too much MB upload
+//                mDatabaseService.toggleOnlineUser(mDatabaseService.getCurrentUser().getUID(), false);
+//            }
             unbindService(mConnection);
         }
         // delete all bound listeners:
@@ -243,7 +243,10 @@ public class ServiceListener extends AppCompatActivity {
             });
 
             // show the dialog
-            dialog.show(getFragmentManager(), notification.getTitle());
+//            android.support.v4.app.FragmentActivity.getSupportFragmentManager()
+            try {
+                dialog.show(getFragmentManager(), notification.getTitle());
+            } catch (Exception ignored){}
         }
 
         // if the new notification is a challenge Accept, show a dialog for that:

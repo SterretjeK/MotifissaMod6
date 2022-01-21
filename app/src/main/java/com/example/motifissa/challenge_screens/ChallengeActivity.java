@@ -4,12 +4,18 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.motifissa.HelperClasses.ChallengeStatus;
@@ -20,8 +26,9 @@ import com.example.motifissa.HelperClasses.ServiceListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Random;
 
 public class ChallengeActivity extends ServiceListener {
     /*
@@ -34,6 +41,7 @@ public class ChallengeActivity extends ServiceListener {
         -5 choose location
         -6 countdown/challengeScreen
      */
+    // TODO add friends in choose friends ding iets
 
     private static final String TAG = "ChallengeActivity";
     public static final String START_FRAGMENT = "START_FRAGMENT";
@@ -47,10 +55,21 @@ public class ChallengeActivity extends ServiceListener {
     ChallengeSentFragment challengeSentFragment;
     ChallengeLoadingFragment challengeLoadingFragment;
     Challenge_MapsFragment challengeMapsFragment;
+    Challenge_ChallengesFragment challengesFragment;
 
     // the actual challenge:
     ChallengeStatus challengeStatus;
     ChallengeStatus challengeStatusOpponent;
+
+    // GPS location
+    final static String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    private static final int PERMISSION_ALL = 69;
+    public static final int DEFAULT_GPS_INTERVAL = 60000;
+    public static final int DEFAULT_GPS_DISTANCE = 50;
+
+    public static final int FASTEST_GPS_INTERVAL = 10000;
+    LocationManager locationManager;
+
 
     private String selectedFriend;
 
@@ -60,12 +79,13 @@ public class ChallengeActivity extends ServiceListener {
         setContentView(R.layout.activity_challenge);
 
         // wait until the service is bounded
-        isBounded().setSuccessListener(bounded ->{
+        isBounded().setSuccessListener(bounded -> {
             chooseFriendFragment = new ChooseFriendFragment();
             overviewChallengeFragment = new OverviewChallengeFragment();
             challengeSentFragment = new ChallengeSentFragment();
             challengeLoadingFragment = new ChallengeLoadingFragment();
             challengeMapsFragment = new Challenge_MapsFragment();
+            challengesFragment = new Challenge_ChallengesFragment();
 
 
             // This callback will change what happens when the user clicks back
@@ -88,13 +108,13 @@ public class ChallengeActivity extends ServiceListener {
             actionBar.setCustomView(R.layout.action_bar); // set our custom action bar
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-            if (getIntent().hasExtra(START_FRAGMENT)){
+            if (getIntent().hasExtra(START_FRAGMENT)) {
                 currentFragment = getIntent().getIntExtra(START_FRAGMENT, 1);
             } else {
                 currentFragment = 1;
             }
 
-            if (getIntent().hasExtra(START_SELECTED_FRIEND_UID)){
+            if (getIntent().hasExtra(START_SELECTED_FRIEND_UID)) {
                 selectedFriend = getIntent().getStringExtra(START_SELECTED_FRIEND_UID);
             }
 
@@ -102,6 +122,51 @@ public class ChallengeActivity extends ServiceListener {
         });
     }
 
+    // ---------------------------------- GPS ----------------------------------
+    public void setupGPS() {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        requestPermissions(PERMISSIONS, PERMISSION_ALL);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // if the permission was accepted
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            requestLocation();
+        }
+    }
+
+    public void requestLocation() {
+        if (locationManager == null) { //stupid shouldn't happen
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        } else {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, DEFAULT_GPS_DISTANCE, DEFAULT_GPS_DISTANCE, locationListener);
+                }
+            }
+        }
+    }
+
+    private final LocationListener locationListener = location -> {
+        if (currentFragment == 5){
+            ChallengeStatus.Position newPos = new ChallengeStatus.Position(location.getLatitude(), location.getLongitude());
+            // if run on an emulator change it's position:
+            if (Build.FINGERPRINT.contains("generic")) {
+                Random random = new Random();
+                newPos = new ChallengeStatus.Position(52.24655176852505 + (0.5 - random.nextDouble()) * 0.01, 6.847529082501974 + (0.5 - random.nextDouble()) * 0.01);
+            }
+            challengeMapsFragment.updatePos(newPos);
+            setOwnPos(newPos);
+        }
+        else{
+            // stop gps
+            locationManager.removeUpdates(this.locationListener);
+        }
+        Log.d(TAG, "got location: " + location.getLatitude() + "," + location.getLongitude());
+    };
 
     public void changeFragment(int changeToFragment) {
         Fragment selectedFragment;
@@ -122,9 +187,12 @@ public class ChallengeActivity extends ServiceListener {
             case 5:
                 selectedFragment = challengeMapsFragment;
                 break;
+            case 6:
+                selectedFragment = challengesFragment;
+                break;
 
             default:
-                Toast.makeText(this, "changeToFragment in changeFragment was unknown, " +  changeToFragment, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "changeToFragment in changeFragment was unknown, " + changeToFragment, Toast.LENGTH_SHORT).show();
                 return;
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerChallenge, selectedFragment).commit();
@@ -180,7 +248,7 @@ public class ChallengeActivity extends ServiceListener {
         selectedFriend = newID;
     }
 
-    public void startChallenge(){
+    public void startChallenge() {
         challengeStatus = new ChallengeStatus(selectedFriend, ChallengeStatus.ChallengeState.WAITING);
 
         getOpponentsChallengeQuery(getSelectedFriend()).setSuccessListener(query -> query.addValueEventListener(new ValueEventListener() {
@@ -189,52 +257,52 @@ public class ChallengeActivity extends ServiceListener {
                 challengeStatusOpponent = snapshot.getValue(ChallengeStatus.class);
 
                 // if canceled remove the event listener
-                if (challengeStatus == null){
+                if (challengeStatus == null) {
                     query.removeEventListener(this);
                     return;
                 }
                 // if the other user canceled cancel this one as well
-                if (challengeStatusOpponent == null && challengeStatus.getChallengeState() != ChallengeStatus.ChallengeState.WAITING){
+                if (challengeStatusOpponent == null && challengeStatus.getChallengeState() != ChallengeStatus.ChallengeState.WAITING) {
                     if (challengeStatus != null)
                         getUser(getSelectedFriend()).setSuccessListener(friend -> Toast.makeText(ChallengeActivity.this, "username disconnected".replaceAll("username", friend.getName()), Toast.LENGTH_SHORT).show());
                     cancelChallenge();
                     query.removeEventListener(this);
                     return;
 
-                // if the other user isn't connected yet then make this user the master
-                } else if (challengeStatusOpponent == null && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.WAITING){
+                    // if the other user isn't connected yet then make this user the master
+                } else if (challengeStatusOpponent == null && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.WAITING) {
                     challengeStatus.setMaster(true);
                     changeChallengeStatus(challengeStatus);
                     return;
-                // if the other user isn't connected yet and, wait this one is never called :) , just keep it in to fix unknown errors
-                } else  if (challengeStatusOpponent == null) {
+                    // if the other user isn't connected yet and, wait this one is never called :) , just keep it in to fix unknown errors
+                } else if (challengeStatusOpponent == null) {
                     Log.e(TAG, "this shouldn't be called :) , startChallenge() in challenge activity");
                     return;
                 }
                 // it the other user connected and this one is still loading go to the second phase.
-                if (challengeStatusOpponent.shouldBeInSecondPhase()  && currentFragment < 5){
+                if (challengeStatusOpponent.shouldBeInSecondPhase() && currentFragment < 5) {
                     challengeStatus.moveToSecondPhase();
 
                     changeFragment(5);
                     changeChallengeStatus(challengeStatus);
                 }
                 // if the other shared their location and the user is still in the maps fragment
-                if (currentFragment == 5 && !challengeStatusOpponent.ownPosIsEmpty()){
+                if (currentFragment == 5 && !challengeStatusOpponent.ownPosIsEmpty()) {
                     challengeMapsFragment.updateOpponentsPos(challengeStatusOpponent.getOwnPos());
                 }
 
                 // if the other user choose a new location sent that trough to the maps fragment
-                if (currentFragment == 5 && !challengeStatusOpponent.chosenPosIsEmpty() && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_WAITING){
+                if (currentFragment == 5 && !challengeStatusOpponent.chosenPosIsEmpty() && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_WAITING) {
                     challengeMapsFragment.otherChooseLocation(challengeStatusOpponent.getChosenPos());
                 }
 
                 // if the other user accepted the location
-                if (currentFragment == 5 && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.FINDING_EACH_OTHER){
+                if (currentFragment == 5 && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.FINDING_EACH_OTHER) {
                     challengeMapsFragment.acceptedLocation();
                 }
 
                 // if the other user didn't accept the location and pressed change:
-                if (currentFragment == 5 && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION){
+                if (currentFragment == 5 && challengeStatus.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION_DONE && challengeStatusOpponent.getChallengeState() == ChallengeStatus.ChallengeState.PICK_LOCATION) {
                     challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.PICK_LOCATION_WAITING);
                     changeChallengeStatus(challengeStatus).setSuccessListener(task -> task.addOnSuccessListener(success -> challengeMapsFragment.setupView()).addOnFailureListener(error -> {
                         Log.e(TAG, "couldn't update challengeState to reflect the other users denial of the proposed location");
@@ -257,16 +325,17 @@ public class ChallengeActivity extends ServiceListener {
     public void setChallengeStatus(ChallengeStatus challengeStatus) {
         this.challengeStatus = challengeStatus;
     }
-    public void setOwnPos(ChallengeStatus.Position pos){
+
+    public void setOwnPos(ChallengeStatus.Position pos) {
         challengeStatus.setOwnPos(pos);
         changeChallengeStatus(challengeStatus);
     }
 
-    public ChallengeStatus getChallengeStatusOpponent(){
+    public ChallengeStatus getChallengeStatusOpponent() {
         return challengeStatusOpponent;
     }
 
-    public void cancelChallenge(){
+    public void cancelChallenge() {
         challengeStatus = null;
         removeChallengeStatus().setSuccessListener(task -> task.addOnSuccessListener(success -> finish())
                 .addOnFailureListener(error -> {
@@ -275,11 +344,20 @@ public class ChallengeActivity extends ServiceListener {
                 }));
     }
 
-    public void onBackPress(){
+    public void onBackPress() {
         if (currentFragment > 1 && currentFragment < 4)
             changeFragment(currentFragment - 1);
         else if (currentFragment > 4)
             cancelChallenge();
         else finish();
+    }
+
+    public enum ChallengeFragmentState {
+        Choose_Friend,
+        Overview_Friend,
+        Sent,
+        waiting_on_other_user,
+        choose_location,
+        countdown_challengeScreen,
     }
 }
