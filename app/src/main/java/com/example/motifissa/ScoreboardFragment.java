@@ -73,7 +73,7 @@ public class ScoreboardFragment extends Fragment {
                     friends.add(currentUser);
                 else
                     Log.e(TAG, "current User is null");
-                if (friends != null) {
+                if (friends != null && getActivity() != null) {
                     arrayAdaptor = new ScoreboardListAdapter(getActivity(), friends);
                     scoreboardList.setAdapter(arrayAdaptor);
                 }
@@ -84,9 +84,13 @@ public class ScoreboardFragment extends Fragment {
                         serviceListener.getFriends().setSuccessListener(updatedFriends -> {
                             serviceListener.getCurrentUser().setSuccessListener(updatedCurrentUser -> {
                                 friends = new ArrayList<>(updatedFriends);
-                                friends.add(updatedCurrentUser);
+                                if (currentUser != null)
+                                    friends.add(currentUser);
+                                else
+                                    Log.e(TAG, "current User is null");
 
                                 if (arrayAdaptor == null){
+                                    if (friends != null && getActivity() != null)
                                     arrayAdaptor = new ScoreboardListAdapter(getActivity(), friends);
                                     scoreboardList.setAdapter(arrayAdaptor);
                                 } else {
