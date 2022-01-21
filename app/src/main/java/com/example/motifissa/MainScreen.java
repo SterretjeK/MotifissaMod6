@@ -13,7 +13,9 @@ import android.view.MenuItem;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.example.motifissa.HelperClasses.ListenerTask;
 import com.example.motifissa.HelperClasses.ListenerVariable;
+import com.example.motifissa.HelperClasses.ServiceListener;
 import com.example.motifissa.HelperClasses.User;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -23,7 +25,7 @@ import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 
-public class MainScreen extends AppCompatActivity {
+public class MainScreen extends ServiceListener {
 
     // fragments
     DashboardFragment dashboardFragment;
@@ -41,8 +43,6 @@ public class MainScreen extends AppCompatActivity {
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
 
-    String loginName;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,16 +52,12 @@ public class MainScreen extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         // get the current user
         currentUser = mAuth.getCurrentUser();
-        if (currentUser == null){ //log out if the login isn't valid
+        if (currentUser == null) { //log out if the login isn't valid
             logout();
         }
-        loginName = currentUser.getDisplayName();
 
         // setup the dashboard fragment
         dashboardFragment = new DashboardFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("LOGIN_NAME", loginName);
-        dashboardFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, dashboardFragment).commit();
 
         // setup the friends fragment
@@ -81,7 +77,7 @@ public class MainScreen extends AppCompatActivity {
         this.connectToService();
     }
 
-    public void logout(){
+    public void logout() {
         mAuth.signOut();
         finish();
         Intent loginPageIntent = new Intent(this, LoginScreen.class);
@@ -93,7 +89,7 @@ public class MainScreen extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
 
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.dashboard:
                     selectedFragment = dashboardFragment;
                     break;
@@ -104,7 +100,7 @@ public class MainScreen extends AppCompatActivity {
 //                    selectedFragment = ;
 //                    break;
             }
-            if (selectedFragment == null){
+            if (selectedFragment == null) {
                 Toast.makeText(MainScreen.this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -113,138 +109,23 @@ public class MainScreen extends AppCompatActivity {
         }
     };
 
-    private void connectToService(){
-        if (!mBounded.get()) {
-            mIsConnecting = true;
-            mBounded = new ListenerVariable<>(false);
-            Intent serviceIntent = new Intent(this, DatabaseService.class);
-            bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
-        }
-    }
-
-    ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Toast.makeText(MainScreen.this, "Service is disconnected", Toast.LENGTH_SHORT).show();
-            mBounded.set(false);
-            mIsConnecting = false;
-            mDatabaseService = null;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Toast.makeText(MainScreen.this, "Service is connected", Toast.LENGTH_SHORT).show();
-            DatabaseService.LocalBinder mLocalBinder = (DatabaseService.LocalBinder)service;
-            mDatabaseService = mLocalBinder.getServerInstance();
-
-//            mDatabaseService.makeUsers();
-//            mDatabaseService.setCurrentUser(loginName);
-
-            mIsConnecting = false;
-            mBounded.set(true);
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-//        super.onStop();
-        super.onDestroy();
-
-        //when the activity is stopped, release the server
-        if (mBounded.get()) {
-            // set the user as offline, might disable this if it cost too much MB upload
-            mDatabaseService.toggleOnlineUser(currentUser.getUid(), false);
-            unbindService(mConnection);
-        }
-        mBounded = new ListenerVariable<>(false);
-        mIsConnecting = false;
-    }
-
-    public Query getUsersQuery(){
-        if (mBounded.get() && mDatabaseService != null) {
-            try {
-                return mDatabaseService.getUsersQuery();
-            } catch (Exception e) {
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getUsersQuery");
-            }
-        }
-
-        if (!mIsConnecting) {
-            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public ArrayList<String> getFriendsUID(){
-        if (mBounded.get() && mDatabaseService != null) {
-            try {
-                return mDatabaseService.getFriendsUIDArray();
-            } catch (Exception e) {
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsUID");
-            }
-        }
-
-        if (!mIsConnecting) {
-            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public Task<Void> toggleFriend(String UID){
-        if (mBounded.get() && mDatabaseService != null) {
-            try {
-                return mDatabaseService.toggleFriend(UID);
-            } catch (Exception e) {
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getFriendsUID");
-            }
-        }
-
-        if (!mIsConnecting) {
-            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public FirebaseUser getCurrentUser(){
-        return currentUser;
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//
+//        //when the activity is stopped, release the server
+//        if (mBounded.get()) {
+//            // set the user as offline, might disable this if it cost too much MB upload
+//            mDatabaseService.toggleOnlineUser(currentUser.getUid(), false);
+//            unbindService(mConnection);
+//        }
+//        mBounded = new ListenerVariable<>(false);
+//        mIsConnecting = false;
+//    }
 
     public void showNotifications() {
         Intent notificationsIntent = new Intent(MainScreen.this, NotificationsActivity.class);
         startActivity(notificationsIntent);
     }
 
-    public Query getNotifications(){
-        if (mBounded.get() && mDatabaseService != null) {
-            try {
-                return mDatabaseService.getNotifications();
-            } catch (Exception e) {
-                Log.e("MainScreen", "Database not bound, but said it was when trying to access getNotifications");
-            }
-        }
-
-        if (!mIsConnecting) {
-            Toast.makeText(this, "Service is disconnected, connecting...", Toast.LENGTH_SHORT).show();
-            this.connectToService();
-        }
-        return null;
-    }
-
-    public User getUser(String ID){
-        if (mBounded.get()) {
-            try {
-                return mDatabaseService.getUser(ID);
-            } catch (Exception e){
-                Log.e("ChallengeScreen", "Database not bound, but said it was when trying to access getUser");
-            }
-        }
-
-        if (!mIsConnecting) {
-            this.connectToService();
-        }
-        return null;
-    }
 }

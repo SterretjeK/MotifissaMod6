@@ -22,32 +22,17 @@ import com.example.motifissa.challenge_screens.ChallengeActivity;
 
 import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DashboardFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DashboardFragment extends Fragment {
     View view;
 
     ScoreboardFragment scoreboardFragment;
 
-    public static final String LOGIN_NAME = "LOGIN_NAME";
-
-    private String Login_name;
     private MainScreen mainscreen;
 
     public DashboardFragment() {
         // Required empty public constructor
     }
 
-    public static DashboardFragment newInstance(String Login_name) {
-        DashboardFragment fragment = new DashboardFragment();
-        Bundle args = new Bundle();
-        args.putString(LOGIN_NAME, Login_name);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -61,9 +46,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            Login_name = getArguments().getString(LOGIN_NAME);
-        }
+
     }
 
     @Override
@@ -72,9 +55,13 @@ public class DashboardFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-         // set the login name to the screen's textview
-         TextView Username_welcome = (TextView) view.findViewById(R.id.Username_welcome);
-         Username_welcome.setText(Login_name);
+        mainscreen.getUpdateListener().setSuccessListener(listener -> listener.addListener(value -> {
+            mainscreen.getCurrentUser().setSuccessListener(user -> {
+                // set the login name to the screen's textview
+                TextView Username_welcome = (TextView) view.findViewById(R.id.username_hello);
+                Username_welcome.setText(user.getName());
+            });
+        }));
 
          // setup the scoreboard fragment
 //        scoreboardFragment = new ScoreboardFragment();
@@ -107,7 +94,6 @@ public class DashboardFragment extends Fragment {
 
         return view;
     }
-
 
     private View.OnClickListener challengeOnClickListener = v -> {
         Intent mainScreenIntent = new Intent(getContext(), ChallengeActivity.class);
