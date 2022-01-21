@@ -68,40 +68,33 @@ public class DashboardFragment extends Fragment {
 
 
          // setup the scoreboard fragment
-//        scoreboardFragment = new ScoreboardFragment();
-//        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.scoreboard_container, scoreboardFragment).commit();
+        scoreboardFragment = new ScoreboardFragment();
+        Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.scoreboard_container, scoreboardFragment).commit();
 
-        CardView challengeButton = view.findViewById(R.id.dashboard_tile_challenge);
-        challengeButton.setOnClickListener(challengeOnClickListener);
+        CardView profileTile = view.findViewById(R.id.dashboard_tile_profile);
+        profileTile.setOnClickListener(v -> {
+            Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+            startActivity(profileIntent);
+        });
 
-        ImageButton menuButton = view.findViewById(R.id.moreMenuButton);
-        menuButton.setOnClickListener(v -> {
-            //Creating the instance of PopupMenu
-            PopupMenu popup = new PopupMenu(getContext(), menuButton);
-            //Inflating the Popup using xml file
-            popup.getMenuInflater().inflate(R.menu.dashboard_menu, popup.getMenu());
+        CardView friendsTile = view.findViewById(R.id.dashboard_tile_friends);
+        friendsTile.setOnClickListener(v -> {
+            Intent friendsIntent = new Intent(getContext(), ChallengeActivity.class);
+            startActivity(friendsIntent);
+        });
 
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                public boolean onMenuItemClick(MenuItem item) {
-//                    Toast.makeText(getContext(),"You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
-                    if (item.getTitle().equals(getResources().getString(R.string.logout))) {
-                        mainscreen.logout();
-                    } else if (item.getTitle().equals(getResources().getString(R.string.Notifications))){
-                        mainscreen.showNotifications();
-                    }
-                    return true;
-                }
-            });
+        CardView notificationsTile = view.findViewById(R.id.dashboard_tile_notifications);
+        notificationsTile.setOnClickListener(v -> {
+            Intent notificationsIntent = new Intent(getContext(), NotificationsActivity.class);
+            startActivity(notificationsIntent);
+        });
 
-            popup.show();
+        CardView settingsTile = view.findViewById(R.id.dashboard_tile_settings);
+        settingsTile.setOnClickListener(v -> {
+            Intent settingIntent = new Intent(getContext(), SettingsActivity.class);
+            startActivity(settingIntent);
         });
 
         return view;
     }
-
-    private View.OnClickListener challengeOnClickListener = v -> {
-        Intent mainScreenIntent = new Intent(getContext(), ChallengeActivity.class);
-        startActivity(mainScreenIntent);
-    };
-
 }

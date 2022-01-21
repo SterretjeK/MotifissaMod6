@@ -8,4 +8,5 @@
     <dimen name="titleSize">32sp</dimen>
     <dimen name="button_textSize">10sp</dimen>
     <dimen name="button_textSize_L">20sp</dimen>
+    <dimen name="tile_corner_radius">12dp</dimen>
 </resources>

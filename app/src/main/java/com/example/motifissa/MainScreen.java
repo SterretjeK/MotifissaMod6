@@ -64,8 +64,8 @@ public class MainScreen extends ServiceListener {
         friendsFragment = new FriendsFragment();
 
         // setup the bottom navigation
-        bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setOnNavigationItemSelectedListener(navListener);
+//        bottomNav = findViewById(R.id.bottom_navigation);
+//        bottomNav.setOnNavigationItemSelectedListener(navListener);
 
     }
 
@@ -77,6 +77,16 @@ public class MainScreen extends ServiceListener {
         this.connectToService();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // get the current user
+        currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) { //log out if the login isn't valid
+            logout();
+        }
+    }
+
     public void logout() {
         mAuth.signOut();
         finish();
@@ -84,30 +94,30 @@ public class MainScreen extends ServiceListener {
         startActivity(loginPageIntent);
     }
 
-    private final BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment selectedFragment = null;
-
-            switch (item.getItemId()) {
-                case R.id.dashboard:
-                    selectedFragment = dashboardFragment;
-                    break;
-                case R.id.friends:
-                    selectedFragment = friendsFragment;
-                    break;
-//                case R.id.profile:
-//                    selectedFragment = ;
+//    private final BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+//        @Override
+//        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//            Fragment selectedFragment = null;
+//
+//            switch (item.getItemId()) {
+//                case R.id.dashboard:
+//                    selectedFragment = dashboardFragment;
 //                    break;
-            }
-            if (selectedFragment == null) {
-                Toast.makeText(MainScreen.this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selectedFragment).commit();
-            return true;
-        }
-    };
+//                case R.id.friends:
+//                    selectedFragment = friendsFragment;
+//                    break;
+////                case R.id.profile:
+////                    selectedFragment = ;
+////                    break;
+//            }
+//            if (selectedFragment == null) {
+//                Toast.makeText(MainScreen.this, "SelectedFragment in navListener was unknown", Toast.LENGTH_SHORT).show();
+//                return false;
+//            }
+//            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selectedFragment).commit();
+//            return true;
+//        }
+//    };
 
 //    @Override
 //    protected void onDestroy() {
@@ -123,9 +133,5 @@ public class MainScreen extends ServiceListener {
 //        mIsConnecting = false;
 //    }
 
-    public void showNotifications() {
-        Intent notificationsIntent = new Intent(MainScreen.this, NotificationsActivity.class);
-        startActivity(notificationsIntent);
-    }
 
 }
