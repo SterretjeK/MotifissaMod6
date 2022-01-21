@@ -60,18 +60,10 @@ public class FriendsFragment extends Fragment {
             throw new RuntimeException(context.toString() + " must be MainScreen");
         }
 
-        if (mainscreen.mBounded.get()){
-            userQuery = mainscreen.mDatabaseService.getUsersQuery();
+        mainscreen.getUsersQuery().setSuccessListener(queryIn -> {
+            userQuery = queryIn;
             userQuery.addValueEventListener(usersChangeListener);
-        }
-        else{
-            mainscreen.mBounded.addListener(value -> {
-                if(value) {
-                    userQuery = mainscreen.mDatabaseService.getUsersQuery();
-                    userQuery.addValueEventListener(usersChangeListener);
-                }
-            });
-        }
+        });
     }
 
     @Override
@@ -79,22 +71,14 @@ public class FriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_friends, container, false);
 
-        // setup the list view for the users
-//        if (mainscreen.mBounded.get())
-//            this.populateList();
-//        else{
-//            mainscreen.mBounded.setListener(value -> {
-//             if(value) populateList();
-//            });
-//        }
-
         return view;
     }
 
     @Override
     public void onDetach() { // called when the fragment is detached, so when it isn't visible anymore to the user
         super.onDetach();
-        userQuery.removeEventListener(usersChangeListener);
+        if (userQuery != null)
+            userQuery.removeEventListener(usersChangeListener);
     }
 
     public void populateList(ArrayList<User> users, ArrayList<String> friends){

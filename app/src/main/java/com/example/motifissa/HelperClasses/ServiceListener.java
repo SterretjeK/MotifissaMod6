@@ -119,7 +119,9 @@ public class ServiceListener extends AppCompatActivity {
     public ListenerTask<ListenerVariable<Boolean>> getUpdateListener() {
         return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
     }
-
+    public ListenerTask<Query> getUsersQuery(){
+        return new ListenerTask<>(this, () -> mDatabaseService.getUsersQuery());
+    }
 
     // Current user:
     public ListenerTask<User> getCurrentUser() {
