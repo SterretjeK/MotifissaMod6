@@ -33,6 +33,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Random;
 
 // TODO rework entire gps: https://www.youtube.com/watch?v=77BO6UiWt4A
@@ -84,17 +86,11 @@ public class Challenge_MapsFragment extends Fragment{
             throw new RuntimeException(context.toString() + " must be ChallengeActivity");
         }
 
-        // TODO change this to the users current location:
-        // get the location of the user
-//        if (Build.FINGERPRINT.contains("generic")) { // if run on an emulator:
-            Random random = new Random();
-            userPos = new ChallengeStatus.Position(52.24655176852505 + (0.5 - random.nextDouble()) * 0.01, 6.847529082501974 + (0.5 - random.nextDouble()) * 0.01);
-
-
+        // activates the GPS location of the user
         challengeActivity.setupGPS();
     }
 
-    private OnMapReadyCallback callback = new OnMapReadyCallback() {
+    private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
          * Manipulates the map once available.
@@ -107,10 +103,14 @@ public class Challenge_MapsFragment extends Fragment{
 
         // https://developers.google.com/maps/documentation/android-sdk/events
         @Override
-        public void onMapReady(GoogleMap googleMap) {
+        public void onMapReady(@NotNull GoogleMap googleMap) {
             maps = googleMap;
+            LatLng userLatLng;
 
-            LatLng userLatLng = userPos.changeToLatLng();
+            if (userPos == null){
+                userLatLng = new LatLng(0,0);
+            } else
+                userLatLng = userPos.changeToLatLng();
             userMarker = googleMap.addMarker(new MarkerOptions().position(userLatLng).title("Your location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
             assert userMarker != null;
             userMarker.showInfoWindow();
@@ -203,15 +203,17 @@ public class Challenge_MapsFragment extends Fragment{
         confirmButton.setText(R.string.action_arrived_temp);
         titleTxt.setText(R.string.challenge_maps_title_find);
 
+        confirmButton.setOnClickListener(v -> {
+            challengeActivity.moveUpFragment();
+            //TODO this
+        });
+
         ChallengeStatus challengeStatus = challengeActivity.getChallengeStatus();
         challengeStatus.setChallengeState(ChallengeStatus.ChallengeState.FINDING_EACH_OTHER);
         challengeActivity.setChallengeStatus(challengeStatus);
-        challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> task.addOnSuccessListener(success -> {
-            //TODO this
-            // and this
-        }).addOnFailureListener(error -> {
-            Toast.makeText(getContext(), "Couldn't accept challenge, " + error, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Couldn't accept challenge, " + error);
+        challengeActivity.changeChallengeStatus(challengeStatus).setSuccessListener(task -> task.addOnFailureListener(error -> {
+            Toast.makeText(getContext(), "Couldn't accept Location, " + error, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Couldn't accept Location, " + error);
         }));
 
         centerCamera();
@@ -273,7 +275,8 @@ public class Challenge_MapsFragment extends Fragment{
 
     private void centerCamera() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(userPos.changeToLatLng());
+        if (userPos != null)
+            builder.include(userPos.changeToLatLng());
         if (opponentMarker != null && opponentMarker.isVisible() && opponentsPos != null) {
             builder.include(opponentsPos.changeToLatLng());
         }

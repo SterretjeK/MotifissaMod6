@@ -56,10 +56,16 @@ public class DashboardFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-        mainscreen.getCurrentUser().setSuccessListener(user ->{
-            TextView Username_welcome = view.findViewById(R.id.username_welcome);
-            Username_welcome.setText(user.getName());
-        });
+        // update each time the username was updated
+        mainscreen.getUpdateListener().setSuccessListener(listener -> listener.addListener(value ->{
+            if(value){ // only update it when the service is connected to firebase
+                mainscreen.getCurrentUser().setSuccessListener(user ->{
+                    TextView Username_welcome = view.findViewById(R.id.username_welcome);
+                    Username_welcome.setText(user.getName());
+                });
+            }
+        }));
+
 
          // setup the scoreboard fragment
 //        scoreboardFragment = new ScoreboardFragment();

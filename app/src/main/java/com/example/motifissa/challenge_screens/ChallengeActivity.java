@@ -41,6 +41,7 @@ public class ChallengeActivity extends ServiceListener {
         -5 choose location
         -6 countdown/challengeScreen
      */
+    // TODO add friends in choose friends ding iets
 
     private static final String TAG = "ChallengeActivity";
     public static final String START_FRAGMENT = "START_FRAGMENT";
@@ -54,6 +55,7 @@ public class ChallengeActivity extends ServiceListener {
     ChallengeSentFragment challengeSentFragment;
     ChallengeLoadingFragment challengeLoadingFragment;
     Challenge_MapsFragment challengeMapsFragment;
+    Challenge_ChallengesFragment challengesFragment;
 
     // the actual challenge:
     ChallengeStatus challengeStatus;
@@ -83,6 +85,7 @@ public class ChallengeActivity extends ServiceListener {
             challengeSentFragment = new ChallengeSentFragment();
             challengeLoadingFragment = new ChallengeLoadingFragment();
             challengeMapsFragment = new Challenge_MapsFragment();
+            challengesFragment = new Challenge_ChallengesFragment();
 
 
             // This callback will change what happens when the user clicks back
@@ -147,7 +150,7 @@ public class ChallengeActivity extends ServiceListener {
         }
     }
 
-    private LocationListener locationListener = location -> {
+    private final LocationListener locationListener = location -> {
         if (currentFragment == 5){
             ChallengeStatus.Position newPos = new ChallengeStatus.Position(location.getLatitude(), location.getLongitude());
             // if run on an emulator change it's position:
@@ -159,8 +162,8 @@ public class ChallengeActivity extends ServiceListener {
             setOwnPos(newPos);
         }
         else{
-            // TODO stop location
-//            locationManager.removeUpdates();
+            // stop gps
+            locationManager.removeUpdates(this.locationListener);
         }
         Log.d(TAG, "got location: " + location.getLatitude() + "," + location.getLongitude());
     };
@@ -183,6 +186,9 @@ public class ChallengeActivity extends ServiceListener {
                 break;
             case 5:
                 selectedFragment = challengeMapsFragment;
+                break;
+            case 6:
+                selectedFragment = challengesFragment;
                 break;
 
             default:

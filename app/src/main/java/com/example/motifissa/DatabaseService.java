@@ -37,6 +37,7 @@ public class DatabaseService extends Service {
     // Firebase
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReferenceUsers;
+    private DatabaseReference databaseReferenceChallenges;
     private FirebaseUser currentUser;
 
     // Data
@@ -49,7 +50,7 @@ public class DatabaseService extends Service {
     ListenerVariable<Boolean> updateListener = new ListenerVariable<>(false);
     ListenerVariable<Notification> notificationListener = new ListenerVariable<>();
 
-    // ***!!! IMPORTANT PRESS CTRL SHIFT -. this minimalize everything, making it more readable
+    // ***!!! IMPORTANT PRESS CTRL SHIFT -. this minimize everything, making it more readable
 
     // ------------ Setup functions ------------
     @Override
@@ -57,6 +58,7 @@ public class DatabaseService extends Service {
         // firebase setup
         FirebaseDatabase database = FirebaseDatabase.getInstance(getResources().getString(R.string.databaseURL));
         databaseReferenceUsers = database.getReference(getResources().getString(R.string.DatabaseUsersRoot));
+        databaseReferenceChallenges = database.getReference(getString(R.string.DatabaseChallengesRoot));
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -296,12 +298,15 @@ public class DatabaseService extends Service {
 
     // challenges
     public Query getOpponentsChallengeQuery(String UID){
-        return databaseReferenceUsers.child(UID).child(challengeStatusStr);
+//        return databaseReferenceUsers.child(UID).child(challengeStatusStr);
+        return databaseReferenceChallenges.child(UID);
     }
     public Task<Void> changeChallengeStatus(ChallengeStatus challengeStatus){
-        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).setValue(challengeStatus);
+//        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).setValue(challengeStatus);
+        return databaseReferenceChallenges.child(getCurrentFirebaseUser().getUid()).setValue(challengeStatus);
     }
     public Task<Void> removeChallengeStatus(){
-        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).removeValue();
+//        return databaseReferenceUsers.child(getCurrentFirebaseUser().getUid()).child(challengeStatusStr).removeValue();
+        return databaseReferenceChallenges.child(getCurrentFirebaseUser().getUid()).removeValue();
     }
 }
