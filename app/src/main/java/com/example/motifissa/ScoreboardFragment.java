@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.example.motifissa.HelperClasses.ListenerVariable;
 import com.example.motifissa.HelperClasses.ScoreboardListAdapter;
 import com.example.motifissa.HelperClasses.ServiceListener;
 import com.example.motifissa.HelperClasses.User;
@@ -25,7 +26,12 @@ import java.util.ArrayList;
 public class ScoreboardFragment extends Fragment {
     private static final String TAG = "ScoreboardFragment";
 
+    // communication with service/database
     ServiceListener serviceListener;
+    ListenerVariable<Boolean> updateListener;
+
+    ListView scoreboardList;
+
     private ArrayList<User> friends;
     private ScoreboardListAdapter arrayAdaptor;
 
@@ -64,45 +70,40 @@ public class ScoreboardFragment extends Fragment {
 
     public void populateList(View view) {
         // setup the list view for the users
-        ListView scoreboardList = view.findViewById(R.id.scoreboard_listview);
+        scoreboardList = view.findViewById(R.id.scoreboard_listview);
 
-        serviceListener.getFriends().setSuccessListener(friendsIn -> {
-            serviceListener.getCurrentUser().setSuccessListener(currentUser -> {
-                friends = new ArrayList<>(friendsIn);
-                if (currentUser != null)
-                    friends.add(currentUser);
-                else
-                    Log.e(TAG, "current User is null");
-                if (friends != null && getActivity() != null) {
-                    arrayAdaptor = new ScoreboardListAdapter(getActivity(), friends);
-                    scoreboardList.setAdapter(arrayAdaptor);
-                }
-
-                // automatically update when a user was changed
-                serviceListener.getUpdateListener().setSuccessListener(updateListener -> updateListener.addListener(value -> {
-                    if (value) {
-                        serviceListener.getFriends().setSuccessListener(updatedFriends -> {
-                            serviceListener.getCurrentUser().setSuccessListener(updatedCurrentUser -> {
-                                friends = new ArrayList<>(updatedFriends);
-                                if (currentUser != null)
-                                    friends.add(currentUser);
-                                else
-                                    Log.e(TAG, "current User is null");
-
-                                if (arrayAdaptor == null){
-                                    if (friends != null && getActivity() != null)
-                                    arrayAdaptor = new ScoreboardListAdapter(getActivity(), friends);
-                                    scoreboardList.setAdapter(arrayAdaptor);
-                                } else {
-                                    if (friends != arrayAdaptor.getCurrentUsers()) {
-                                        arrayAdaptor.changeUsers(friends);
-                                    }
-                                }
-                            });
-                        });
-                    }
-                }));
-            });
+        serviceListener.getUpdateListener().setSuccessListener(updateListenerIn -> {
+            updateListener = updateListenerIn;
+            updateListener.addListener(changeListener);
         });
     }
+
+    private ListenerVariable.ChangeListener<Boolean> changeListener = value -> {
+        if (value) {
+            friends = serviceListener.getFriendsDirect();
+            User currentUser = serviceListener.getCurrentUserDirect();
+
+            if (currentUser != null)
+                friends.add(currentUser);
+            else
+                Log.e(TAG, "current User is null");
+
+            if (getActivity() == null) {
+                Log.e(TAG, "No Activity active");
+                return;
+            } else if (friends == null) {
+                Log.e(TAG, "friends was null in changeListener");
+                return;
+            }
+
+            // if the arrayAdaptor wasn't made yet make it
+            if (arrayAdaptor == null) {
+                arrayAdaptor = new ScoreboardListAdapter(getActivity(), friends);
+                scoreboardList.setAdapter(arrayAdaptor);
+            } else if (friends != arrayAdaptor.getCurrentUsers()) { // otherwise just update it
+                arrayAdaptor.changeUsers(friends);
+            }
+
+        }
+    };
 }

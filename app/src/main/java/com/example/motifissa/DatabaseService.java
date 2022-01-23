@@ -72,7 +72,7 @@ public class DatabaseService extends Service {
         // set the user to online
         databaseReferenceUsers.child(currentUser.getUid()).child("online").setValue(true);
 
-         setup();
+        setup();
         return START_STICKY;
     }
 
@@ -235,9 +235,6 @@ public class DatabaseService extends Service {
             currentUser = mAuth.getCurrentUser();
         }
         return currentUser;
-    }
-    public User getCurrentUserData() {
-        return currentUserData;
     }
 
 

@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class ServiceListener extends AppCompatActivity {
@@ -115,10 +116,6 @@ public class ServiceListener extends AppCompatActivity {
     public ListenerTask<User> getUser(String UID) {
         return new ListenerTask<>(this, () -> mDatabaseService.getUser(UID));
     }
-
-    public ListenerTask<ListenerVariable<Boolean>> getUpdateListener() {
-        return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
-    }
     public ListenerTask<Query> getUsersQuery(){
         return new ListenerTask<>(this, () -> mDatabaseService.getUsersQuery());
     }
@@ -132,11 +129,9 @@ public class ServiceListener extends AppCompatActivity {
     public ListenerTask<ArrayList<User>> getFriends() {
         return new ListenerTask<>(this, () -> mDatabaseService.getFriendsData());
     }
-
     public ListenerTask<Query> getCurrentUserFriendsQuery() {
         return new ListenerTask<>(this, () -> mDatabaseService.getCurrentUserFriendsQuery());
     }
-
     public ListenerTask<ArrayList<String>> getFriendsNames() {
         return new ListenerTask<>(this, () -> mDatabaseService.getFriendsNameArray());
     }
@@ -147,13 +142,10 @@ public class ServiceListener extends AppCompatActivity {
         return new ListenerTask<>(this, () -> mDatabaseService.toggleFriend(UID));
     }
 
-
-
     // Notifications:
     public ListenerTask<Query> getNotifications() {
         return new ListenerTask<>(this, () -> mDatabaseService.getNotifications());
     }
-
     public ListenerTask<Task<Void>> sendNotification(String msg, String toUID) {
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
@@ -161,11 +153,9 @@ public class ServiceListener extends AppCompatActivity {
 
         return new ListenerTask<>(this, () -> mDatabaseService.sendNotification(msg, toUID, formattedDate));
     }
-
     public ListenerTask<Task<Void>> removeNotification(Notification notification) {
         return new ListenerTask<>(this, () -> mDatabaseService.removeNotification(notification));
     }
-
     public ListenerTask<ListenerVariable<Notification>> getNotificationListener() {
         return new ListenerTask<>(this, () -> mDatabaseService.getNotificationListener());
     }
@@ -174,11 +164,9 @@ public class ServiceListener extends AppCompatActivity {
     public ListenerTask<Query> getOpponentsChallengeQuery(String UID) {
         return new ListenerTask<>(this, () -> mDatabaseService.getOpponentsChallengeQuery(UID));
     }
-
     public ListenerTask<Task<Void>> changeChallengeStatus(ChallengeStatus challengeStatus) {
         return new ListenerTask<>(this, () -> mDatabaseService.changeChallengeStatus(challengeStatus));
     }
-
     public ListenerTask<Task<Void>> removeChallengeStatus() {
         return new ListenerTask<>(this, () -> mDatabaseService.removeChallengeStatus());
     }
@@ -187,11 +175,27 @@ public class ServiceListener extends AppCompatActivity {
     public ListenerTask<Boolean> isBounded() {
         return new ListenerTask<>(this, () -> mBounded.get());
     }
+    public ListenerTask<ListenerVariable<Boolean>> getUpdateListener() {
+        return new ListenerTask<>(this, () -> mDatabaseService.getUpdateListener());
+    }
 
     // ----------- Direct service functions  -----------
-    // DON't USE THESE AS THEY COULD TROW A NULLPOINTER ERROR because the connection isn't checked
+
+    // only use these direct functions in a successListener of isBounded or getUpdateListener
     public User getUserDirect(String UID) {
         return mDatabaseService.getUser(UID);
+    }
+    public ArrayList<User> getUsersDirect(){
+        return mDatabaseService.getUsersArray();
+    }
+    public HashMap<String, User> getUsersHashMapDirect(){
+        return mDatabaseService.getUsers();
+    }
+    public ArrayList<User> getFriendsDirect(){
+        return mDatabaseService.getFriendsData();
+    }
+    public User getCurrentUserDirect(){
+        return mDatabaseService.getCurrentUser();
     }
 
     protected void acceptChallenge(Notification notification) {
