@@ -147,4 +147,5 @@
     <string name="action_arrived_temp">Arrived</string>
     <string name="friends">Friends</string>
     <string name="DatabaseChallengesRoot">Challenges</string>
+    <string name="add_friend_desc">Add friend</string>
 </resources>
