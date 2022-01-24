@@ -32,7 +32,6 @@ public class ScoreboardFragment extends Fragment {
 
     ListView scoreboardList;
 
-    private ArrayList<User> friends;
     private ScoreboardListAdapter arrayAdaptor;
 
     public ScoreboardFragment() {
@@ -72,17 +71,21 @@ public class ScoreboardFragment extends Fragment {
         // setup the list view for the users
         scoreboardList = view.findViewById(R.id.scoreboard_listview);
 
+        // add a change listener so the scoreboard data is loaded and updated when the data is available
         serviceListener.getUpdateListener().setSuccessListener(updateListenerIn -> {
             updateListener = updateListenerIn;
             updateListener.addListener(changeListener);
         });
     }
 
-    private ListenerVariable.ChangeListener<Boolean> changeListener = value -> {
-        if (value) {
-            friends = serviceListener.getFriendsDirect();
+    private final ListenerVariable.ChangeListener<Boolean> changeListener = value -> {
+        // an change listener is called when it's attached and when the value changes so it's important to check it it has the value we want
+        if (value) { // so this is a boolean if it has been updated, which should be TRUE
+            // get the data we want:
+            ArrayList<User> friends = serviceListener.getFriendsDirect();
             User currentUser = serviceListener.getCurrentUserDirect();
 
+            // check if the data is valid
             if (currentUser != null)
                 friends.add(currentUser);
             else
