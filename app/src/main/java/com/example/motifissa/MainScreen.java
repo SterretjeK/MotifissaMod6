@@ -1,35 +1,19 @@
  package com.example.motifissa;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
-import android.content.ComponentName;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
-import android.view.MenuItem;
 import android.content.Intent;
-import android.widget.Toast;
 
-import com.example.motifissa.HelperClasses.ListenerTask;
 import com.example.motifissa.HelperClasses.ListenerVariable;
 import com.example.motifissa.HelperClasses.ServiceListener;
-import com.example.motifissa.HelperClasses.User;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.Query;
 
-import java.util.ArrayList;
-
-public class MainScreen extends ServiceListener {
+ public class MainScreen extends ServiceListener {
 
     // fragments
     DashboardFragment dashboardFragment;
-    FriendsFragment friendsFragment;
+    AddFriendsFragment addFriendsFragment;
 
     // elements
     BottomNavigationView bottomNav;
@@ -61,7 +45,7 @@ public class MainScreen extends ServiceListener {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, dashboardFragment).commit();
 
         // setup the friends fragment
-        friendsFragment = new FriendsFragment();
+        addFriendsFragment = new AddFriendsFragment();
 
         // setup the bottom navigation
 //        bottomNav = findViewById(R.id.bottom_navigation);

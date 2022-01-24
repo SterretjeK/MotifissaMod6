@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class ScoreboardListAdapter extends ArrayAdapter<User> implements Filterable {
-    private static final int SCOREBOARD_AMOUNT = 6;
+    private static final int SCOREBOARD_AMOUNT = 4;
     private ArrayList<User> users;
     private ArrayList<User> originalUsers;
     private final Activity context;

@@ -49,4 +49,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/C_search_friends" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_friends_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/C_friends_list"
+        app:layout_constraintEnd_toEndOf="@id/C_friends_list"
+        android:src="@drawable/ic_add"
+        android:backgroundTint="?attr/colorPrimary"
+        app:borderWidth="0dp"
+        android:contentDescription="@string/add_friend_desc" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

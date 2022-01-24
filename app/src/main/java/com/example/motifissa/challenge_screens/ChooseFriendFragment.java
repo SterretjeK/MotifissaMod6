@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.example.motifissa.HelperClasses.UsersArrayAdaptor;
 import com.example.motifissa.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -58,6 +59,9 @@ public class ChooseFriendFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_challenge_choose_friend, container, false);
+
+        FloatingActionButton addFriendsButton = view.findViewById(R.id.add_friends_button);
+        addFriendsButton.setOnClickListener(v -> challengeActivity.showAddFriendsFragment());
 
         populateList(view);
 

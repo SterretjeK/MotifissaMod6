@@ -197,6 +197,9 @@ public class ServiceListener extends AppCompatActivity {
     public User getCurrentUserDirect(){
         return mDatabaseService.getCurrentUser();
     }
+    public ArrayList<String> getFriendsUIDDirect(){
+        return mDatabaseService.getFriendsUIDArray();
+    }
 
     protected void acceptChallenge(Notification notification) {
         Intent challengeIntent = new Intent(getApplicationContext(), ChallengeActivity.class);

@@ -87,6 +87,10 @@ public class FriendsListAdaptor extends ArrayAdapter<User> implements Filterable
         this.friends = friends;
         notifyDataSetChanged();
     }
+    public void changeUsers(ArrayList<User> users) {
+        this.users = users;
+        notifyDataSetChanged();
+    }
 
     Filter myFilter = new Filter() {
         @Override

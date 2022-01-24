@@ -79,10 +79,10 @@ public class ScoreboardFragment extends Fragment {
     }
 
     private final ListenerVariable.ChangeListener<Boolean> changeListener = value -> {
-        // an change listener is called when it's attached and when the value changes so it's important to check it it has the value we want
+        // a change listener is called when it's attached and when the value changes so it's important to check it it has the value we want
         if (value) { // so this is a boolean if it has been updated, which should be TRUE
             // get the data we want:
-            ArrayList<User> friends = serviceListener.getFriendsDirect();
+            ArrayList<User> friends = new ArrayList<>(serviceListener.getFriendsDirect());
             User currentUser = serviceListener.getCurrentUserDirect();
 
             // check if the data is valid
@@ -93,9 +93,6 @@ public class ScoreboardFragment extends Fragment {
 
             if (getActivity() == null) {
                 Log.e(TAG, "No Activity active");
-                return;
-            } else if (friends == null) {
-                Log.e(TAG, "friends was null in changeListener");
                 return;
             }
 

@@ -18,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.motifissa.AddFriendsFragment;
 import com.example.motifissa.HelperClasses.ChallengeStatus;
 import com.example.motifissa.HelperClasses.ListenerTask;
 import com.example.motifissa.HelperClasses.Notification;
@@ -33,6 +34,7 @@ import java.util.Random;
 public class ChallengeActivity extends ServiceListener {
     /*
     Screens
+        - -1 add Friend
         -1 Choose Friend
         -2 Overview Friend
         -3 Sent
@@ -50,6 +52,7 @@ public class ChallengeActivity extends ServiceListener {
 
     // fragments
     int currentFragment = 1;
+    AddFriendsFragment addFriendsFragment;
     ChooseFriendFragment chooseFriendFragment;
     OverviewChallengeFragment overviewChallengeFragment;
     ChallengeSentFragment challengeSentFragment;
@@ -80,6 +83,7 @@ public class ChallengeActivity extends ServiceListener {
 
         // wait until the service is bounded
         isBounded().setSuccessListener(bounded -> {
+            addFriendsFragment = new AddFriendsFragment();
             chooseFriendFragment = new ChooseFriendFragment();
             overviewChallengeFragment = new OverviewChallengeFragment();
             challengeSentFragment = new ChallengeSentFragment();
@@ -172,6 +176,9 @@ public class ChallengeActivity extends ServiceListener {
         Fragment selectedFragment;
 
         switch (changeToFragment) {
+            case -1:
+                selectedFragment = addFriendsFragment;
+                break;
             case 1:
                 selectedFragment = chooseFriendFragment;
                 break;
@@ -222,18 +229,30 @@ public class ChallengeActivity extends ServiceListener {
         this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
-    public void moveBackFragment() {
-        if (currentFragment > 1)
-            changeFragment(currentFragment - 1);
-        else
-            finish();
+    public void moveBackFragment(int amount) {
+        if (currentFragment == -1) {
+            changeFragment(1);
+        } else if (currentFragment - amount > 0 && currentFragment < 4)
+            changeFragment(currentFragment - amount);
+        else if (currentFragment > 4)
+            cancelChallenge();
+        else finish();
     }
 
-    public void moveBackFragment(int amount) {
-        if (currentFragment - amount > 0)
-            changeFragment(currentFragment - amount);
-        else
-            finish();
+    public void onBackPress() {
+        moveBackFragment(1);
+    }
+
+    public void showAddFriendsFragment(){
+        changeFragment(-1);
+        // This callback will change what happens when the user clicks back
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                onBackPress();
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     public ListenerTask<Task<Void>> challengeFriend() {
@@ -342,14 +361,6 @@ public class ChallengeActivity extends ServiceListener {
                     Toast.makeText(this, "Couldn't cancel challenge", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Couldn't cancel challenge error: " + error);
                 }));
-    }
-
-    public void onBackPress() {
-        if (currentFragment > 1 && currentFragment < 4)
-            changeFragment(currentFragment - 1);
-        else if (currentFragment > 4)
-            cancelChallenge();
-        else finish();
     }
 
     public enum ChallengeFragmentState {
